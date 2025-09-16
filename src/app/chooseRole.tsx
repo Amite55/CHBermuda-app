@@ -5,6 +5,7 @@ import {
 } from "@/assets/icons";
 import { ImgChooseRoleBG, ImgChooseRoleBottomBG } from "@/assets/image";
 import { Image, ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
@@ -38,7 +39,8 @@ const ChooseRole = () => {
             delayPressIn={0}
             delayPressOut={0}
             delayLongPress={1000}
-            style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white`}
+            onPress={() => router.push("/auth/singIn")}
+            style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
           >
             <View style={tw`flex-row items-center gap-3`}>
               <SvgXml xml={IconUser} />
@@ -54,7 +56,7 @@ const ChooseRole = () => {
             delayPressIn={0}
             delayPressOut={0}
             delayLongPress={1000}
-            style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white`}
+            style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
           >
             <View style={tw`flex-row items-center gap-3`}>
               <SvgXml xml={IconProvider} />
