@@ -12,6 +12,9 @@ const _layout = () => {
     >
       <Stack.Screen name="singIn" />
       <Stack.Screen name="singUp" />
+      <Stack.Screen name="forgotPassword" />
+      <Stack.Screen name="enterOTP" />
+      <Stack.Screen name="resetPassword" />
     </Stack>
   );
 };
