@@ -8,6 +8,7 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
+import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import tw from "@/src/lib/tailwind";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
@@ -31,6 +32,7 @@ import * as Yup from "yup";
 const SingIn = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
+  const role = useRoleHooks();
 
   // ==================== Validation Schema ====================
   const LoginSchema = Yup.object().shape({
@@ -166,6 +168,11 @@ const SingIn = () => {
                   <PrimaryButton
                     buttonContainerStyle={tw`mb-5`}
                     buttonText="Sign In"
+                    onPress={() =>
+                      role === "user"
+                        ? router.push("/user_role_sections/user_tabs/user_home")
+                        : router.push("/user_role_sections/user_tabs/user_home")
+                    }
                   />
 
                   <View style={tw`flex-row items-center justify-center gap-4`}>

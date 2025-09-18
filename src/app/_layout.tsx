@@ -7,7 +7,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F2F5FF" }}>
           <StatusBar />
           <Stack
             screenOptions={{
@@ -19,6 +19,7 @@ export default function RootLayout() {
           >
             <Stack.Screen name="index" />
             <Stack.Screen name="chooseRole" />
+            <Stack.Screen name="user_role_sections" />
           </Stack>
         </SafeAreaView>
       </SafeAreaProvider>

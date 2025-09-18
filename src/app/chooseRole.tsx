@@ -4,6 +4,7 @@ import {
   IconUser,
 } from "@/assets/icons";
 import { ImgChooseRoleBG, ImgChooseRoleBottomBG } from "@/assets/image";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
@@ -11,6 +12,11 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import tw from "../lib/tailwind";
 const ChooseRole = () => {
+  const handleSetRole = async (role: string) => {
+    router.replace(`/auth/singIn`);
+    await AsyncStorage.setItem("role", JSON.stringify(role));
+  };
+
   return (
     <ScrollView style={tw`flex-1 bg-bgBaseColor`}>
       <Image style={tw`w-full h-80`} source={ImgChooseRoleBG} />
@@ -39,7 +45,9 @@ const ChooseRole = () => {
             delayPressIn={0}
             delayPressOut={0}
             delayLongPress={1000}
-            onPress={() => router.push("/auth/singIn")}
+            onPress={() => {
+              handleSetRole("user");
+            }}
             style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
           >
             <View style={tw`flex-row items-center gap-3`}>
