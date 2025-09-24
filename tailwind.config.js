@@ -26,6 +26,7 @@ module.exports = {
         regularText: "#111111",
         bgBaseColor: "#F2F5FF",
         borderColor: "#11111129",
+        subText: "#535353",
       },
     },
   },
