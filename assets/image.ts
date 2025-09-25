@@ -12,3 +12,5 @@ export const ImgCategoryNurse = require("@/assets/images/categoryNurse.png");
 export const ImgCategoryPhysiotherapy = require("@/assets/images/categoryPhysiotherapy.png");
 export const ImgCategoryTransports = require("@/assets/images/categoryTransports.png");
 export const ImgExploreBanner = require("@/assets/images/exploreBanner.jpg");
+export const ImgProfileImg = require("@/assets/images/profileImg.jpg");
+export const ImgNoOrder = require("@/assets/images/noOrder.png");

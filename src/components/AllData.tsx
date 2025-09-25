@@ -145,7 +145,3 @@ export const ServicesData = [
     ],
   },
 ];
-
-// export const OrderData = [
-
-// ]

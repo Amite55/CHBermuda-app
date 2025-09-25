@@ -11,6 +11,8 @@ const _layout = () => {
       }}
     >
       <Stack.Screen name="user_tabs" />
+      <Stack.Screen name="cart" />
+      <Stack.Screen name="paymentSystem" />
     </Stack>
   );
 };
