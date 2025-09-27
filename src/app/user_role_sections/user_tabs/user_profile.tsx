@@ -7,6 +7,7 @@ import {
   IconLogout,
   IconPrivacyPolicy,
   IconRightCornerArrowGreen,
+  IconRightTopConnerArrow,
   IconSubscriptionPlan,
   IconSupport,
 } from "@/assets/icons";
@@ -65,6 +66,7 @@ const User_Profile = () => {
             subTitleText="Change your account password."
             subTitleStyle={tw`text-xs`}
             icon={IconLock}
+            endIcon={IconRightTopConnerArrow}
           />
 
           <MenuCard
@@ -73,6 +75,7 @@ const User_Profile = () => {
             subTitleText="About application and platform."
             subTitleStyle={tw`text-xs`}
             icon={IconAboutUs}
+            endIcon={IconRightTopConnerArrow}
           />
 
           <MenuCard
@@ -81,6 +84,7 @@ const User_Profile = () => {
             subTitleText="Read it carefully before accepting. "
             subTitleStyle={tw`text-xs`}
             icon={IconPrivacyPolicy}
+            endIcon={IconRightTopConnerArrow}
           />
           <MenuCard
             onPress={() => {}}
@@ -88,6 +92,7 @@ const User_Profile = () => {
             subTitleText="Purchase plans to get more features."
             subTitleStyle={tw`text-xs`}
             icon={IconSubscriptionPlan}
+            endIcon={IconRightTopConnerArrow}
           />
           <MenuCard
             onPress={() => {}}
@@ -95,6 +100,7 @@ const User_Profile = () => {
             subTitleText="Contact with admin for any kind of emergency support. "
             subTitleStyle={tw`text-xs`}
             icon={IconSupport}
+            endIcon={IconRightTopConnerArrow}
           />
           <MenuCard
             onPress={() => {}}
@@ -102,6 +108,7 @@ const User_Profile = () => {
             subTitleText="Your account will be permanently deleted from this application. "
             subTitleStyle={tw`text-xs`}
             icon={IconDeleteRed}
+            endIcon={IconRightTopConnerArrow}
           />
           <MenuCard
             onPress={() => {}}

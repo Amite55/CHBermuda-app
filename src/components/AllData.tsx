@@ -1,3 +1,4 @@
+import { IconUserNotification } from "@/assets/icons";
 import {
   ImgCategoryCareGivers,
   ImgCategoryCleaners,
@@ -143,5 +144,40 @@ export const ServicesData = [
       "Installation of safety equipment.",
       "Detailed safety recommendations.",
     ],
+  },
+];
+
+export const NotificationData = [
+  {
+    id: 1,
+    title: "Your order has been placed.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "pending",
+  },
+  {
+    id: 2,
+    title: "Booking request approved.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "approved",
+  },
+  {
+    id: 3,
+    title: "Booking request canceled.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "canceled",
+  },
+  {
+    id: 4,
+    title: "Requested for delivery.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "delivered",
   },
 ];

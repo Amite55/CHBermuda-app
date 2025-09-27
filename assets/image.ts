@@ -14,3 +14,4 @@ export const ImgCategoryTransports = require("@/assets/images/categoryTransports
 export const ImgExploreBanner = require("@/assets/images/exploreBanner.jpg");
 export const ImgProfileImg = require("@/assets/images/profileImg.jpg");
 export const ImgNoOrder = require("@/assets/images/noOrder.png");
+export const ImgService = require("@/assets/images/service.jpg");

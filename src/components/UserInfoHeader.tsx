@@ -49,6 +49,9 @@ const UserInfoHeader = ({ containerStyle = "" }: any) => {
           <SvgXml xml={IconShoppingCart} />
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            router.push("/user_role_sections/notificationsUser/notifications");
+          }}
           activeOpacity={0.7}
           style={tw`h-12 w-12 rounded-full bg-white items-center justify-center`}
         >

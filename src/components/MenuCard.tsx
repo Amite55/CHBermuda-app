@@ -1,4 +1,3 @@
-import { IconRightTopConnerArrow } from "@/assets/icons";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -29,7 +28,7 @@ const MenuCard = ({
   imageStyle = "",
   titleTextStyle = "",
   subTitleStyle = "",
-  endIcon = IconRightTopConnerArrow,
+  endIcon = "",
   endIconOnPress,
 }: Props) => {
   return (
@@ -80,13 +79,15 @@ const MenuCard = ({
           </Text>
         </View>
       </View>
-      <TouchableOpacity
-        activeOpacity={0.6}
-        onPress={endIconOnPress}
-        disabled={!endIconOnPress}
-      >
-        <SvgXml xml={endIcon} />
-      </TouchableOpacity>
+      {endIcon ? (
+        <TouchableOpacity
+          activeOpacity={0.6}
+          onPress={endIconOnPress}
+          disabled={!endIconOnPress}
+        >
+          <SvgXml xml={endIcon} />
+        </TouchableOpacity>
+      ) : null}
     </TouchableOpacity>
   );
 };
