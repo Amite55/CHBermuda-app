@@ -3,13 +3,14 @@ import {
   ImgBennerBG,
   ImgBennerImage,
   ImgExploreBanner,
-  ImgUserBG,
+  ImgG,
 } from "@/assets/image";
 import { CategoryData, ServicesData } from "@/src/components/AllData";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import {
   FlatList,
@@ -26,7 +27,7 @@ const User_home = () => {
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw`pb-56`}
     >
-      <ImageBackground style={tw`relative w-full h-1/5`} source={ImgUserBG}>
+      <ImageBackground style={tw`relative w-full h-1/5 `} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
         <UserInfoHeader containerStyle={tw`px-5`} />
       </ImageBackground>
@@ -48,6 +49,9 @@ const User_home = () => {
               Get a plan and enjoy unlimited {"\n"} caring services.
             </Text>
             <TouchableOpacity
+              onPress={() => {
+                router.push("/user_role_sections/user_tabs/explore");
+              }}
               activeOpacity={0.9}
               style={tw`w-32 h-8 mt-2 bg-primaryBtn rounded-lg justify-center items-center`}
             >

@@ -1,5 +1,5 @@
 import { IconCartWhite } from "@/assets/icons";
-import { ImgUserBG } from "@/assets/image";
+import { ImgG } from "@/assets/image";
 import { CategoryData, ServicesData } from "@/src/components/AllData";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
@@ -11,7 +11,7 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 const Explore = () => {
   const RenderHeader = () => {
     return (
-      <ImageBackground style={[tw` w-full h-36 `]} source={ImgUserBG}>
+      <ImageBackground style={[tw` w-full h-36 `]} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
         <UserInfoHeader containerStyle={tw`px-5`} />
         <Text

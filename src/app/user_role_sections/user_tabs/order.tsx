@@ -1,5 +1,5 @@
 import { IconRatingStar } from "@/assets/icons";
-import { ImgBennerImage, ImgNoOrder, ImgUserBG } from "@/assets/image";
+import { ImgBennerImage, ImgG, ImgNoOrder } from "@/assets/image";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
@@ -18,7 +18,7 @@ const Order = () => {
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw`pb-20`}
     >
-      <ImageBackground style={[tw` w-full h-36 `]} source={ImgUserBG}>
+      <ImageBackground style={[tw` w-full h-36 `]} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
         <UserInfoHeader containerStyle={tw`px-5`} />
         <Text

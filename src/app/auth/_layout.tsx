@@ -15,6 +15,7 @@ const _layout = () => {
       <Stack.Screen name="forgotPassword" />
       <Stack.Screen name="enterOTP" />
       <Stack.Screen name="resetPassword" />
+      <Stack.Screen name="changePassward" />
     </Stack>
   );
 };

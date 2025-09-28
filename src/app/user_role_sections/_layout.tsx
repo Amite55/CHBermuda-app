@@ -14,6 +14,8 @@ const _layout = () => {
       <Stack.Screen name="cart" />
       <Stack.Screen name="paymentSystem" />
       <Stack.Screen name="notificationsUser" />
+      <Stack.Screen name="boutAboutUs" />
+      <Stack.Screen name="boutPrivacyPolicy" />
     </Stack>
   );
 };
