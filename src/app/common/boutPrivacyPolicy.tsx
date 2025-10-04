@@ -1,12 +1,12 @@
-import { ImgAbout } from "@/assets/image";
+import { ImgPrivacyPolicy } from "@/assets/image";
+import BackTitleButton from "@/src/lib/BackTitleButton";
+import tw from "@/src/lib/tailwind";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text } from "react-native";
-import BackTitleButton from "../lib/BackTitleButton";
-import tw from "../lib/tailwind";
 
-const BoutAboutUs = () => {
+const BoutPrivacyPolicy = () => {
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -14,12 +14,12 @@ const BoutAboutUs = () => {
       style={tw`flex-1 bg-bgBaseColor `}
       contentContainerStyle={tw`pb-5 px-5`}
     >
-      <BackTitleButton title={"About Us"} onPress={() => router.back()} />
+      <BackTitleButton title={"Privacy policy"} onPress={() => router.back()} />
 
       <Image
         contentFit="contain"
         style={tw`w-full h-48 my-4`}
-        source={ImgAbout}
+        source={ImgPrivacyPolicy}
       />
 
       <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
@@ -38,4 +38,4 @@ const BoutAboutUs = () => {
   );
 };
 
-export default BoutAboutUs;
+export default BoutPrivacyPolicy;

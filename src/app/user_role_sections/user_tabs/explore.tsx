@@ -5,6 +5,7 @@ import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
@@ -135,7 +136,22 @@ const Explore = () => {
       ListFooterComponent={RenderFooter}
       renderItem={(items) => {
         return (
-          <TouchableOpacity activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={() => {
+              items.item.provider === "Admin"
+                ? router.push({
+                    pathname:
+                      "/user_role_sections/categoryPlaning/adminProviderService",
+                    params: { category: items.item.name },
+                  })
+                : router.push({
+                    pathname:
+                      "/user_role_sections/categoryPlaning/serviceProviderService",
+                    params: { category: items.item.name },
+                  });
+            }}
+            activeOpacity={0.7}
+          >
             <View
               style={tw`bg-white h-20 w-20 rounded-full items-center justify-center`}
             >

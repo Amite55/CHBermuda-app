@@ -109,6 +109,7 @@ const Order = () => {
                   <Image
                     style={tw`w-16 h-16 rounded-full`}
                     source={ImgBennerImage}
+                    contentFit="contain"
                   />
                   <View>
                     <View style={tw`flex-row items-center gap-2`}>

@@ -59,11 +59,12 @@ const SingIn = () => {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS/Android alada behavior
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <ScrollView
-          contentContainerStyle={tw`flex-1 justify-center  px-5`}
-          style={tw`bg-bgBaseColor`}
+          contentContainerStyle={tw` justify-center px-5`}
+          style={tw`flex-1  bg-bgBaseColor `}
         >
           <View style={tw`w-full items-center  `}>
             <Image style={tw`w-36 h-36  `} source={ImgSplashLogo} />

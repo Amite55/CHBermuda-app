@@ -52,7 +52,7 @@ const User_home = () => {
               onPress={() => {
                 router.push("/user_role_sections/user_tabs/explore");
               }}
-              activeOpacity={0.9}
+              activeOpacity={0.2}
               style={tw`w-32 h-8 mt-2 bg-primaryBtn rounded-lg justify-center items-center`}
             >
               <Text style={tw`font-LufgaRegular text-sm text-white`}>
@@ -82,7 +82,22 @@ const User_home = () => {
             keyExtractor={(item) => item.id.toString()}
             renderItem={(items) => {
               return (
-                <TouchableOpacity activeOpacity={0.9}>
+                <TouchableOpacity
+                  onPress={() => {
+                    items.item.provider === "Admin"
+                      ? router.push({
+                          pathname:
+                            "/user_role_sections/categoryPlaning/adminProviderService",
+                          params: { category: items.item.name },
+                        })
+                      : router.push({
+                          pathname:
+                            "/user_role_sections/categoryPlaning/serviceProviderService",
+                          params: { category: items.item.name },
+                        });
+                  }}
+                  activeOpacity={0.9}
+                >
                   <View
                     style={tw`bg-white h-20 w-20 rounded-full items-center justify-center`}
                   >

@@ -85,7 +85,7 @@ const User_Profile = () => {
 
             <MenuCard
               onPress={() => {
-                router.push("/boutAboutUs");
+                router.push("/common/boutAboutUs");
               }}
               titleText="About us"
               subTitleText="About application and platform."
@@ -96,7 +96,7 @@ const User_Profile = () => {
 
             <MenuCard
               onPress={() => {
-                router.push("/boutPrivacyPolicy");
+                router.push("/common/boutPrivacyPolicy");
               }}
               titleText="Privacy policy"
               subTitleText="Read it carefully before accepting. "

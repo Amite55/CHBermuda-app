@@ -19,3 +19,5 @@ export const ImgG = require("@/assets/images/G.png");
 export const ImgAbout = require("@/assets/images/aboutImg.png");
 export const ImgPrivacyPolicy = require("@/assets/images/privacyPolicay.png");
 export const ImgChangePass = require("@/assets/images/changePass.png");
+export const ImgServiceImage = require("@/assets/images/serviceImage.jpg");
+export const ImgServiceProviderPlan = require("@/assets/images/serviceProviderPlan.jpg");

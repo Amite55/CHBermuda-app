@@ -12,31 +12,37 @@ export const CategoryData = [
     id: 1,
     name: "Care givers",
     image: ImgCategoryCareGivers,
+    provider: "Admin",
   },
   {
     id: 2,
     name: "Cleaners",
     image: ImgCategoryCleaners,
+    provider: "Provider",
   },
   {
     id: 3,
     name: "Transports",
     image: ImgCategoryTransports,
+    provider: "Provider",
   },
   {
     id: 4,
     name: "Meal delivery",
     image: ImgCategoryMealDelivery,
+    provider: "Provider",
   },
   {
     id: 5,
     name: "Physiotherapy",
     image: ImgCategoryMealDelivery,
+    provider: "Admin",
   },
   {
     id: 6,
     name: "Rotating Nurse",
     image: ImgCategoryNurse,
+    provider: "Admin",
   },
 ];
 
