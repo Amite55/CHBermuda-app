@@ -1,11 +1,9 @@
-import { IconRatingStar } from "@/assets/icons";
 import { ImgBennerImage, ImgG, ImgNoOrder } from "@/assets/image";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { SvgXml } from "react-native-svg";
 
 const Order = () => {
   const [orderStatus, setOrderStatus] = React.useState<any>("Pending");
@@ -112,33 +110,21 @@ const Order = () => {
                     contentFit="contain"
                   />
                   <View>
-                    <View style={tw`flex-row items-center gap-2`}>
-                      <Text
-                        style={tw`font-LufgaMedium text-base text-regularText`}
-                      >
-                        Elizabeth Olson
-                      </Text>
-                      <Text
-                        style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-                      >
-                        12 order
-                      </Text>
-                    </View>
+                    <Text
+                      style={tw`font-LufgaMedium text-base text-regularText`}
+                    >
+                      Elizabeth Olson
+                    </Text>
 
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                    <Text style={tw`font-LufgaRegular text-sm text-black`}>
                       Cristal comfort plan
                     </Text>
-                    <View style={tw`flex-row items-center gap-1`}>
-                      <SvgXml xml={IconRatingStar} />
-                      <Text
-                        style={tw`font-LufgaRegular text-sm text-regularText`}
-                      >
-                        4.0
-                      </Text>
-                      <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                        (8 reviews)
-                      </Text>
-                    </View>
+
+                    <Text
+                      style={tw`font-LufgaMedium text-xs text-subText pt-1`}
+                    >
+                      Ordered on: 10-09-2025
+                    </Text>
                   </View>
                 </TouchableOpacity>
               );
