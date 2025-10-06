@@ -20,11 +20,15 @@ import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
@@ -151,53 +155,64 @@ const User_Profile = () => {
           setIsModalVisible(!isModalVisible);
         }}
       >
-        <View
-          style={tw`flex-1 justify-center items-center bg-black bg-opacity-50 px-5`}
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS/Android alada behavior
+          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         >
-          <View style={[tw`bg-white   rounded-2xl p-6 h-88`]}>
-            <View style={tw`flex-row justify-between`}>
-              <View />
-              <TouchableOpacity
-                onPress={() => setIsModalVisible(false)}
-                style={tw`p-3 rounded-full justify-center items-center bg-gray-300 shadow-md`}
-              >
-                <SvgXml xml={IconCrossRed} />
-              </TouchableOpacity>
-            </View>
-            <View style={tw`justify-center items-center mb-4`}>
-              <SvgXml xml={IconDeleteRed} />
-              <Text style={tw`text-center font-LufgaSemiBold  text-lg `}>
-                Are you sure to delete your account ?
-              </Text>
-
-              <Text
-                style={tw`text-center font-LufgaMedium  text-sm text-regularText my-2`}
-              >
-                For deleting please enter your password
-              </Text>
-            </View>
-
-            <View style={tw`my-5`}>
-              <TextInput
-                placeholder="Password"
-                style={tw`w-full border rounded-lg h-11 bg-bgBaseColor px-2`}
-                // onChangeText={(i) => serUserPass(i)}
-              />
-            </View>
-
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setIsModalVisible(false)}
-              style={tw` rounded-full bg-red-500`}
+          <TouchableWithoutFeedback
+            onPress={Keyboard.dismiss}
+            accessible={false}
+          >
+            <View
+              style={tw`flex-1 justify-center items-center bg-black bg-opacity-50 px-5`}
             >
-              <Text
-                style={tw`font-LufgaMedium text-xl text-center p-2 text-white`}
-              >
-                Delete
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+              <View style={[tw`bg-white   rounded-2xl p-6 h-88`]}>
+                <View style={tw`flex-row justify-between`}>
+                  <View />
+                  <TouchableOpacity
+                    onPress={() => setIsModalVisible(false)}
+                    style={tw`p-3 rounded-full justify-center items-center bg-gray-300 shadow-md`}
+                  >
+                    <SvgXml xml={IconCrossRed} />
+                  </TouchableOpacity>
+                </View>
+                <View style={tw`justify-center items-center pb-4 gap-1`}>
+                  <SvgXml width={35} height={35} xml={IconDeleteRed} />
+                  <Text style={tw`text-center font-LufgaSemiBold  text-lg `}>
+                    Are you sure to delete your account ?
+                  </Text>
+
+                  <Text
+                    style={tw`text-center font-LufgaMedium  text-sm text-regularText`}
+                  >
+                    For deleting please enter your password
+                  </Text>
+                </View>
+
+                <View style={tw`mt-6`}>
+                  <TextInput
+                    placeholder="Password"
+                    style={tw`w-full border rounded-lg h-11 bg-bgBaseColor px-2`}
+                    // onChangeText={(i) => serUserPass(i)}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => setIsModalVisible(false)}
+                  style={tw` rounded-full bg-red-500 my-3`}
+                >
+                  <Text
+                    style={tw`font-LufgaMedium text-lg text-center p-2 text-white`}
+                  >
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );

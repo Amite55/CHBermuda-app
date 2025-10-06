@@ -90,13 +90,13 @@ const Provider = () => {
                 </View>
 
                 <PrimaryButton
-                  buttonText="See detailsSee details"
+                  buttonText="See details"
                   buttonTextStyle={tw`font-LufgaRegular text-base`}
                   buttonContainerStyle={tw` h-10  `}
                   rightIcon={IconRightCornerArrowWhite}
                   onPress={() => {
                     router.push(
-                      "/user_role_sections/providers/providerDetailsInfo"
+                      "/user_role_sections/providers/providerDetailsInfoAdmin"
                     );
                   }}
                 />

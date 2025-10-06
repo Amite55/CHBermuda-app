@@ -71,7 +71,7 @@ const ConfirmDetailsAdminOrders = () => {
               Cristal comfort plan
             </Text>
 
-            <View style={tw`flex-row gap-2 mt-1`}>
+            <View style={tw`flex-row items-center gap-2 mt-1`}>
               <Text style={tw`font-LufgaMedium text-xs text-subText pt-1`}>
                 Used: 1
               </Text>
@@ -209,7 +209,9 @@ const ConfirmDetailsAdminOrders = () => {
             <Text style={tw`font-LufgaBold text-xl text-[#172B4D]`}>
               Order placed
             </Text>
-            <Text style={tw`text-center font-regular  text-sm text-black my-2`}>
+            <Text
+              style={tw`text-center font-LufgaRegular  text-sm text-black my-2`}
+            >
               Your order has been placed. Please be patient until it’s accepted
               from provider side.
             </Text>

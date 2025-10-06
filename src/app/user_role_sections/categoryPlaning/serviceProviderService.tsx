@@ -17,6 +17,8 @@ const ServiceProviderService = () => {
       keyExtractor={(item, index) => index.toString()}
       contentContainerStyle={tw` pb-4 px-5 bg-bgBaseColor gap-5`}
       style={tw`flex-1 bg-bgBaseColor`}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       ListHeaderComponent={() => {
         return (
           <BackTitleButton
@@ -80,6 +82,11 @@ const ServiceProviderService = () => {
               helping hand. The Crystal Comfort Plan is thoughtfully designed
             </Text>
             <PrimaryButton
+              onPress={() => {
+                router.push(
+                  "/user_role_sections/providers/providerDetailsInfoProviders"
+                );
+              }}
               buttonText="See details"
               buttonTextStyle={tw`font-LufgaMedium text-base`}
               rightIcon={IconRightCornerArrowWhite}

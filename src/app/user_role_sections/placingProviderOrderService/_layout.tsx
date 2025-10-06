@@ -9,9 +9,8 @@ const _layout = () => {
         statusBarAnimation: "fade",
       }}
     >
-      <Stack.Screen name="provider" />
-      <Stack.Screen name="providerDetailsInfoAdmin" />
-      <Stack.Screen name="providerDetailsInfoProviders" />
+      <Stack.Screen name="providerOrderDateTimePlacing" />
+      <Stack.Screen name="confirmDetailsProviderPlacingOrder" />
     </Stack>
   );
 };

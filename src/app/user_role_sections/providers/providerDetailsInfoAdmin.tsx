@@ -16,7 +16,7 @@ import {
 import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
 
-const ProviderDetailsInfo = () => {
+const providerDetailsInfoAdmin = () => {
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
@@ -29,11 +29,16 @@ const ProviderDetailsInfo = () => {
         disabled
         style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl mt-2`}
       >
-        <Image
-          style={tw`w-16 h-16 rounded-full`}
-          source={ImgBennerImage}
-          contentFit="contain"
-        />
+        <View style={tw`relative`}>
+          <Image
+            style={tw`w-16 h-16 rounded-full`}
+            source={ImgBennerImage}
+            contentFit="contain"
+          />
+          <View
+            style={tw`w-2 h-2 bg-green-600 rounded-full absolute top-0 right-0`}
+          />
+        </View>
         <View>
           <View style={tw`flex-row items-center gap-2`}>
             <Text style={tw`font-LufgaMedium text-base text-regularText`}>
@@ -238,4 +243,4 @@ const ProviderDetailsInfo = () => {
   );
 };
 
-export default ProviderDetailsInfo;
+export default providerDetailsInfoAdmin;

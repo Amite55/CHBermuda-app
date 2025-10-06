@@ -23,6 +23,7 @@ module.exports = {
       colors: {
         primaryBtn: "#183E9F",
         secondaryBtn: "#4A9BDA",
+        secondaryBtn2: "#EFF4FF",
         regularText: "#111111",
         bgBaseColor: "#F2F5FF",
         borderColor: "#11111129",

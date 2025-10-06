@@ -109,10 +109,13 @@ const Explore = () => {
 
                   {/* Button at bottom */}
                   <PrimaryButton
+                    onPress={() => {
+                      router.push("/user_role_sections/cart");
+                    }}
                     buttonTextStyle={tw`text-lg font-LufgaMedium`}
                     buttonContainerStyle={tw`mt-4 h-10`}
                     leftIcon={IconCartWhite}
-                    buttonText="Book Now"
+                    buttonText="Add to Cart"
                   />
                 </View>
               </View>

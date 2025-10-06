@@ -200,9 +200,14 @@ const User_home = () => {
 
                     {/* Button at bottom */}
                     <PrimaryButton
+                      onPress={() => {
+                        router.push(
+                          "/user_role_sections/categoryPlaning/serviceProviderService"
+                        );
+                      }}
                       buttonTextStyle={tw`text-lg font-LufgaMedium`}
                       buttonContainerStyle={tw`mt-4 h-10`}
-                      buttonText="Add to cart"
+                      buttonText="See Details"
                     />
                   </View>
                 </View>
@@ -239,6 +244,11 @@ const User_home = () => {
                       </Text>
 
                       <TouchableOpacity
+                        onPress={() => {
+                          router.push(
+                            "/user_role_sections/categoryPlaning/adminProviderService"
+                          );
+                        }}
                         activeOpacity={0.8}
                         style={tw`flex-row justify-between  items-center p-3 border border-white rounded-full  bg-white bg-opacity-40 `}
                       >

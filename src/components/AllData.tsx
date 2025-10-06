@@ -187,3 +187,38 @@ export const NotificationData = [
     status: "delivered",
   },
 ];
+
+export const ProviderServiceData = [
+  {
+    id: 1,
+    title: "Meal delivery",
+    price: 175,
+    description: "Nutritious, senior-friendly meals delivered to your door.",
+    duration: "1 hr",
+  },
+  {
+    id: 2,
+    title: "Home cleaning",
+    price: 120,
+    description: "Weekly home cleaning service tailored to your needs.",
+    duration: "2 hr",
+  },
+  {
+    id: 3,
+    title: "Personal care",
+    price: 200,
+    description: "Compassionate assistance with daily personal activities.",
+    duration: "1 hr",
+  },
+];
+
+export const BookingTimeData = [
+  {
+    id: 1,
+    time: "9:00 AM - 10:00 AM",
+  },
+  { id: 2, time: "10:00 AM - 11:00 AM" },
+  { id: 3, time: "11:00 AM - 12:00 PM" },
+  { id: 4, time: "12:00 PM - 1:00 PM" },
+  { id: 5, time: "1:00 PM - 2:00 PM" },
+];
