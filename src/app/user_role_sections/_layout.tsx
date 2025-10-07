@@ -18,6 +18,7 @@ const _layout = () => {
       <Stack.Screen name="providers" />
       <Stack.Screen name="placingAdminOrderService" />
       <Stack.Screen name="placingProviderOrderService" />
+      <Stack.Screen name="activePlan" />
     </Stack>
   );
 };

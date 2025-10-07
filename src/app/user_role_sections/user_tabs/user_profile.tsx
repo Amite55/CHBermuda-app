@@ -67,7 +67,9 @@ const User_Profile = () => {
           />
 
           <MenuCard
-            onPress={() => {}}
+            onPress={() => {
+              router.push("/user_role_sections/activePlan");
+            }}
             titleText="2 active plans"
             subTitleText="Tap to see details"
             icon={IconDiamond}
