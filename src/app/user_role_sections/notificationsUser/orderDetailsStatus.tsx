@@ -64,12 +64,22 @@ const OrderDetailsStatus = () => {
           <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
             Service
           </Text>
-          <MenuCard
-            titleText="Crystal Comfort Plan"
-            subTitleText="Number of order in this month: 2"
-            image={ImgProfileImg}
-            containerStyle={tw` bg-white`}
-          />
+          {status === "completed" ? (
+            <MenuCard
+              titleText="Crystal Comfort Plan"
+              subTitleText="Order Completed"
+              subTitleStyle={tw`border px-4 py-1.5 rounded-xl border-green-500 text-green-500`}
+              image={ImgService}
+              containerStyle={tw` bg-white`}
+            />
+          ) : (
+            <MenuCard
+              titleText="Crystal Comfort Plan"
+              subTitleText="Number of order in this month: 2"
+              image={ImgProfileImg}
+              containerStyle={tw` bg-white`}
+            />
+          )}
           {/* = ----------------- provider content ---------------- */}
           <View style={tw`flex-row items-center justify-between pt-6 pb-3`}>
             <Text style={tw`font-LufgaSemiBold text-base text-black`}>
@@ -78,6 +88,9 @@ const OrderDetailsStatus = () => {
             {status === "approved" && (
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() =>
+                  router.push("/user_role_sections/notificationsUser/messaging")
+                }
                 style={tw`w-10 h-10 bg-slate-300 rounded-xl items-center justify-center`}
               >
                 <SvgXml xml={IconMessage} />
@@ -156,21 +169,22 @@ const OrderDetailsStatus = () => {
           )}
 
           {/* ====================== ongoing or complete status details ================ */}
-          {status === "approved" && (
-            <View>
-              <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
-                Assigned stuff
-              </Text>
-              <MenuCard
-                titleText="John Doe"
-                subTitleText="+12345678965"
-                image={ImgProfileImg}
-                containerStyle={tw` bg-white`}
-                endIcon={IconTellPhone}
-                endIconOnPress={() => {}}
-              />
-            </View>
-          )}
+          {status === "approved" ||
+            (status === "completed" && (
+              <View>
+                <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
+                  Assigned stuff
+                </Text>
+                <MenuCard
+                  titleText="John Doe"
+                  subTitleText="+12345678965"
+                  image={ImgProfileImg}
+                  containerStyle={tw` bg-white`}
+                  endIcon={IconTellPhone}
+                  endIconOnPress={() => {}}
+                />
+              </View>
+            ))}
           {/* ================= cancel status details ================ */}
           {status === "canceled" && (
             <PrimaryButton

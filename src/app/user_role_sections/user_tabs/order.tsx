@@ -2,6 +2,7 @@ import { ImgBennerImage, ImgG, ImgNoOrder } from "@/assets/image";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -34,7 +35,14 @@ const Order = () => {
             {/* Pending */}
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => setOrderStatus("Pending")}
+              onPress={() => {
+                setOrderStatus("Pending");
+                // router.push({
+                //   pathname:
+                //     "/user_role_sections/notificationsUser/orderDetailsStatus",
+                //   params: { status: "pending" },
+                // });
+              }}
               style={tw.style(
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Pending"
@@ -52,10 +60,47 @@ const Order = () => {
               </Text>
             </TouchableOpacity>
 
+            {/* Ongoing */}
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                setOrderStatus("Ongoing");
+
+                // router.push({
+                //   pathname:
+                //     "/user_role_sections/notificationsUser/orderDetailsStatus",
+                //   params: { status: "approved" },
+                // });
+              }}
+              style={tw.style(
+                "flex-1 h-8 rounded-lg justify-center items-center",
+                orderStatus === "Ongoing"
+                  ? "bg-primaryBtn"
+                  : "border border-primaryBtn bg-white"
+              )}
+            >
+              <Text
+                style={tw.style(
+                  "font-LufgaMedium text-base",
+                  orderStatus === "Ongoing" ? "text-white" : "text-primaryBtn"
+                )}
+              >
+                Ongoing
+              </Text>
+            </TouchableOpacity>
+
             {/* Completed */}
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => setOrderStatus("Completed")}
+              onPress={() => {
+                setOrderStatus("Completed");
+
+                // router.push({
+                //   pathname:
+                //     "/user_role_sections/notificationsUser/orderDetailsStatus",
+                //   params: { status: "completed" },
+                // });
+              }}
               style={tw.style(
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Completed"
@@ -72,27 +117,6 @@ const Order = () => {
                 Completed
               </Text>
             </TouchableOpacity>
-
-            {/* Canceled */}
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => setOrderStatus("Canceled")}
-              style={tw.style(
-                "flex-1 h-8 rounded-lg justify-center items-center",
-                orderStatus === "Canceled"
-                  ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
-              )}
-            >
-              <Text
-                style={tw.style(
-                  "font-LufgaMedium text-base",
-                  orderStatus === "Canceled" ? "text-white" : "text-primaryBtn"
-                )}
-              >
-                Canceled
-              </Text>
-            </TouchableOpacity>
           </View>
 
           {/* ========================== order list ========================== */}
@@ -100,6 +124,13 @@ const Order = () => {
             {[1, 2, 3, 4, 5].map((item, index) => {
               return (
                 <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname:
+                        "/user_role_sections/notificationsUser/orderDetailsStatus",
+                      params: { status: "completed" },
+                    });
+                  }}
                   key={index}
                   activeOpacity={0.7}
                   style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}

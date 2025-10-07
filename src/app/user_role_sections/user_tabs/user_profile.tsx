@@ -55,7 +55,9 @@ const User_Profile = () => {
         {/* ========================== user profile section ========================== */}
         <View style={tw`px-5 gap-6 py-4`}>
           <MenuCard
-            onPress={() => {}}
+            endIconOnPress={() => {
+              router.push("/auth/editProfile");
+            }}
             titleText="Mr. Lopez"
             subTitleText="example@gmail.com"
             image={ImgProfileImg}
@@ -109,7 +111,9 @@ const User_Profile = () => {
               endIcon={IconRightTopConnerArrow}
             />
             <MenuCard
-              onPress={() => {}}
+              onPress={() => {
+                router.push("/user_role_sections/user_tabs/explore");
+              }}
               titleText="Subscription plans"
               subTitleText="Purchase plans to get more features."
               subTitleStyle={tw`text-xs`}
@@ -117,7 +121,9 @@ const User_Profile = () => {
               endIcon={IconRightTopConnerArrow}
             />
             <MenuCard
-              onPress={() => {}}
+              onPress={() => {
+                router.push("/user_role_sections/support");
+              }}
               titleText="Support"
               subTitleText="Contact with admin for any kind of emergency support. "
               subTitleStyle={tw`text-xs`}
@@ -135,7 +141,9 @@ const User_Profile = () => {
               endIcon={IconRightTopConnerArrow}
             />
             <MenuCard
-              onPress={() => {}}
+              onPress={() => {
+                router.replace("/auth/singIn");
+              }}
               titleText="Logout"
               subTitleText="You have to login using username and password again after logout"
               subTitleStyle={tw`text-xs`}

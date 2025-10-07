@@ -10,6 +10,7 @@ const _layout = () => {
     >
       <Stack.Screen name="notifications" />
       <Stack.Screen name="orderDetailsStatus" />
+      <Stack.Screen name="messaging" />
     </Stack>
   );
 };
