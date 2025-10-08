@@ -169,11 +169,15 @@ const SingIn = () => {
                   <PrimaryButton
                     buttonContainerStyle={tw`mb-5`}
                     buttonText="Sign In"
-                    onPress={() =>
-                      role === "user"
-                        ? router.push("/user_role_sections/user_tabs/user_home")
-                        : router.push("/user_role_sections/user_tabs/user_home")
-                    }
+                    onPress={() => {
+                      if (role === "user") {
+                        router.push("/user_role_sections/user_tabs/user_home");
+                      } else if (role === "provider") {
+                        router.push(
+                          "/serviceProvider/serviceProviderTabs/providerHome"
+                        );
+                      }
+                    }}
                   />
 
                   <View style={tw`flex-row items-center justify-center gap-4`}>

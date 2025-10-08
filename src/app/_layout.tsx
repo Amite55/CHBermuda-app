@@ -21,6 +21,8 @@ export default function RootLayout() {
             <Stack.Screen name="chooseRole" />
             <Stack.Screen name="user_role_sections" />
             <Stack.Screen name="common" />
+            <Stack.Screen name="auth" />
+            <Stack.Screen name="serviceProvider" />
           </Stack>
         </SafeAreaView>
       </SafeAreaProvider>

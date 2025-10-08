@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { BaseColor } from "../utils/util";
 
 export default function Index() {
   const decideNavigation = async () => {
@@ -37,6 +38,7 @@ export default function Index() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: BaseColor,
       }}
     >
       <Animated.Image

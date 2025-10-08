@@ -64,6 +64,9 @@ const ChooseRole = () => {
             delayPressIn={0}
             delayPressOut={0}
             delayLongPress={1000}
+            onPress={() => {
+              handleSetRole("provider");
+            }}
             style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
           >
             <View style={tw`flex-row items-center gap-3`}>

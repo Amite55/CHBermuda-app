@@ -1,4 +1,4 @@
-import { UserTabsBar } from "@/src/components/UserTabs";
+import UserTabsBar from "@/src/components/UserTabs";
 import { Tabs } from "expo-router";
 import React from "react";
 

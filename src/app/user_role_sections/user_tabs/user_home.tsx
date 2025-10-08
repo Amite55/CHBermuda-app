@@ -4,6 +4,7 @@ import {
   ImgBennerImage,
   ImgExploreBanner,
   ImgG,
+  ImgProfileImg,
 } from "@/assets/image";
 import { CategoryData, ServicesData } from "@/src/components/AllData";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
@@ -29,7 +30,20 @@ const User_home = () => {
     >
       <ImageBackground style={tw`relative w-full h-1/5 `} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
-        <UserInfoHeader containerStyle={tw`px-5`} />
+        <UserInfoHeader
+          containerStyle={tw`px-5`}
+          userName="Rohit"
+          userImage={ImgProfileImg}
+          cartOnPress={() => {
+            router.push("/user_role_sections/cart");
+          }}
+          notificationOnPress={() => {
+            router.push("/user_role_sections/notificationsUser/notifications");
+          }}
+          profileOnPress={() => {
+            router.push("/user_role_sections/user_tabs/user_profile");
+          }}
+        />
       </ImageBackground>
       {/* ------------------------ promo banner section just for demo  ---------------- */}
       <ImageBackground
@@ -52,8 +66,8 @@ const User_home = () => {
               onPress={() => {
                 router.push("/user_role_sections/user_tabs/explore");
               }}
-              activeOpacity={0.2}
-              style={tw`w-32 h-8 mt-2 bg-primaryBtn rounded-lg justify-center items-center`}
+              activeOpacity={0.7}
+              style={tw`w-32 h-8 mt-2 z-30 bg-primaryBtn rounded-lg justify-center items-center`}
             >
               <Text style={tw`font-LufgaRegular text-sm text-white`}>
                 Buy now

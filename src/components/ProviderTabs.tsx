@@ -1,12 +1,12 @@
 import {
-  IconExploreActive,
-  IconExploreInactive,
-  IconHomeActive,
-  IconHomeInactive,
-  IconOrderActive,
-  IconOrderInactive,
-  IconProfileActive,
-  IconProfileInactive,
+  IconProviderTabsChatActive,
+  IconProviderTabsChatInActive,
+  IconProviderTabsHomeActive,
+  IconProviderTabsHomeInActive,
+  IconProviderTabsOrderActive,
+  IconProviderTabsOrderInActive,
+  IconProviderTabsProfileActive,
+  IconProviderTabsProfileInActive,
 } from "@/assets/icons";
 import tw from "@/src/lib/tailwind";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -21,20 +21,17 @@ import Animated, {
 } from "react-native-reanimated";
 import { SvgXml } from "react-native-svg";
 
-const UserTabsBar: React.FC<BottomTabBarProps> = ({
+const ProviderTabsBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
   const { buildHref } = useLinkBuilder();
-
   const AnimatedTouchableOpacity =
     Animated.createAnimatedComponent(PlatformPressable);
 
   return (
-    <View
-      style={tw` absolute bottom-3 shadow flex-row justify-between bg-white py-4 px-2 w-[90%] items-center self-center  rounded-3xl`}
-    >
+    <View style={tw`flex-row bg-white py-2 items-center  `}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const isFocused = state.index === index;
@@ -48,16 +45,24 @@ const UserTabsBar: React.FC<BottomTabBarProps> = ({
         // Get the icon based on route name
         const getIcon = () => {
           switch (route.name) {
-            case "user_home":
-              return isFocused ? IconHomeActive : IconHomeInactive;
-            case "explore":
-              return isFocused ? IconExploreActive : IconExploreInactive;
-            case "order":
-              return isFocused ? IconOrderActive : IconOrderInactive;
-            case "user_profile":
-              return isFocused ? IconProfileActive : IconProfileInactive;
+            case "providerHome":
+              return isFocused
+                ? IconProviderTabsHomeActive
+                : IconProviderTabsHomeInActive;
+            case "providerOrder":
+              return isFocused
+                ? IconProviderTabsOrderActive
+                : IconProviderTabsOrderInActive;
+            case "providerChat":
+              return isFocused
+                ? IconProviderTabsChatActive
+                : IconProviderTabsChatInActive;
+            case "providerAccount":
+              return isFocused
+                ? IconProviderTabsProfileActive
+                : IconProviderTabsProfileInActive;
             default:
-              return IconHomeActive;
+              return IconProviderTabsHomeActive;
           }
         };
 
@@ -93,32 +98,38 @@ const UserTabsBar: React.FC<BottomTabBarProps> = ({
             testID={options.tabBarButtonTestID}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={[
-              tw`flex-row items-center justify-center h-10 px-2 rounded-full `,
-              isFocused ? tw`bg-primaryBtn  ` : tw`bg-transparent`,
-            ]}
+            //   style={tw`flex-1 items-center justify-center`}
+            style={[tw`flex-1  items-center justify-center  `]}
           >
-            <View style={[tw`flex-row gap-2 items-center`]}>
+            <View style={[tw` gap-1 items-center `]}>
               <View
-                style={tw`bg-slate-100 rounded-full h-8 w-8 items-center justify-center`}
+                style={tw`bg-slate-100 rounded-full h-10 w-10 items-center justify-center`}
               >
-                <SvgXml
-                  xml={getIcon()}
-                  width={20}
-                  height={20}
-                  // style={[tw`mb-1`]}
-                />
+                <SvgXml xml={getIcon()} width={20} height={20} />
               </View>
-              {isFocused && (
-                <Animated.Text
-                  entering={FadeIn.duration(300)}
-                  exiting={FadeOut.duration(300)}
-                  style={tw`text-white text-sm font-semibold mr-2`}
-                >
-                  {label}
-                </Animated.Text>
-              )}
+              <Animated.Text
+                layout={LinearTransition.springify()}
+                entering={FadeIn.duration(200)}
+                exiting={FadeOut.duration(200)}
+                style={[
+                  tw`text-black text-sm font-bold`,
+                  isFocused ? tw`text-primaryBtn` : tw`text-subText`,
+                ]}
+              >
+                {label}
+              </Animated.Text>
             </View>
+            {isFocused && (
+              <Animated.View
+                layout={LinearTransition.springify()
+                  .mass(0.5)
+                  .stiffness(100)
+                  .damping(20)}
+                style={[
+                  tw` bg-primaryBtn h-1 w-14 justify-center items-center rounded-2xl`,
+                ]}
+              />
+            )}
           </AnimatedTouchableOpacity>
         );
       })}
@@ -126,4 +137,4 @@ const UserTabsBar: React.FC<BottomTabBarProps> = ({
   );
 };
 
-export default UserTabsBar;
+export default ProviderTabsBar;

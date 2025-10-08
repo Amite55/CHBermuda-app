@@ -45,7 +45,22 @@ const User_Profile = () => {
       >
         <ImageBackground style={[tw` w-full h-36 `]} source={ImgG}>
           {/* ------------------- user header part ---------------- */}
-          <UserInfoHeader containerStyle={tw`px-5`} />
+          <UserInfoHeader
+            containerStyle={tw`px-5`}
+            userName="Rohit"
+            userImage={ImgProfileImg}
+            cartOnPress={() => {
+              router.push("/user_role_sections/cart");
+            }}
+            notificationOnPress={() => {
+              router.push(
+                "/user_role_sections/notificationsUser/notifications"
+              );
+            }}
+            profileOnPress={() => {
+              router.push("/user_role_sections/user_tabs/user_profile");
+            }}
+          />
           <Text
             style={tw`font-LufgaMedium text-2xl text-center text-regularText`}
           >

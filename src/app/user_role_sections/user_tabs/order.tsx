@@ -1,4 +1,9 @@
-import { ImgBennerImage, ImgG, ImgNoOrder } from "@/assets/image";
+import {
+  ImgBennerImage,
+  ImgG,
+  ImgNoOrder,
+  ImgProfileImg,
+} from "@/assets/image";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
@@ -19,7 +24,20 @@ const Order = () => {
     >
       <ImageBackground style={[tw` w-full h-36 `]} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
-        <UserInfoHeader containerStyle={tw`px-5`} />
+        <UserInfoHeader
+          containerStyle={tw`px-5`}
+          userName="Rohit"
+          userImage={ImgProfileImg}
+          cartOnPress={() => {
+            router.push("/user_role_sections/cart");
+          }}
+          notificationOnPress={() => {
+            router.push("/user_role_sections/notificationsUser/notifications");
+          }}
+          profileOnPress={() => {
+            router.push("/user_role_sections/user_tabs/user_profile");
+          }}
+        />
         <Text
           style={tw`font-LufgaMedium text-2xl text-center text-regularText`}
         >
