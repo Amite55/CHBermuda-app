@@ -187,6 +187,32 @@ export const NotificationData = [
     status: "delivered",
   },
 ];
+export const NotificationProviderData = [
+  {
+    id: 1,
+    title: "New order",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "new_order",
+  },
+  {
+    id: 2,
+    title: "Delivery request approved.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "approved",
+  },
+  {
+    id: 3,
+    title: "Delivery request canceled.",
+    description: "Crystal Comfort Plan",
+    time: new Date().toDateString(),
+    icon: IconUserNotification,
+    status: "canceled",
+  },
+];
 
 export const ProviderServiceData = [
   {

@@ -1,9 +1,10 @@
 import {
-  ImgBennerImage,
   ImgG,
   ImgNoOrder,
   ImgProfileImg,
+  ImgServiceImage,
 } from "@/assets/image";
+import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
@@ -141,41 +142,14 @@ const Order = () => {
           <View style={tw`mt-4 gap-4`}>
             {[1, 2, 3, 4, 5].map((item, index) => {
               return (
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push({
-                      pathname:
-                        "/user_role_sections/notificationsUser/orderDetailsStatus",
-                      params: { status: "completed" },
-                    });
-                  }}
-                  key={index}
-                  activeOpacity={0.7}
-                  style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
-                >
-                  <Image
-                    style={tw`w-16 h-16 rounded-full`}
-                    source={ImgBennerImage}
-                    contentFit="contain"
-                  />
-                  <View>
-                    <Text
-                      style={tw`font-LufgaMedium text-base text-regularText`}
-                    >
-                      Elizabeth Olson
-                    </Text>
-
-                    <Text style={tw`font-LufgaRegular text-sm text-black`}>
-                      Cristal comfort plan
-                    </Text>
-
-                    <Text
-                      style={tw`font-LufgaMedium text-xs text-subText pt-1`}
-                    >
-                      Ordered on: 10-09-2025
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                <OrderCard
+                  key={index.toString()}
+                  onPress={() => {}}
+                  image={ImgServiceImage}
+                  title="Order Title"
+                  subTitle="Order Sub Title"
+                  dateAndTime="Date and Time"
+                />
               );
             })}
           </View>
