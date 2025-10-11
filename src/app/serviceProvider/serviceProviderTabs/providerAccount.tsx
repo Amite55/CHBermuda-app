@@ -125,7 +125,7 @@ const ProviderAccount = () => {
           />
           <MenuCard
             onPress={() => {
-              // router.push("/auth/changePassward");
+              router.push("/serviceProvider/providerStaffs/staffs");
             }}
             titleText="Staffs"
             subTitleText="Manage your staffs"

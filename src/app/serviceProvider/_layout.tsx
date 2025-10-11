@@ -9,6 +9,7 @@ const ServiceProviderLayout = () => {
       }}
     >
       <Stack.Screen name="serviceProviderTabs" />
+      <Stack.Screen name="providerStaffs" />
     </Stack>
   );
 };
