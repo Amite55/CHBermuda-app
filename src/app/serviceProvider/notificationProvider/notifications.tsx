@@ -24,11 +24,11 @@ const Notifications = () => {
         renderItem={(item) => (
           <NotificationCard
             onPress={() => {
-              // router.push({
-              //   pathname:
-              //     "/user_role_sections/notificationsUser/orderDetailsStatus",
-              //   params: { status: item.item.status },
-              // });
+              router.push({
+                pathname:
+                  "/serviceProvider/notificationProvider/providerOrderDetails",
+                params: { status: item.item.status },
+              });
             }}
             title={item.item.title}
             description={item.item.description}
