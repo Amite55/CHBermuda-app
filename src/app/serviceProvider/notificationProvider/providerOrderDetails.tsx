@@ -7,6 +7,7 @@ import { ImgProfileImg, ImgServiceImage } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import PrimaryButton from "@/src/utils/PrimaryButton";
 import TextButton from "@/src/utils/TextButton";
 import { GoogleMaps } from "expo-maps";
 import { router, useLocalSearchParams } from "expo-router";
@@ -16,9 +17,7 @@ import { SvgXml } from "react-native-svg";
 
 const ProviderOrder = () => {
   const { status } = useLocalSearchParams();
-  console.log(status, "status");
 
- 
   return (
     <>
       <ScrollView
@@ -66,23 +65,21 @@ const ProviderOrder = () => {
           </View>
         </View>
         {/* --------------------------- User Location  --------------------------- */}
-       
-              <GoogleMaps.View 
-                style={tw`flex-1`} 
-                cameraPosition={{
-                  coordinates:{
-                    latitude:22.38,
-                    longitude: 90.41
-                  },
-                  zoom: 30
-                }}  
-              />
-              
-           
+
+        <GoogleMaps.View
+          style={tw`flex-1`}
+          // cameraPosition={{
+          //   coordinates:{
+          //     latitude:22.38,
+          //     longitude: 90.41
+          //   },
+          //   zoom: 30
+          // }}
+        />
 
         {/* Check status  */}
-        {
-          status === "new_order" && <View style={tw`pt-3 items-center flex-row gap-2 justify-between `}>
+        {status === "new_order" && (
+          <View style={tw`pt-3 items-center flex-row gap-2 justify-between `}>
             <TextButton
               buttonText="Decline"
               buttonContainerStyle={tw` bg-dangerBtn w-[49%] rounded-full`}
@@ -94,9 +91,8 @@ const ProviderOrder = () => {
               buttonTextStyle={tw`text-lg`}
             />
           </View>
-        }
-        {
-          status === "approved" &&
+        )}
+        {status === "approved" && (
           <View>
             <View style={tw`flex-row items-center gap-3 pt-3`}>
               <Text style={tw`font-LufgaMedium text-black text-base`}>
@@ -110,19 +106,20 @@ const ProviderOrder = () => {
               containerStyle={tw` bg-white`}
             />
           </View>
-
-        }
-        {
-          status === "canceled" && 
+        )}
+        {status === "canceled" && (
           <View style={tw`gap-3`}>
-            <Text style={tw`text-red-500 text-center font-LufgaMedium`}>Delivery request canceled</Text>
-            <TextButton 
-              buttonText="Deliver again"
-              buttonContainerStyle={tw`bg-transparent border border-gray-300`}
-              buttonTextStyle={tw`text-black font-LufgaMedium`}
+            <Text style={tw`text-red-500 text-center font-LufgaMedium`}>
+              Delivery request canceled
+            </Text>
+            <PrimaryButton
+              // onPress={() => router.push("/serviceProvider/notificationProvider")}
+              buttonText="Go Back"
+              buttonTextStyle={tw`text-lg text-black`}
+              buttonContainerStyle={tw`bg-transparent rounded-full border border-subText`}
             />
           </View>
-        }
+        )}
       </ScrollView>
     </>
   );

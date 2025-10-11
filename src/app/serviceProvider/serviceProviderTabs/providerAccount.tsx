@@ -105,7 +105,7 @@ const ProviderAccount = () => {
           />
           <MenuCard
             onPress={() => {
-              // router.push("/auth/changePassward");
+              router.push("/serviceProvider/myServices/myService");
             }}
             titleText="My services"
             subTitleText="Manage your services"

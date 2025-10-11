@@ -25,6 +25,13 @@ const ServiceHistory = () => {
       renderItem={() => {
         return (
           <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname:
+                  "/serviceProvider/notificationProvider/providerOrderDetails",
+                params: { status: "pending" },
+              })
+            }
             activeOpacity={0.7}
             style={[
               tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`,

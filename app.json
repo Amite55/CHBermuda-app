@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "config": {
-        "googleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
+        "googleMapsApiKey": "Google_key"
       },
       "supportsTablet": true
     },
@@ -54,11 +54,8 @@
         "expo-maps",
         {
           "requestLocationPermission": true
-          // enable for ios
-          // "locationPermission": "Allow $(PRODUCT_NAME) to use your location"
         }
       ]
-      
     ],
     "experiments": {
       "typedRoutes": true,
