@@ -8,17 +8,17 @@ import MenuCard from "@/src/components/MenuCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import TextButton from "@/src/utils/TextButton";
-import { GoogleMaps } from "expo-maps";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { SvgXml } from "react-native-svg";
-
+// import { AppleMaps, GoogleMaps } from 'expo-maps';
 const ProviderOrder = () => {
   const { status } = useLocalSearchParams();
   console.log(status, "status");
 
- 
+
   return (
     <>
       <ScrollView
@@ -66,19 +66,31 @@ const ProviderOrder = () => {
           </View>
         </View>
         {/* --------------------------- User Location  --------------------------- */}
-       
-              <GoogleMaps.View 
-                style={tw`flex-1`} 
-                cameraPosition={{
-                  coordinates:{
-                    latitude:22.38,
-                    longitude: 90.41
-                  },
-                  zoom: 30
-                }}  
-              />
-              
-           
+        
+        
+        
+        <View>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={tw`h-60 w-full`}
+            initialRegion={{
+              latitude: 23.8103, // Dhaka center
+              longitude: 90.4125,
+              latitudeDelta: 5,
+              longitudeDelta: 5,
+            }}
+            
+          >
+            <Marker
+              coordinate={{ latitude: 23.8103, longitude: 90.4125 }}
+              title={"Dhaka"}
+              description={"Capital of Bangladesh"}
+            />
+          </MapView>
+        </View>
+
+
+
 
         {/* Check status  */}
         {
@@ -113,10 +125,10 @@ const ProviderOrder = () => {
 
         }
         {
-          status === "canceled" && 
+          status === "canceled" &&
           <View style={tw`gap-3`}>
             <Text style={tw`text-red-500 text-center font-LufgaMedium`}>Delivery request canceled</Text>
-            <TextButton 
+            <TextButton
               buttonText="Deliver again"
               buttonContainerStyle={tw`bg-transparent border border-gray-300`}
               buttonTextStyle={tw`text-black font-LufgaMedium`}
