@@ -51,9 +51,10 @@
       "expo-font",
       "expo-build-properties",
       [
-        "expo-maps",
+        "react-native-maps",
         {
-          "requestLocationPermission": true
+          "iosGoogleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA",
+          "androidGoogleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
         }
       ]
     ],
