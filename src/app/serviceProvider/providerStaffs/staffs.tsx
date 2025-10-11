@@ -21,6 +21,9 @@ const Staffs = () => {
       <View style={tw`relative`}>
         <BackTitleButton title="Staffs" onPress={() => router.back()} />
         <TouchableOpacity
+          onPress={() => {
+            router.push("/serviceProvider/providerStaffs/addNewStaffs");
+          }}
           activeOpacity={0.7}
           style={tw`absolute top-2 right-0 bg-primaryBtn flex-row items-center justify-center gap-1 rounded-lg py-2 px-3`}
         >
@@ -115,9 +118,9 @@ const Staffs = () => {
           return (
             <MenuCard
               key={index}
-              //   endIconOnPress={() => {
-              //     router.push("/auth/editProfile");
-              //   }}
+              onPress={() => {
+                router.push("/serviceProvider/providerStaffs/editStaffProfile");
+              }}
               titleText="Mr. Lopez"
               subTitleText="example@gmail.com"
               image={ImgProfileImg}

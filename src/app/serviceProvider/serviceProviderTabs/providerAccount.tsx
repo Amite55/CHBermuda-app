@@ -115,7 +115,7 @@ const ProviderAccount = () => {
           />
           <MenuCard
             onPress={() => {
-              // router.push("/auth/changePassward");
+              router.push("/serviceProvider/serviceHistory");
             }}
             titleText="Service history"
             subTitleText="See your previous services."

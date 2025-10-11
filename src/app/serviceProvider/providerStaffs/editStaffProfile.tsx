@@ -1,4 +1,4 @@
-import { IconCameraWhite, IconPlus } from "@/assets/icons";
+import { IconCameraWhite, IconSave } from "@/assets/icons";
 import { ImgProfileImg } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { SvgXml } from "react-native-svg";
 
-const AddNewStaffs = () => {
+const EditStaffProfile = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -51,7 +51,10 @@ const AddNewStaffs = () => {
           ]}
         >
           <View>
-            <BackTitleButton title="Add Staff" onPress={() => router.back()} />
+            <BackTitleButton
+              title="Staff details"
+              onPress={() => router.back()}
+            />
 
             {/* ======================= user profile image ======================= */}
             <View style={tw`relative items-center`}>
@@ -78,7 +81,7 @@ const AddNewStaffs = () => {
                 style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1`}
               >
                 <TextInput
-                  //   defaultValue="John Doe"
+                  defaultValue="John Doe"
                   placeholder="Enter your Full Name"
                   placeholderTextColor="#535353"
                   style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
@@ -94,6 +97,7 @@ const AddNewStaffs = () => {
                 style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1`}
               >
                 <TextInput
+                  defaultValue="K5kMl@example.com"
                   placeholder="Enter your Email"
                   placeholderTextColor="#535353"
                   style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
@@ -109,6 +113,7 @@ const AddNewStaffs = () => {
               >
                 <TextInput
                   keyboardType="numeric"
+                  defaultValue="01712345678"
                   placeholder="Enter your Phone"
                   placeholderTextColor="#535353"
                   style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
@@ -124,7 +129,7 @@ const AddNewStaffs = () => {
                 style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1`}
               >
                 <TextInput
-                  //   defaultValue="Dhaka, Bangladesh"
+                  defaultValue="Dhaka, Bangladesh"
                   placeholder="Enter your Location"
                   placeholderTextColor="#535353"
                   style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
@@ -136,8 +141,8 @@ const AddNewStaffs = () => {
           {/* ====================== buttons ====================== */}
           <PrimaryButton
             onPress={() => {}}
-            buttonText="Add"
-            leftIcon={IconPlus}
+            buttonText="Save changes"
+            leftIcon={IconSave}
             buttonContainerStyle={tw`mt-4`}
           />
         </ScrollView>
@@ -146,4 +151,4 @@ const AddNewStaffs = () => {
   );
 };
 
-export default AddNewStaffs;
+export default EditStaffProfile;
