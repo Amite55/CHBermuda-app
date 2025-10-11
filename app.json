@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "config": {
-        "googleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
+        "googleMapsApiKey": "Google_key"
       },
       "supportsTablet": true
     },

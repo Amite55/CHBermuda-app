@@ -7,6 +7,7 @@ import { ImgProfileImg, ImgServiceImage } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import PrimaryButton from "@/src/utils/PrimaryButton";
 import TextButton from "@/src/utils/TextButton";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -16,7 +17,6 @@ import { SvgXml } from "react-native-svg";
 // import { AppleMaps, GoogleMaps } from 'expo-maps';
 const ProviderOrder = () => {
   const { status } = useLocalSearchParams();
-  console.log(status, "status");
 
 
   return (
@@ -93,8 +93,8 @@ const ProviderOrder = () => {
 
 
         {/* Check status  */}
-        {
-          status === "new_order" && <View style={tw`pt-3 items-center flex-row gap-2 justify-between `}>
+        {status === "new_order" && (
+          <View style={tw`pt-3 items-center flex-row gap-2 justify-between `}>
             <TextButton
               buttonText="Decline"
               buttonContainerStyle={tw` bg-dangerBtn w-[49%] rounded-full`}
@@ -106,9 +106,8 @@ const ProviderOrder = () => {
               buttonTextStyle={tw`text-lg`}
             />
           </View>
-        }
-        {
-          status === "approved" &&
+        )}
+        {status === "approved" && (
           <View>
             <View style={tw`flex-row items-center gap-3 pt-3`}>
               <Text style={tw`font-LufgaMedium text-black text-base`}>
@@ -134,7 +133,7 @@ const ProviderOrder = () => {
               buttonTextStyle={tw`text-black font-LufgaMedium`}
             />
           </View>
-        }
+        )}
       </ScrollView>
     </>
   );

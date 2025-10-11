@@ -6,6 +6,7 @@ const _layout = () => {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="staffs" />
       <Stack.Screen name="addNewStaffs" />
+      <Stack.Screen name="editStaffProfile" />
     </Stack>
   );
 };
