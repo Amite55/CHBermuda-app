@@ -778,3 +778,8 @@ export const IconPlus = `<svg width="17" height="16" viewBox="0 0 17 16" fill="n
 
 
 `;
+export const IconEditPenGreen = `<svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M20.425 4.49104C20.8583 4.05777 20.8583 3.33565 20.425 2.92459L17.8254 0.324955C17.4144 -0.108318 16.6922 -0.108318 16.259 0.324955L14.2148 2.35801L18.3809 6.52409M0.75 15.8339V20H4.91609L17.2033 7.70171L13.0372 3.53562L0.75 15.8339Z" fill="#00AD2E"/>
+</svg>
+
+`;
