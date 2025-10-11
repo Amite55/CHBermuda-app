@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "config": {
-        "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
+        "googleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
       },
       "supportsTablet": true
     },
     "android": {
       "config": {
         "googleMaps": {
-          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+          "apiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
         }
       },
       "adaptiveIcon": {
@@ -49,7 +49,16 @@
         }
       ],
       "expo-font",
-      "expo-build-properties"
+      "expo-build-properties",
+      [
+        "expo-maps",
+        {
+          "requestLocationPermission": true
+          // enable for ios
+          // "locationPermission": "Allow $(PRODUCT_NAME) to use your location"
+        }
+      ]
+      
     ],
     "experiments": {
       "typedRoutes": true,

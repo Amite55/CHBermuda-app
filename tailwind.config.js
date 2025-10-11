@@ -24,6 +24,8 @@ module.exports = {
         primaryBtn: "#183E9F",
         secondaryBtn: "#4A9BDA",
         secondaryBtn2: "#EFF4FF",
+        dangerBtn: "#FF4D4D",
+        successBtn: "#00AD2E",
         regularText: "#111111",
         bgBaseColor: "#F2F5FF",
         borderColor: "#11111129",
