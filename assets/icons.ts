@@ -783,3 +783,13 @@ export const IconEditPenGreen = `<svg width="21" height="20" viewBox="0 0 21 20"
 </svg>
 
 `;
+export const IconImageUpload = `<svg width="27" height="23" viewBox="0 0 27 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.4604 21.5L13.4555 10.9118M23.1931 17.5683C25.1306 16.2088 25.9614 13.7531 25.246 11.5C24.5306 9.24695 22.3399 8.0126 19.9713 8.01442H18.603C17.7085 4.53606 14.7572 1.96807 11.1819 1.55718C7.60659 1.14628 4.14756 2.97753 2.48397 6.16195C0.820392 9.34636 1.29675 13.2245 3.6818 15.9138M17.2073 13.6389L13.4556 9.89547L9.70386 13.6389" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+`;
+export const IconPlushPrimaryColor = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6.85714 9.14286H0V6.85714H6.85714V0H9.14286V6.85714H16V9.14286H9.14286V16H6.85714V9.14286Z" fill="#183E9F"/>
+</svg>
+
+`;

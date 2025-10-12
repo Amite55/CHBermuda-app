@@ -9,6 +9,7 @@ const _layout = () => {
       }}
     >
       <Stack.Screen name="myService" />
+      <Stack.Screen name="addNewService" />
     </Stack>
   );
 };
