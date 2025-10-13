@@ -3,26 +3,18 @@ import {
   IconProviderNewOrder,
   IconProviderPendingOrder,
   IconProviderRecentOrders,
-  IconProviderStaffs,
 } from "@/assets/icons";
 import { ImgProfileImg, ImgProviderBG, ImgServiceImage } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
-import { Image, ImageBackground } from "expo-image";
-import { router } from "expo-router";
+import { ImageBackground } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {
-  FlatList,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
-const ProviderHome = () => {
+const AdminHome = () => {
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -37,15 +29,15 @@ const ProviderHome = () => {
           <UserInfoHeader
             containerStyle={tw`px-5`}
             notificationContentStyle={tw`bg-[#FFFFFF33] `}
-            userName="Provider"
+            userName="Admin Provider"
             userImage={ImgProfileImg}
             notificationIcon={IconNotificationWhite}
             greetingStyle={tw`text-white `}
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
-              router.push(
-                "/serviceProvider/notificationProvider/notifications"
-              );
+              // router.push(
+              //   // "/serviceProvider/notificationProvider/notifications"
+              // );
             }}
             profileOnPress={() => {}}
           />
@@ -80,65 +72,17 @@ const ProviderHome = () => {
         </View>
       </View>
 
-      {/* ================ your staff section ================ */}
-
-      <View style={tw`flex-row justify-between items-center px-5 mt-32`}>
-        <View style={tw`flex-row items-center gap-2`}>
-          <SvgXml xml={IconProviderStaffs} />
-          <Text style={tw`font-medium text-base text-black`}>Staffs</Text>
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          style={tw`border border-subText px-2 py-1 rounded-lg`}
-        >
-          <Text style={tw`font-LufgaRegular text-sm text-black`}>See all</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={[1, 2, 3, 4, 5]}
-        keyExtractor={(item, index) => index.toString()}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        horizontal
-        style={tw``}
-        contentContainerStyle={tw`px-5 gap-4 mt-4`}
-        renderItem={({ item }) => {
-          return (
-            <View>
-              <View style={tw`relative `}>
-                <Image
-                  source={ImgProfileImg}
-                  style={tw`w-20 h-20 rounded-full `}
-                />
-                <View
-                  style={tw`absolute top-1 right-1 w-3 h-3 bg-green-600 rounded-full`}
-                />
-              </View>
-              <Text style={tw`font-LufgaMedium text-sm text-black pt-2`}>
-                Staff Name
-              </Text>
-            </View>
-          );
-        }}
-      />
-
       {/* =========================== provider recent order =========================== */}
-      <View style={tw`flex-row items-center pl-5 mt-6 gap-2`}>
+      <View style={tw`flex-row items-center pl-5 gap-2 mt-32`}>
         <SvgXml xml={IconProviderRecentOrders} />
-        <Text style={tw`font-medium text-base text-black`}>Recent orders</Text>
+        <Text style={tw`font-medium text-base text-black`}>Assigned order</Text>
       </View>
       <View style={tw`mt-4 gap-4 px-5`}>
         {[1, 2, 3, 4, 5].map((item, index) => {
           return (
             <OrderCard
               key={index.toString()}
-              onPress={() => {
-                router.push({
-                  pathname:
-                    "/serviceProvider/notificationProvider/providerOrderDetails",
-                  params: { status: "new_order" },
-                });
-              }}
+              onPress={() => {}}
               image={ImgServiceImage}
               title="Order Title"
               subTitle="Order Sub Title"
@@ -151,4 +95,4 @@ const ProviderHome = () => {
   );
 };
 
-export default ProviderHome;
+export default AdminHome;

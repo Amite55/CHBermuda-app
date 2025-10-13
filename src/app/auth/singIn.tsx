@@ -176,6 +176,8 @@ const SingIn = () => {
                         router.push(
                           "/serviceProvider/serviceProviderTabs/providerHome"
                         );
+                      } else {
+                        router.push("/admin_provider/adminTabs/adminHome");
                       }
                     }}
                   />

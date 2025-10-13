@@ -78,6 +78,25 @@ const ChooseRole = () => {
 
             <SvgXml xml={IconRightTopConnerArrow} />
           </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            delayPressIn={0}
+            delayPressOut={0}
+            delayLongPress={1000}
+            onPress={() => {
+              handleSetRole("admin_provider");
+            }}
+            style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
+          >
+            <View style={tw`flex-row items-center gap-3`}>
+              <SvgXml xml={IconProvider} />
+              <Text style={tw`font-LufgaMedium text-lg text-regularText`}>
+                Admin provider
+              </Text>
+            </View>
+
+            <SvgXml xml={IconRightTopConnerArrow} />
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </ScrollView>
