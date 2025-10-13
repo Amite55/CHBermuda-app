@@ -23,6 +23,8 @@ const MyService = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={tw`bg-bgBaseColor px-5 gap-3 pb-3 `}
         style={tw`flex-1 bg-bgBaseColor`}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
           <View>
             <BackTitleButton
@@ -62,6 +64,9 @@ const MyService = () => {
                 style={tw`absolute top-3 right-2 flex-row items-center gap-2`}
               >
                 <TouchableOpacity
+                  onPress={() =>
+                    router.push("/serviceProvider/myServices/editMyService")
+                  }
                   activeOpacity={0.6}
                   style={tw`w-10 h-10 rounded-lg bg-white justify-center items-center shadow`}
                 >

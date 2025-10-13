@@ -15,7 +15,7 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const ProviderOrder = () => {
   const [orderData, setOrderData] = React.useState<any>(true);
-  const [orderStatus, setOrderStatus] = React.useState<any>("Pending");
+  const [orderStatus, setOrderStatus] = React.useState<any>("New");
 
   return (
     <ScrollView
@@ -50,20 +50,20 @@ const ProviderOrder = () => {
           {/* ============================= order section ============================= */}
 
           <View style={tw`flex-row justify-between items-center  gap-1 my-2`}>
-            {/* Pending */}
+            {/* New */}
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                setOrderStatus("Pending");
+                setOrderStatus("New");
                 // router.push({
                 //   pathname:
-                //     "/user_role_sections/notificationsUser/orderDetailsStatus",
-                //   params: { status: "pending" },
+                //     "/serviceProvider/notificationProvider/providerOrderDetails",
+                //   params: { status: "new_order" },
                 // });
               }}
               style={tw.style(
                 "flex-1 h-8 rounded-lg justify-center items-center",
-                orderStatus === "Pending"
+                orderStatus === "New"
                   ? "bg-primaryBtn"
                   : "border border-primaryBtn bg-white"
               )}
@@ -71,10 +71,10 @@ const ProviderOrder = () => {
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Pending" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "New" ? "text-white" : "text-primaryBtn"
                 )}
               >
-                Pending
+                New
               </Text>
             </TouchableOpacity>
 
@@ -143,7 +143,13 @@ const ProviderOrder = () => {
               return (
                 <OrderCard
                   key={index.toString()}
-                  onPress={() => {}}
+                  onPress={() => {
+                    router.push({
+                      pathname:
+                        "/serviceProvider/notificationProvider/providerOrderDetails",
+                      params: { status: "new_order" },
+                    });
+                  }}
                   image={ImgServiceImage}
                   title="Order Title"
                   subTitle="Order Sub Title"

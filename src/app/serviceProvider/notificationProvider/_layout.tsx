@@ -6,6 +6,8 @@ const _layout = () => {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="notifications" />
       <Stack.Screen name="providerOrderDetails" />
+      <Stack.Screen name="deliveryRequestSent" />
+      <Stack.Screen name="ServiceAssign" />
     </Stack>
   );
 };

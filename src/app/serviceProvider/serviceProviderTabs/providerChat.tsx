@@ -50,21 +50,24 @@ const ProviderChat = () => {
         />
       </View>
 
-      <View style={tw`pt-5 gap-3 px-5 `}>
+      <View style={tw`flex-1 pt-5 gap-3 px-5 `}>
         {[1, 2, 3, 4, 5, 6].map((item, index) => {
           return (
             <TouchableOpacity
+              onPress={() => {
+                router.push("/serviceProvider/messagingProviderService");
+              }}
               activeOpacity={0.8}
               key={index}
-              style={tw` flex-row items-center gap-4  p-4 bg-white  rounded-xl shadow`}
+              style={tw`  flex-row items-center gap-2  p-4 bg-white  rounded-xl shadow`}
             >
               <Image
                 source={ImgProfileImg}
                 style={tw`w-14 h-14 rounded-full`}
               />
-              <View style={tw` gap-2`}>
-                <View style={tw`flex-row justify-between items-center`}>
-                  <Text style={tw`font-LufgaMedium text-sm text-black`}>
+              <View style={tw` flex-1 gap-1`}>
+                <View style={tw`flex-row justify-between items-center `}>
+                  <Text style={tw`font-LufgaMedium text-base text-black`}>
                     Jhon Doe
                   </Text>
                   <Text style={tw`font-LufgaRegular text-xs text-subText`}>
@@ -73,7 +76,8 @@ const ProviderChat = () => {
                 </View>
                 <Text
                   numberOfLines={1}
-                  style={tw` font-LufgaRegular text-sm text-regularText`}
+                  ellipsizeMode="tail"
+                  style={tw` font-LufgaRegular text-sm text-regularText `}
                 >
                   Lorem ipsum dolor sit amet consectetur.
                 </Text>

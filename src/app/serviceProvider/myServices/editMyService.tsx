@@ -1,13 +1,15 @@
 import {
   IconDeleteRed,
-  IconImageUpload,
   IconPlus,
   IconPlushPrimaryColor,
+  IconReUpload,
 } from "@/assets/icons";
+import { ImgServiceImage } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import React from "react";
@@ -25,7 +27,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { SvgXml } from "react-native-svg";
 import * as Yup from "yup";
 
-const AddNewService = () => {
+const EditMyService = () => {
   const [servicesText, setServicesText] = React.useState();
   const [serviceIncludeArry, setServiceIncludeArry] = React.useState([]);
 
@@ -66,25 +68,26 @@ const AddNewService = () => {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
         >
-          <BackTitleButton
-            title="Add new package"
-            onPress={() => router.back()}
-          />
-          <View
-            style={tw`justify-center items-center gap-2 bg-white p-4 rounded-2xl mt-3`}
-          >
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={tw`flex-row items-center gap-2 p-3 bg-white rounded-xl shadow`}
+          <BackTitleButton title="Edit package" onPress={() => router.back()} />
+          {/* --------------- service image  --------------- */}
+          <View style={tw`relative`}>
+            <Image
+              style={tw`w-full h-40 rounded-3xl mt-2`}
+              contentFit="cover"
+              source={ImgServiceImage}
+            />
+
+            <View
+              style={tw`absolute top-4 right-3 flex-row items-center gap-2`}
             >
-              <SvgXml xml={IconImageUpload} />
-              <Text style={tw`font-LufgaMedium text-lg text-black`}>
-                Upload file
-              </Text>
-            </TouchableOpacity>
-            <Text style={tw`font-LufgaRegular text-subText text-sm`}>
-              Upload coder photo for this package
-            </Text>
+              <TouchableOpacity
+                onPress={() => {}}
+                activeOpacity={0.6}
+                style={tw`w-10 h-10 rounded-lg bg-gray-400 border border-white justify-center items-center shadow`}
+              >
+                <SvgXml xml={IconReUpload} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* -0----------------- input from here ----------------- */}
@@ -293,4 +296,4 @@ const AddNewService = () => {
   );
 };
 
-export default AddNewService;
+export default EditMyService;

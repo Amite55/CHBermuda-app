@@ -5,17 +5,20 @@ import {
 } from "@/assets/icons";
 import { ImgProfileImg, ImgServiceImage } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
+import ProviderCard from "@/src/components/ProviderCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import PrimaryButton from "@/src/utils/PrimaryButton";
 import TextButton from "@/src/utils/TextButton";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { SvgXml } from "react-native-svg";
 // import { AppleMaps, GoogleMaps } from 'expo-maps';
 const ProviderOrder = () => {
   const { status } = useLocalSearchParams();
+  console.log(status);
 
   return (
     <>
@@ -52,7 +55,7 @@ const ProviderOrder = () => {
           containerStyle={tw` bg-white`}
         />
         {/* --------------------------- Schedule details --------------------------- */}
-        <View style={tw`flex-row items-center gap-3 pt-3`}>
+        <View style={tw`flex-row items-center gap-3 py-4`}>
           <SvgXml xml={IconCalendar} />
           <View>
             <Text style={tw`font-LufgaMedium text-black text-base`}>
@@ -65,7 +68,7 @@ const ProviderOrder = () => {
         </View>
         {/* --------------------------- User Location  --------------------------- */}
 
-        <View>
+        <View style={tw`my-4`}>
           <MapView
             provider={PROVIDER_GOOGLE}
             style={tw`h-60 w-full`}
@@ -99,6 +102,45 @@ const ProviderOrder = () => {
             />
           </View>
         )}
+        {status === "pending" && (
+          <View>
+            <View
+              style={tw`flex-row justify-between items-center gap-3 pt-3 pb-3`}
+            >
+              <Text style={tw`font-LufgaMedium text-black text-base`}>
+                Assigned stuff
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  router.push(
+                    "/serviceProvider/notificationProvider/serviceAssign"
+                  );
+                }}
+                style={tw`p-1.5 border border-subText rounded-xl`}
+              >
+                <Text style={tw`font-LufgaMedium text-black text-sm `}>
+                  Change stuff
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <MenuCard
+              titleText="Mr. Lopez"
+              subTitleText="Location goes here."
+              image={ImgProfileImg}
+              containerStyle={tw` bg-white`}
+            />
+            <PrimaryButton
+              onPress={() => {
+                router.push(
+                  "/serviceProvider/notificationProvider/deliveryRequestSent"
+                );
+              }}
+              buttonText="Send delivery request"
+              buttonContainerStyle={tw`bg-transparent border border-gray-300 mt-5`}
+              buttonTextStyle={tw`text-black text-base font-LufgaMedium`}
+            />
+          </View>
+        )}
         {status === "approved" && (
           <View>
             <View style={tw`flex-row items-center gap-3 pt-3`}>
@@ -106,23 +148,33 @@ const ProviderOrder = () => {
                 Assigned stuff
               </Text>
             </View>
-            <MenuCard
-              titleText="Mr. Lopez"
-              subTitleText="+123456789"
+            <ProviderCard
               image={ImgProfileImg}
-              containerStyle={tw` bg-white`}
+              title="Mr. Lopez"
+              // subTitle="Cleaner"
+              ratings={4}
+              // reviews={4}
+              totalOrder={10}
+              containerStyle={tw`bg-white`}
+              disabled
             />
           </View>
         )}
+
         {status === "canceled" && (
           <View style={tw`gap-3`}>
-            <Text style={tw`text-red-500 text-center font-LufgaMedium`}>
+            <Text style={tw`text-red-500 text-center font-LufgaMedium `}>
               Delivery request canceled
             </Text>
-            <TextButton
+            <PrimaryButton
+              onPress={() => {
+                router.push(
+                  "/serviceProvider/notificationProvider/deliveryRequestSent"
+                );
+              }}
               buttonText="Deliver again"
               buttonContainerStyle={tw`bg-transparent border border-gray-300`}
-              buttonTextStyle={tw`text-black font-LufgaMedium`}
+              buttonTextStyle={tw`text-black text-base font-LufgaMedium`}
             />
           </View>
         )}
