@@ -33,7 +33,7 @@ const UserTabsBar: React.FC<BottomTabBarProps> = ({
 
   return (
     <View
-      style={tw` absolute bottom-3 shadow flex-row justify-between bg-white py-4 px-2 w-[90%] items-center self-center  rounded-3xl`}
+      style={tw` absolute bottom-3 shadow flex-row justify-between bg-white py-4 px-2 w-[90%] items-center self-center  rounded-full `}
     >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
@@ -94,7 +94,7 @@ const UserTabsBar: React.FC<BottomTabBarProps> = ({
             onPress={onPress}
             onLongPress={onLongPress}
             style={[
-              tw`flex-row items-center justify-center h-10 px-2 rounded-full `,
+              tw`flex-row items-center justify-center h-10 pl-1 pr-2 rounded-full `,
               isFocused ? tw`bg-primaryBtn  ` : tw`bg-transparent`,
             ]}
           >

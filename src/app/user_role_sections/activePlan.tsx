@@ -4,7 +4,7 @@ import tw from "@/src/lib/tailwind";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
 
 const ActivePlan = () => {
@@ -23,7 +23,20 @@ const ActivePlan = () => {
       <View>
         {[1, 2].map((item) => {
           return (
-            <View key={item}>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => {
+                router.push({
+                  pathname:
+                    "/user_role_sections/categoryPlaning/adminServiceDetails",
+                  params: {
+                    // category: category ? category.toString() : "Services",
+                    category: "Services Details",
+                  },
+                });
+              }}
+              key={item}
+            >
               <Image
                 style={tw`w-full h-40 rounded-3xl mt-2`}
                 source={ImgService}
@@ -113,7 +126,7 @@ const ActivePlan = () => {
                 </View>
               </View>
               {/* ---------------------- plan progress bar end hare  ---------------------- */}
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
@@ -125,7 +138,20 @@ const ActivePlan = () => {
       <View>
         {[1, 2].map((item) => {
           return (
-            <View key={item} style={tw``}>
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname:
+                    "/user_role_sections/categoryPlaning/adminServiceDetails",
+                  params: {
+                    category: "Services Details",
+                  },
+                });
+              }}
+              activeOpacity={0.9}
+              key={item}
+              style={tw``}
+            >
               <View
                 style={tw`flex-row items-center justify-center bg-white py-4 rounded-2xl gap-2`}
               >
@@ -230,7 +256,7 @@ const ActivePlan = () => {
                 </View>
               </View>
               {/* ---------------------- plan progress bar end hare  ---------------------- */}
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>

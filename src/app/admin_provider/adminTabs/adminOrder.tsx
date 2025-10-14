@@ -9,6 +9,7 @@ import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -33,7 +34,7 @@ const AdminOrder = () => {
           greetingStyle={tw`text-white `}
           userNameStyle={tw`text-white `}
           notificationOnPress={() => {
-            // router.push("/serviceProvider/notificationProvider/notifications");
+            router.push("/admin_provider/adminNotification/notificationsAdmin");
           }}
           profileOnPress={() => {}}
         />
@@ -142,11 +143,11 @@ const AdminOrder = () => {
                 <OrderCard
                   key={index.toString()}
                   onPress={() => {
-                    // router.push({
-                    //   pathname:
-                    //     "/serviceProvider/notificationProvider/providerOrderDetails",
-                    //   params: { status: "new_order" },
-                    // });
+                    router.push({
+                      pathname:
+                        "/serviceProvider/notificationProvider/providerOrderDetails",
+                      params: { status: "new_order" },
+                    });
                   }}
                   image={ImgServiceImage}
                   title="Order Title"
