@@ -10,7 +10,7 @@ const _layout = () => {
     >
       <Tabs.Screen name="providerHome" options={{ title: "Home" }} />
       <Tabs.Screen name="providerOrder" options={{ title: "Order" }} />
-      <Tabs.Screen name="providerChat" options={{ title: "Chat" }} />
+      {/* <Tabs.Screen name="providerChat" options={{ title: "Chat" }} /> */}
       <Tabs.Screen name="providerAccount" options={{ title: "Account" }} />
     </Tabs>
   );

@@ -2,7 +2,6 @@ import {
   IconCartWhite,
   IconCrossRed,
   IconCrossWhite,
-  IconMessage,
   IconPendingStatus,
   IconRightCornerArrowWhite,
   IconSuccess,
@@ -85,7 +84,7 @@ const OrderDetailsStatus = () => {
             <Text style={tw`font-LufgaSemiBold text-base text-black`}>
               Provider
             </Text>
-            {status === "approved" && (
+            {/* {status === "approved" && (
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() =>
@@ -95,7 +94,7 @@ const OrderDetailsStatus = () => {
               >
                 <SvgXml xml={IconMessage} />
               </TouchableOpacity>
-            )}
+            )} */}
           </View>
           <ProviderCard
             containerStyle={tw`bg-white`}
