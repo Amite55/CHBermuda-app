@@ -37,7 +37,7 @@ const ServicePlanCard = ({
           {planName}
         </Text>
         <Text style={tw`font-LufgaMedium text-base text-black`}>
-          ${price}{" "}
+          ${price}
           <Text style={tw`font-LufgaRegular text-sm text-subText`}>
             /{plan}
           </Text>
@@ -54,7 +54,7 @@ const ServicePlanCard = ({
           style={tw`pt-3 bg-sky-200 rounded-lg px-3 py-1  justify-center items-center mt-3`}
         >
           <Text style={tw`font-LufgaMedium text-base text-black`}>
-            Providers:{" "}
+            Providers:
             <Text style={tw`font-LufgaSemiBold text-lg text-black`}>
               {providers}
             </Text>

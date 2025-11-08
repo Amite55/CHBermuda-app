@@ -27,6 +27,8 @@ const User_home = () => {
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw`pb-56`}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
     >
       <ImageBackground style={tw`relative w-full h-1/5 `} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
@@ -91,24 +93,32 @@ const User_home = () => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={tw`gap-5 mt-3  pl-4`}
+            contentContainerStyle={tw`gap-5 mt-3  px-4 `}
             data={CategoryData}
             keyExtractor={(item) => item.id.toString()}
             renderItem={(items) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    items.item.provider === "Admin"
-                      ? router.push({
-                          pathname:
-                            "/user_role_sections/categoryPlaning/adminProviderService",
-                          params: { category: items.item.name },
-                        })
-                      : router.push({
-                          pathname:
-                            "/user_role_sections/categoryPlaning/serviceProviderService",
-                          params: { category: items.item.name },
-                        });
+                    if (items.item.provider === "Respite care") {
+                      router.push({
+                        pathname:
+                          "/user_role_sections/respiteCarePlaning/respiteCareAllPlan",
+                        params: { category: items.item.name },
+                      });
+                    } else if (items.item.provider === "Admin") {
+                      router.push({
+                        pathname:
+                          "/user_role_sections/categoryPlaning/adminProviderService",
+                        params: { category: items.item.name },
+                      });
+                    } else {
+                      router.push({
+                        pathname:
+                          "/user_role_sections/categoryPlaning/serviceProviderService",
+                        params: { category: items.item.name },
+                      });
+                    }
                   }}
                   activeOpacity={0.9}
                 >

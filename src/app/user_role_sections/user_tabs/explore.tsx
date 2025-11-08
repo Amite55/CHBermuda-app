@@ -150,6 +150,8 @@ const Explore = () => {
       ListFooterComponentStyle={tw``}
       ListHeaderComponent={RenderHeader}
       ListFooterComponent={RenderFooter}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       renderItem={(items) => {
         return (
           <TouchableOpacity

@@ -5,6 +5,9 @@ import {
   ImgCategoryMealDelivery,
   ImgCategoryNurse,
   ImgCategoryTransports,
+  ImgPhysiotherapy,
+  ImgRespiteCare,
+  ImgRespiteCarePlan,
 } from "@/assets/image";
 
 export const CategoryData = [
@@ -35,7 +38,7 @@ export const CategoryData = [
   {
     id: 5,
     name: "Physiotherapy",
-    image: ImgCategoryMealDelivery,
+    image: ImgPhysiotherapy,
     provider: "Admin",
   },
   {
@@ -43,6 +46,12 @@ export const CategoryData = [
     name: "Rotating Nurse",
     image: ImgCategoryNurse,
     provider: "Admin",
+  },
+  {
+    id: 7,
+    name: "Respite care",
+    image: ImgRespiteCare,
+    provider: "Respite care",
   },
 ];
 
@@ -247,4 +256,61 @@ export const BookingTimeData = [
   { id: 3, time: "11:00 AM - 12:00 PM" },
   { id: 4, time: "12:00 PM - 1:00 PM" },
   { id: 5, time: "1:00 PM - 2:00 PM" },
+];
+
+export const RespiteCareData = [
+  {
+    id: 1,
+    title: "Amber Care",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
+  {
+    id: 2,
+    title: "Amber Care",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
+  {
+    id: 3,
+    title: "Tranquility Retreat",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
+  {
+    id: 4,
+    title: "Tranquility Retreat",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
+  {
+    id: 5,
+    title: "Amber Care",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
+  {
+    id: 5,
+    title: "Tranquility Retreat",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus lobortis sed quis convallis massa nulla est eget ultricies. Quis fringilla sollicitudin posuere luctus et urna molestie et senectus. Eget purus odio in vestibulum tellus condimentum blandit fermentum.",
+    image: ImgRespiteCarePlan,
+    price: 100,
+    duration: "4",
+  },
 ];
