@@ -156,17 +156,25 @@ const Explore = () => {
         return (
           <TouchableOpacity
             onPress={() => {
-              items.item.provider === "Admin"
-                ? router.push({
-                    pathname:
-                      "/user_role_sections/categoryPlaning/adminProviderService",
-                    params: { category: items.item.name },
-                  })
-                : router.push({
-                    pathname:
-                      "/user_role_sections/categoryPlaning/serviceProviderService",
-                    params: { category: items.item.name },
-                  });
+              if (items.item.provider === "Respite care") {
+                router.push({
+                  pathname:
+                    "/user_role_sections/respiteCarePlaning/respiteCareAllPlan",
+                  params: { category: items.item.name },
+                });
+              } else if (items.item.provider === "Admin") {
+                router.push({
+                  pathname:
+                    "/user_role_sections/categoryPlaning/adminProviderService",
+                  params: { category: items.item.name },
+                });
+              } else {
+                router.push({
+                  pathname:
+                    "/user_role_sections/categoryPlaning/serviceProviderService",
+                  params: { category: items.item.name },
+                });
+              }
             }}
             activeOpacity={0.7}
           >

@@ -775,11 +775,18 @@ export const IconCalendar = `<svg width="22" height="24" viewBox="0 0 22 24" fil
 export const IconPlus = `<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M7.35714 9.14286H0.5V6.85714H7.35714V0H9.64286V6.85714H16.5V9.14286H9.64286V16H7.35714V9.14286Z" fill="white"/>
 </svg>
-
-
+`;
+export const IconPlusBlack = `<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7.35714 9.14286H0.5V6.85714H7.35714V0H9.64286V6.85714H16.5V9.14286H9.64286V16H7.35714V9.14286Z" fill="#111111"/>
+</svg>
 `;
 export const IconEditPenGreen = `<svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M20.425 4.49104C20.8583 4.05777 20.8583 3.33565 20.425 2.92459L17.8254 0.324955C17.4144 -0.108318 16.6922 -0.108318 16.259 0.324955L14.2148 2.35801L18.3809 6.52409M0.75 15.8339V20H4.91609L17.2033 7.70171L13.0372 3.53562L0.75 15.8339Z" fill="#00AD2E"/>
+</svg>
+
+`;
+export const IconBlueTick = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9 18C4.0293 18 0 13.9707 0 9C0 4.0293 4.0293 0 9 0C13.9707 0 18 4.0293 18 9C18 13.9707 13.9707 18 9 18ZM7.9407 10.926L5.4522 8.4357L4.5 9.3879L7.3071 12.1968C7.47587 12.3655 7.70475 12.4603 7.9434 12.4603C8.18205 12.4603 8.41092 12.3655 8.5797 12.1968L13.9365 6.8418L12.9807 5.886L7.9407 10.926Z" fill="#00AD2E"/>
 </svg>
 
 `;

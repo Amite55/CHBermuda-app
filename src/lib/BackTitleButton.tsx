@@ -31,6 +31,7 @@ const BackTitleButton = ({
     >
       <TouchableOpacity
         onPress={onPress}
+        activeOpacity={0.7}
         style={tw`w-12 h-12 rounded-full bg-white items-center justify-center`}
       >
         <SvgXml xml={icon ? icon : IconHeaderBackArrow} />
