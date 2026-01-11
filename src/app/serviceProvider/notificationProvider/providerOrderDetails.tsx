@@ -8,6 +8,7 @@ import {
 import { ImgProfileImg, ImgServiceImage } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
+import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
@@ -29,8 +30,7 @@ const ProviderOrder = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { status } = useLocalSearchParams();
   const role = useRoleHooks();
-  console.log(role, "role");
-  console.log(status);
+  const providerType = useGetProviderTypes();
 
   const handleEditModalOpen = useCallback(async () => {
     editBottomSheetModalRef.current?.present();
@@ -116,13 +116,22 @@ const ProviderOrder = () => {
             />
             <PrimaryButton
               onPress={() => {
-                role === "provider"
-                  ? router.push(
+                if (role === "PROVIDER") {
+                  if (providerType === "ADMIN_PROVIDER") {
+                    router.push(
                       "/serviceProvider/notificationProvider/serviceAssign"
-                    )
-                  : setIsModalVisible(true);
+                    );
+                  } else {
+                    setIsModalVisible(true);
+                  }
+                }
               }}
-              buttonText={role === "provider" ? "Accept & Assign" : "Assign"}
+              buttonText={
+                role === "PROVIDER" &&
+                (providerType === "ADMIN_PROVIDER"
+                  ? "Accept & Assign"
+                  : "Assign")
+              }
               buttonContainerStyle={tw`bg-green-500 w-[48%]`}
               buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
             />

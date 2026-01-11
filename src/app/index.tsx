@@ -2,9 +2,10 @@ import { ImgSplashLogo } from "@/assets/image";
 import * as Font from "expo-font";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { BaseColor } from "../utils/util";
+import tw from "../lib/tailwind";
+import { BaseColor, PrimaryColor } from "../utils/util";
 
 export default function Index() {
   const decideNavigation = async () => {
@@ -42,9 +43,17 @@ export default function Index() {
       }}
     >
       <Animated.Image
+        style={tw`w-52 h-52 `}
         entering={FadeInUp.duration(800).delay(1000)}
         source={ImgSplashLogo}
       />
+      <Animated.Text
+        entering={FadeInUp.duration(500).delay(800)}
+        style={tw`text-center font-semibold text-secondaryBtn text-2xl`}
+      >
+        Welcome
+      </Animated.Text>
+      <ActivityIndicator size="small" color={PrimaryColor} />
     </View>
   );
 }

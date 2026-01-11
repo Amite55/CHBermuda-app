@@ -8,6 +8,7 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
+import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import tw from "@/src/lib/tailwind";
 import PrimaryButton from "@/src/utils/PrimaryButton";
@@ -33,7 +34,7 @@ const SingIn = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
   const role = useRoleHooks();
-
+  const providerType = useGetProviderTypes();
   // ==================== Validation Schema ====================
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -170,14 +171,16 @@ const SingIn = () => {
                     buttonContainerStyle={tw`mb-5`}
                     buttonText="Sign In"
                     onPress={() => {
-                      if (role === "user") {
+                      if (role === "USER") {
                         router.push("/user_role_sections/user_tabs/user_home");
-                      } else if (role === "provider") {
-                        router.push(
-                          "/serviceProvider/serviceProviderTabs/providerHome"
-                        );
-                      } else {
-                        router.push("/admin_provider/adminTabs/adminHome");
+                      } else if (role === "PROVIDER") {
+                        if (providerType === "SERVICE_PROVIDER") {
+                          router.push(
+                            "/serviceProvider/serviceProviderTabs/providerHome"
+                          );
+                        } else {
+                          router.push("/admin_provider/adminTabs/adminHome");
+                        }
                       }
                     }}
                   />
