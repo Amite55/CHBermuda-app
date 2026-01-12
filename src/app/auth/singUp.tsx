@@ -9,7 +9,12 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
+import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
+import { useRoleHooks } from "@/src/hooks/useRoleHooks";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useRegisterMutation } from "@/src/redux/Api/authSlices";
+import { ISignUp } from "@/src/redux/CommonTypes/CommonType";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -30,22 +35,28 @@ import { SvgXml } from "react-native-svg";
 import * as Yup from "yup";
 
 const SingUp = () => {
+  const toast = useToastHelpers();
+
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
+  const role = useRoleHooks();
+  const providerType = useGetProviderTypes();
+  // =============== api end point =================
+  const [singUpInfo, { isLoading: isSingUpLoading }] = useRegisterMutation();
 
   // ==================== Validation Schema ====================
   const SignUpSchema = Yup.object().shape({
     email: Yup.string()
       .email("Please enter a valid email address")
       .required("Email is required"),
-    fullName: Yup.string()
+    name: Yup.string()
       .min(3, "Full name must be at least 3 characters")
       .required("Full name is required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .required("Password is required"),
-    CPassword: Yup.string()
+    password_confirmation: Yup.string()
       .oneOf([Yup.ref("password")], "Passwords must match")
       .required("Confirm password is required"),
   });
@@ -56,6 +67,29 @@ const SingUp = () => {
       // await AsyncStorage.setItem("check", JSON.stringify(isChecked));
     } catch (error) {
       console.log(error, "User Info Storage not save ---->");
+    }
+  };
+
+  // =-==================== handle sing up =====================-=
+  const handleSingUp = async (values: ISignUp) => {
+    try {
+      const payload = {
+        ...values,
+        role: role,
+        ...(role === "PROVIDER" && { provider_type: providerType }),
+      };
+      const res = await singUpInfo(payload).unwrap();
+      console.log(res, "this is user info ");
+      router.push({
+        pathname: "/auth/singUpOTP",
+        params: { email: values.email },
+      });
+    } catch (error: any) {
+      console.log(error, "Sing up not success _______________________");
+      router.push({
+        pathname: "/Toaster",
+        params: { res: error.message || "please try again" },
+      });
     }
   };
 
@@ -79,13 +113,13 @@ const SingUp = () => {
 
             <Formik
               initialValues={{
+                name: "",
                 email: "",
                 password: "",
-                fullName: "",
-                CPassword: "",
+                password_confirmation: "",
               }}
-              onSubmit={(values) => console.log(values)}
               validationSchema={SignUpSchema}
+              onSubmit={(values) => handleSingUp(values)}
             >
               {({
                 handleChange,
@@ -102,17 +136,17 @@ const SingUp = () => {
                   >
                     <SvgXml xml={IconUserName} />
                     <TextInput
-                      onChangeText={handleChange("fullName")}
-                      onBlur={handleBlur("fullName")}
-                      value={values.fullName}
+                      onChangeText={handleChange("name")}
+                      onBlur={handleBlur("name")}
+                      value={values.name}
                       placeholder="Enter your Full Name"
                       placeholderTextColor="#111111"
                       style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
                     />
                   </View>
-                  {errors.fullName && touched.fullName && (
+                  {errors.name && touched.name && (
                     <Text style={tw`text-red-500 text-xs mt-1`}>
-                      {errors.fullName}
+                      {errors.name}
                     </Text>
                   )}
                   {/* ---------------------- Email Input ---------------------- */}
@@ -148,7 +182,7 @@ const SingUp = () => {
                         value={values.password}
                         placeholder="Password"
                         placeholderTextColor="#111111"
-                        style={tw` text-regularText `}
+                        style={tw`flex-1 text-regularText `}
                         secureTextEntry={!showPassword}
                       />
                     </View>
@@ -171,12 +205,12 @@ const SingUp = () => {
                       <SvgXml xml={IconPassword} />
                       <TextInput
                         key={showPassword ? "text" : "password"}
-                        onChangeText={handleChange("password")}
-                        onBlur={handleBlur("password")}
-                        value={values.password}
-                        placeholder="Password"
+                        onChangeText={handleChange("password_confirmation")}
+                        onBlur={handleBlur("password_confirmation")}
+                        value={values.password_confirmation}
+                        placeholder="Confirm Password"
                         placeholderTextColor="#111111"
-                        style={tw` text-regularText `}
+                        style={tw`flex-1 text-regularText `}
                         secureTextEntry={!showPassword}
                       />
                     </View>
@@ -190,11 +224,12 @@ const SingUp = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  {errors.CPassword && touched.CPassword && (
-                    <Text style={tw`text-red-500 text-xs mt-1`}>
-                      {errors.CPassword}
-                    </Text>
-                  )}
+                  {errors.password_confirmation &&
+                    touched.password_confirmation && (
+                      <Text style={tw`text-red-500 text-xs mt-1`}>
+                        {errors.password_confirmation}
+                      </Text>
+                    )}
 
                   <View
                     style={tw`flex-row gap-2 items-center rounded-none my-6`}
@@ -228,10 +263,22 @@ const SingUp = () => {
                   </View>
 
                   {/* ------------------- sign in button    ---------------- */}
-
                   <PrimaryButton
-                    buttonContainerStyle={tw`mb-5`}
-                    buttonText="Sign In"
+                    disabled={!isChecked}
+                    loading={isSingUpLoading}
+                    buttonContainerStyle={[
+                      tw`mb-5`,
+                      !isChecked && tw`bg-gray-500 pointer-events-none`,
+                    ]}
+                    buttonText="Sign UP"
+                    // onPress={handleSubmit}
+                    // onPress={() => {
+                    //   router.push({
+                    //     pathname: "/Toaster",
+                    //     params: { res: "please try again" },
+                    //   });
+                    // }}
+                    onPress={() => toast.success(role, 3000)}
                   />
 
                   <View style={tw`flex-row items-center justify-center gap-4`}>
@@ -268,7 +315,7 @@ const SingUp = () => {
                       <Text
                         style={tw`text-primaryBtn text-base font-LufgaRegular`}
                       >
-                        Sign up
+                        Sign In
                       </Text>
                       <SvgXml xml={IconTriangleArrow} />
                     </TouchableOpacity>

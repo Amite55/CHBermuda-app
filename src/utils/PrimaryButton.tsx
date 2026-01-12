@@ -10,14 +10,14 @@ interface PrimaryButtonProps {
   loading?: boolean;
   onPress?: () => void;
   disabled?: boolean;
-  leftIcon: any;
-  rightIcon: any;
+  leftIcon?: any;
+  rightIcon?: any;
 }
 
 const PrimaryButton = ({
-  buttonContainerStyle = "",
-  buttonTextStyle = "",
-  buttonText = "",
+  buttonContainerStyle,
+  buttonTextStyle,
+  buttonText,
   loading = false,
   onPress = () => {},
   disabled = false,

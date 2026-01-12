@@ -96,7 +96,7 @@ const ChooseRole = () => {
               <View style={tw`flex-row items-center gap-3`}>
                 <SvgXml xml={IconProvider} />
                 <Text style={tw`font-LufgaMedium text-lg text-regularText`}>
-                  providers
+                  Providers
                 </Text>
               </View>
 
@@ -137,7 +137,7 @@ const ChooseRole = () => {
               <View style={tw`flex-row items-center gap-3`}>
                 <SvgXml xml={IconAdminServiceIcon} />
                 <Text style={tw`font-LufgaMedium text-lg text-regularText`}>
-                  Admin provider
+                  Admin Provider
                 </Text>
               </View>
 
