@@ -1,5 +1,4 @@
 import { api } from "../BaseApi";
-import { tagTypes } from "../tagsTypes";
 
 export const notificationSlices = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,21 +7,21 @@ export const notificationSlices = api.injectEndpoints({
         url: `/notifications?per_page=${per_page}&page=${page}`,
         method: "GET",
       }),
-      providesTags: [tagTypes.notification],
+      providesTags: ["Notification"],
     }),
     singleMarkAsRead: builder.mutation({
       query: (id) => ({
         url: `/mark-notification/${id}`,
         method: "POST",
       }),
-      invalidatesTags: [tagTypes.notification],
+      invalidatesTags: ["Notification"],
     }),
     allMarkAsRead: builder.mutation({
       query: () => ({
         url: `/mark-all-notification`,
         method: "POST",
       }),
-      invalidatesTags: [tagTypes.notification],
+      invalidatesTags: ["Notification"],
     }),
   }),
 });

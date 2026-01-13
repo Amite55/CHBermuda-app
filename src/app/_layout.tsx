@@ -31,13 +31,6 @@ export default function RootLayout() {
                   <Stack.Screen name="auth" />
                   <Stack.Screen name="serviceProvider" />
                   <Stack.Screen name="admin_provider" />
-                  <Stack.Screen
-                    name="Toaster"
-                    options={{
-                      presentation: "transparentModal",
-                      animation: "fade",
-                    }}
-                  />
                 </Stack>
               </ToastProvider>
             </Provider>

@@ -36,14 +36,13 @@ import * as Yup from "yup";
 
 const SingUp = () => {
   const toast = useToastHelpers();
-
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
   const role = useRoleHooks();
   const providerType = useGetProviderTypes();
   // =============== api end point =================
-  const [singUpInfo, { isLoading: isSingUpLoading }] = useRegisterMutation();
+  const [registerInfo, { isLoading: isSingUpLoading }] = useRegisterMutation();
 
   // ==================== Validation Schema ====================
   const SignUpSchema = Yup.object().shape({
@@ -64,7 +63,6 @@ const SingUp = () => {
   const handleCheckBox = async () => {
     setIsChecked(!isChecked);
     try {
-      // await AsyncStorage.setItem("check", JSON.stringify(isChecked));
     } catch (error) {
       console.log(error, "User Info Storage not save ---->");
     }
@@ -76,20 +74,25 @@ const SingUp = () => {
       const payload = {
         ...values,
         role: role,
-        ...(role === "PROVIDER" && { provider_type: providerType }),
+        // ...(role === "PROVIDER" && { provider_type: providerType }),
       };
-      const res = await singUpInfo(payload).unwrap();
-      console.log(res, "this is user info ");
-      router.push({
-        pathname: "/auth/singUpOTP",
-        params: { email: values.email },
-      });
+      const res = await registerInfo(payload).unwrap();
+      if (res) {
+        router.push({
+          pathname: "/auth/singUpOTP",
+          params: { email: values.email },
+        });
+      }
     } catch (error: any) {
       console.log(error, "Sing up not success _______________________");
-      router.push({
-        pathname: "/Toaster",
-        params: { res: error.message || "please try again" },
-      });
+      toast.showError(
+        error.message ||
+          error?.data?.message ||
+          error ||
+          error?.data ||
+          "Something went wrong please try again",
+        4000
+      );
     }
   };
 
@@ -271,14 +274,7 @@ const SingUp = () => {
                       !isChecked && tw`bg-gray-500 pointer-events-none`,
                     ]}
                     buttonText="Sign UP"
-                    // onPress={handleSubmit}
-                    // onPress={() => {
-                    //   router.push({
-                    //     pathname: "/Toaster",
-                    //     params: { res: "please try again" },
-                    //   });
-                    // }}
-                    onPress={() => toast.success(role, 3000)}
+                    onPress={handleSubmit}
                   />
 
                   <View style={tw`flex-row items-center justify-center gap-4`}>

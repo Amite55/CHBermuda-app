@@ -1,5 +1,4 @@
 import { api } from "../BaseApi";
-import { tagTypes } from "../tagsTypes";
 
 export const messagesSlices = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,7 +8,7 @@ export const messagesSlices = api.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [tagTypes.message],
+      invalidatesTags: ["Message"],
     }),
     editMessage: builder.mutation({
       query: (data) => ({
@@ -17,14 +16,14 @@ export const messagesSlices = api.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [tagTypes.message],
+      invalidatesTags: ["Message"],
     }),
     getMessages: builder.query({
       query: (receiver_id) => ({
         url: `/get-message?receiver_id=${receiver_id}`,
         method: "GET",
       }),
-      providesTags: [tagTypes.message],
+      providesTags: ["Message"],
     }),
     markAsRead: builder.mutation({
       query: (receiver_id) => ({
@@ -32,21 +31,21 @@ export const messagesSlices = api.injectEndpoints({
         method: "POST",
         body: receiver_id,
       }),
-      invalidatesTags: [tagTypes.message],
+      invalidatesTags: ["Message"],
     }),
     getSearchNewUser: builder.query({
       query: (role) => ({
         url: `/search-new-user?role=${role}`,
         method: "GET",
       }),
-      providesTags: [tagTypes.message],
+      providesTags: ["Message"],
     }),
     getChatList: builder.query({
       query: () => ({
         url: `/chat-list`,
         method: "GET",
       }),
-      providesTags: [tagTypes.message],
+      providesTags: ["Message"],
     }),
   }),
 });

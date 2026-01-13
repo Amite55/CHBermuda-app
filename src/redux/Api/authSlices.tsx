@@ -1,5 +1,4 @@
 import { api } from "../BaseApi";
-import { tagTypes } from "../tagsTypes";
 
 export const authSlices = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,15 +8,17 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: [tagTypes.profile, tagTypes.auth],
+      invalidatesTags: ["SingIn"],
     }),
     register: builder.mutation({
-      query: (credentials) => ({
-        url: "/auth/register",
-        method: "POST",
-        body: credentials,
-      }),
-      invalidatesTags: [tagTypes.auth],
+      query: (registerInfo) => {
+        return {
+          url: "/auth/register",
+          method: "POST",
+          body: registerInfo,
+        };
+      },
+      invalidatesTags: ["SingUp"],
     }),
     socialLogin: builder.mutation({
       query: (credentials) => ({
@@ -25,7 +26,7 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: [tagTypes.auth, tagTypes.profile],
+      invalidatesTags: ["SingUp", "SingIn", "Profile"],
     }),
     verifyOtp: builder.mutation({
       query: (code) => ({
@@ -59,7 +60,7 @@ export const authSlices = api.injectEndpoints({
       query: () => ({
         url: "/profile",
       }),
-      providesTags: [tagTypes.profile],
+      providesTags: ["Profile"],
     }),
     editProfilePic: builder.mutation({
       query: (formData) => ({
@@ -67,7 +68,7 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: [tagTypes.profile],
+      invalidatesTags: ["Profile"],
     }),
     deleteProfile: builder.mutation({
       query: (password) => ({
@@ -75,7 +76,7 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: password,
       }),
-      invalidatesTags: [tagTypes.profile, tagTypes.auth],
+      invalidatesTags: ["Profile", "SingIn", "SingUp"],
     }),
     editProfile: builder.mutation({
       query: (credentials) => ({
@@ -83,7 +84,7 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: [tagTypes.profile],
+      invalidatesTags: ["Profile"],
     }),
     updateLatLong: builder.mutation({
       query: (LatLong) => ({
@@ -91,7 +92,7 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
         body: LatLong,
       }),
-      invalidatesTags: [tagTypes.profile, tagTypes.auth],
+      invalidatesTags: ["Profile", "SingIn", "SingUp"],
     }),
     logout: builder.mutation({
       query: () => ({
@@ -99,11 +100,11 @@ export const authSlices = api.injectEndpoints({
         method: "POST",
       }),
       invalidatesTags: [
-        tagTypes.auth,
-        tagTypes.profile,
-        tagTypes.notification,
-        tagTypes.booking,
-        tagTypes.payment,
+        "Profile",
+        "SingIn",
+        "SingUp",
+        "Notification",
+        "Booking",
       ],
     }),
   }),

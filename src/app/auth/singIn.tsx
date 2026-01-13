@@ -10,12 +10,15 @@ import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
 import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useLoginMutation } from "@/src/redux/Api/authSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { Link, router } from "expo-router";
 import { Formik } from "formik";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -33,8 +36,15 @@ import * as Yup from "yup";
 const SingIn = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
+  const [savedEmail, setSavedEmail] = React.useState("");
+  const [savedPassword, setSavedPassword] = React.useState("");
+  const toast = useToastHelpers();
   const role = useRoleHooks();
   const providerType = useGetProviderTypes();
+
+  // =============== api end point =================
+  const [loginInfo, { isLoading: isLoginLoading }] = useLoginMutation();
+
   // ==================== Validation Schema ====================
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -49,13 +59,83 @@ const SingIn = () => {
   });
 
   const handleCheckBox = async () => {
-    setIsChecked(!isChecked);
+    const newValue = !isChecked;
+    setIsChecked(newValue);
     try {
-      // await AsyncStorage.setItem("check", JSON.stringify(isChecked));
+      await AsyncStorage.setItem("rememberMe", JSON.stringify(newValue));
     } catch (error) {
       console.log(error, "User Info Storage not save ---->");
     }
   };
+
+  // ==================== handle sing in =====================
+  const handleSingIn = useCallback(
+    async (values: any) => {
+      console.log(values.email);
+      try {
+        const payload = {
+          ...values,
+          role: role,
+          // ...(role === "PROVIDER" && { provider_type: providerType }),
+        };
+        const res = await loginInfo(payload).unwrap();
+        // ------------- login info save async storage -------------
+        if (isChecked) {
+          await AsyncStorage.setItem(
+            "userInfo",
+            JSON.stringify({
+              email: values.email,
+              password: values.password,
+            })
+          );
+        } else {
+          await AsyncStorage.removeItem("rememberMe");
+          await AsyncStorage.removeItem("userInfo");
+        }
+        if (res) {
+          await AsyncStorage.setItem("token", res?.data?.access_token);
+          if (res?.data?.user?.role === "USER") {
+            router.replace("/user_role_sections/user_tabs/user_home");
+          } else if (res?.data?.user?.role === "PROVIDER") {
+            if (providerType === "SERVICE_PROVIDER") {
+              router.replace(
+                "/serviceProvider/serviceProviderTabs/providerHome"
+              );
+            } else {
+              router.replace("/admin_provider/adminTabs/adminHome");
+            }
+          }
+        }
+      } catch (error: any) {
+        console.log(error, "Sing in not success _______________________");
+        toast.showError(
+          error.message ||
+            error?.data?.message ||
+            error ||
+            error?.data ||
+            "Something went wrong please try again",
+          4000
+        );
+      }
+    },
+    [role, providerType]
+  );
+
+  // ===================== initial render =====================
+  useEffect(() => {
+    const loadData = async () => {
+      const check = await AsyncStorage.getItem("rememberMe");
+      const savedInfo = await AsyncStorage.getItem("userInfo");
+      if (savedInfo) {
+        const parsed = JSON.parse(savedInfo);
+        setIsChecked(true);
+        setSavedEmail(parsed.email);
+        setSavedPassword(parsed.password);
+      }
+    };
+    loadData();
+  }, []);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -74,10 +154,9 @@ const SingIn = () => {
               title="Welcome Back"
               subtile="Please use your credentials to sign in as a user"
             />
-
             <Formik
-              initialValues={{ email: "", password: "" }}
-              onSubmit={(values) => console.log(values)}
+              initialValues={{ email: savedEmail, password: savedPassword }}
+              onSubmit={(values) => handleSingIn(values)}
               validationSchema={LoginSchema}
             >
               {({
@@ -121,7 +200,7 @@ const SingIn = () => {
                         value={values.password}
                         placeholder="Password"
                         placeholderTextColor="#111111"
-                        style={tw` text-regularText `}
+                        style={tw`flex-1 text-regularText `}
                         secureTextEntry={!showPassword}
                       />
                     </View>
@@ -166,23 +245,12 @@ const SingIn = () => {
                     </Text>
                   </View>
                   {/* ------------------- sign in button    ---------------- */}
-
                   <PrimaryButton
+                    loading={isLoginLoading}
+                    disabled={isLoginLoading}
                     buttonContainerStyle={tw`mb-5`}
                     buttonText="Sign In"
-                    onPress={() => {
-                      if (role === "USER") {
-                        router.push("/user_role_sections/user_tabs/user_home");
-                      } else if (role === "PROVIDER") {
-                        if (providerType === "SERVICE_PROVIDER") {
-                          router.push(
-                            "/serviceProvider/serviceProviderTabs/providerHome"
-                          );
-                        } else {
-                          router.push("/admin_provider/adminTabs/adminHome");
-                        }
-                      }
-                    }}
+                    onPress={handleSubmit}
                   />
 
                   <View style={tw`flex-row items-center justify-center gap-4`}>

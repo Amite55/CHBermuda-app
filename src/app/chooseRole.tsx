@@ -23,7 +23,7 @@ const ChooseRole = () => {
   const handleSetRole = async (role: string) => {
     await AsyncStorage.setItem("role", JSON.stringify(role));
     if (role === "USER") {
-      router.replace(`/auth/singIn`);
+      router.push(`/auth/singIn`);
     }
   };
 

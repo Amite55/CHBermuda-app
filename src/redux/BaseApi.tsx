@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { tagTypesList } from "./tagsTypes";
 
 interface BaseQueryArgs extends AxiosRequestConfig {
   url: string;
@@ -65,6 +64,14 @@ export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithPath,
   endpoints: () => ({}),
-  tagTypes: tagTypesList,
+  tagTypes: [
+    "SingIn",
+    "SingUp",
+    "Profile",
+    "Notification",
+    "Booking",
+    "Payment",
+    "Message",
+  ],
 });
 // export const imageUrl = process.env.EXPO_PUBLIC_IMG_URL;

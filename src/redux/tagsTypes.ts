@@ -1,5 +1,5 @@
 export enum tagTypes {
-  auth = "auth",
+  auth = "signIn",
   profile = "profile",
   notification = "notification",
   booking = "booking",

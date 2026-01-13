@@ -30,7 +30,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const showToast = (
     message: string,
     type: ToastType = "success",
-    duration: number = 3000
+    duration: number = 2000
   ) => {
     // Clear any existing toast timeout
     setToast(null);

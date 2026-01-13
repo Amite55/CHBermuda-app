@@ -1,10 +1,12 @@
 import { ImgSplashLogo } from "@/assets/image";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import {
   useForgotPasswordMutation,
   useVerifyOtpMutation,
 } from "@/src/redux/Api/authSlices";
 import { PrimaryColor } from "@/src/utils/util";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -21,45 +23,60 @@ import {
 import { OtpInput } from "react-native-otp-entry";
 
 const EnterOTP = () => {
+  const [otpKey, setOtpKey] = React.useState(Date.now());
+  const [otpCode, setOtpCode] = React.useState("");
   const { email } = useLocalSearchParams();
+  const toast = useToastHelpers();
 
   // ============= otp api end point =================
   const [otp, { isLoading: isOTPLoading }] = useVerifyOtpMutation();
   const [reSetOTP, { isLoading: isOTPResetLoading }] =
     useForgotPasswordMutation();
 
+  // ====================  otp handler ====================
   const handleSendOTP = async (text: string) => {
     try {
       const res = await otp({ email, otp: text }).unwrap();
-      if (res) {
-        console.log(res, "this is otp response ------------>");
+      if (res?.status === "success") {
+        toast.success(res?.message || "OTP send successfully", 3000);
+        await AsyncStorage.setItem("token", res?.data?.access_token);
+        // ============= navigate to dynamic role ===================
+        if (res?.data?.user?.role === "USER") {
+          router.replace("/user_role_sections/user_tabs/user_home");
+        }
       }
     } catch (error: any) {
       console.log(error, "error in otp");
-      router.push({
-        pathname: "/Toaster",
-        params: { res: error.data.message || error || "Your OTP is incorrect" },
-      });
+      toast.showError(
+        error.message ||
+          error?.data?.message ||
+          error ||
+          error?.data ||
+          "Invalid OTP please try again",
+        4000
+      );
     }
   };
 
   // ===================== reset otp =====================-
   const handleResendOtp = async () => {
+    setOtpCode("");
+    setOtpKey(Date.now());
     try {
-      const res = await reSetOTP(email).unwrap();
-      console.log(res, "thi is res>>>>>>>>>>>");
+      const res = await reSetOTP({ email }).unwrap();
       if (res) {
-        router.push({
-          pathname: `/Toaster`,
-          params: { res: "OTP sent successfully!" },
-        });
+        toast.success(res?.message || "OTP send successfully", 3000);
       }
     } catch (error: any) {
       console.log(error, "Resend OTP not success ->>");
-      router.push({
-        pathname: `/Toaster`,
-        params: { res: error?.message || "Not send again!" },
-      });
+      toast.showError(
+        error.message ||
+          error?.data?.message ||
+          error ||
+          error?.data ||
+          "OTP not send please try again",
+        4000
+      );
     }
   };
 
@@ -72,7 +89,11 @@ const EnterOTP = () => {
         <View
           style={tw`flex-1 justify-center items-center bg-bgBaseColor  px-5 `}
         >
-          <Image style={tw`w-36 h-36  `} source={ImgSplashLogo} />
+          <Image
+            contentFit="contain"
+            style={tw`w-36 h-36 `}
+            source={ImgSplashLogo}
+          />
           <View style={tw`gap-2 items-center justify-center`}>
             <Text
               style={tw`font-LufgaBold text-3xl text-regularText text-center`}
@@ -82,13 +103,14 @@ const EnterOTP = () => {
             <Text
               style={tw`font-LufgaRegular text-base text-regularText text-center`}
             >
-              We’ve sent you a 4 digit OTP to {email}
+              We’ve sent you a 6 digit OTP to{" "}
+              <Text style={tw`font-LufgaSemiBold text-lg`}>{email}</Text>
             </Text>
           </View>
 
           <View style={tw`flex-row gap-4 mt-5`}>
             <OtpInput
-              numberOfDigits={4}
+              numberOfDigits={6}
               focusColor={PrimaryColor}
               autoFocus={false}
               hideStick={true}
@@ -98,6 +120,9 @@ const EnterOTP = () => {
               type="numeric"
               secureTextEntry={false}
               focusStickBlinkingDuration={500}
+              key={otpKey}
+              value={otpCode}
+              onChange={(text: any) => setOtpCode(text)}
               onFilled={async (text) => {
                 await handleSendOTP(text);
               }}
@@ -106,7 +131,7 @@ const EnterOTP = () => {
               }}
               theme={{
                 containerStyle: tw`rounded-full mb-2`,
-                pinCodeContainerStyle: tw`h-20 w-20 justify-center items-center bg-white rounded-lg `,
+                pinCodeContainerStyle: tw`h-14 w-14 justify-center items-center bg-white rounded-lg `,
                 pinCodeTextStyle: tw`text-[#262626] text-2xl font-semibold`,
                 placeholderTextStyle: tw`text-[#6D6D6D] text-2xl font-semibold`,
               }}
@@ -120,7 +145,11 @@ const EnterOTP = () => {
               style={tw``}
             >
               {isOTPResetLoading ? (
-                <ActivityIndicator size="small" color={PrimaryColor} />
+                <ActivityIndicator
+                  style={tw`mr-6`}
+                  size="small"
+                  color={PrimaryColor}
+                />
               ) : (
                 <Text style={tw`text-primaryBtn font-semibold text-sm`}>
                   Send Again

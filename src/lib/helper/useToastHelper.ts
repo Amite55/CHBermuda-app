@@ -1,4 +1,5 @@
 import { useToast } from "@/src/context/ToastContext";
+import { getErrorMessage } from "@/src/utils/errorHandler";
 
 export const useToastHelpers = () => {
   const { showToast, hideToast } = useToast();
@@ -24,7 +25,19 @@ export const useToastHelpers = () => {
     // Special functions
     loading: (message: string = "Loading...") => showToast(message, "info", 0),
 
-    dismiss: hideToast,
+    // ✅ ERROR HANDLING - FIXED VERSION
+    showError: (error: any, duration?: number) => {
+      const message = getErrorMessage(error);
+      showToast(message, "error", duration || 3000);
+    },
+
+    // API specific errors==========================================================
+    networkError: () => showToast("No internet connection", "error", 4000),
+    serverError: () =>
+      showToast("Server error. Please try again.", "error", 3000),
+    authError: () => showToast("Please login again", "error", 3000),
+
+    // dismiss: hideToast,
   };
 };
 
