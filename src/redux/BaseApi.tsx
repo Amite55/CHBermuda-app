@@ -72,6 +72,9 @@ export const api = createApi({
     "Booking",
     "Payment",
     "Message",
+    "Package",
+    "Service",
+    "Category",
   ],
 });
 // export const imageUrl = process.env.EXPO_PUBLIC_IMG_URL;

@@ -4,17 +4,22 @@ import {
   ImgBennerImage,
   ImgExploreBanner,
   ImgG,
-  ImgProfileImg,
 } from "@/assets/image";
-import { CategoryData, ServicesData } from "@/src/components/AllData";
+import { ServicesData } from "@/src/components/AllData";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
+import {
+  useGetAllCategoryQuery,
+  useGetServiceThirdPartyQuery,
+} from "@/src/redux/Api/userHomeSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import {
   FlatList,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -23,19 +28,57 @@ import {
 import { SvgXml } from "react-native-svg";
 
 const User_home = () => {
+  const [isRefreshing, setRefreshing] = React.useState(false);
+  // ============= hooks ==================
+  const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
+    useProfile();
+  // ================= api end point ==================
+  const {
+    data: allCategory,
+    isLoading: isCategoryLoading,
+    isFetching: isCategoryFetching,
+  } = useGetAllCategoryQuery({});
+  const {
+    data: thirdPartyServices,
+    isLoading: isThirdPartyServicesLoading,
+    isFetching: isThirdPartyServicesFetching,
+    refetch,
+  } = useGetServiceThirdPartyQuery({});
+
+  // =============== onRefresh ==================
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await Promise.all([profileRefetch(), refetch()]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // =============== loading skeleton =================
+  // const isInitialLoading =
+  //   isProfileLoading || isCategoryLoading || isThirdPartyServicesLoading;
+
+  // if (isInitialLoading) {
+  //   return <UserHomeSkeleton />;
+  // }
+
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw`pb-56`}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} />
+      }
     >
       <ImageBackground style={tw`relative w-full h-1/5 `} source={ImgG}>
         {/* ------------------- user header part ---------------- */}
         <UserInfoHeader
           containerStyle={tw`px-5`}
-          userName="Rohit"
-          userImage={ImgProfileImg}
+          userName={profileData?.data?.name}
+          userImage={profileData?.data?.avatar}
           cartOnPress={() => {
             router.push("/user_role_sections/cart");
           }}
@@ -50,7 +93,7 @@ const User_home = () => {
       {/* ------------------------ promo banner section just for demo  ---------------- */}
       <ImageBackground
         imageStyle={tw`w-full h-full rounded-xl`}
-        style={tw` h-36   rounded-3xl absolute right-1 left-1 top-30 mx-3  `}
+        style={tw` h-36   rounded-3xl absolute right-1 left-1 top-30 mx-3 `}
         source={ImgBennerBG}
       >
         <View style={tw`relative`}>
@@ -94,29 +137,29 @@ const User_home = () => {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={tw`gap-5 mt-3  px-4 `}
-            data={CategoryData}
+            data={allCategory?.data}
             keyExtractor={(item) => item.id.toString()}
             renderItem={(items) => {
               return (
                 <TouchableOpacity
                   onPress={() => {
-                    if (items.item.provider === "Respite care") {
+                    if (items.item.type === "respite_care_service") {
                       router.push({
                         pathname:
                           "/user_role_sections/respiteCarePlaning/respiteCareAllPlan",
-                        params: { category: items.item.name },
+                        params: { category: items?.item.type },
                       });
-                    } else if (items.item.provider === "Admin") {
+                    } else if (items.item.type === "admin_service") {
                       router.push({
                         pathname:
                           "/user_role_sections/categoryPlaning/adminProviderService",
-                        params: { category: items.item.name },
+                        params: { category: items?.item.type },
                       });
                     } else {
                       router.push({
                         pathname:
                           "/user_role_sections/categoryPlaning/serviceProviderService",
-                        params: { category: items.item.name },
+                        params: { category: items?.item.type },
                       });
                     }
                   }}
@@ -128,13 +171,13 @@ const User_home = () => {
                     <Image
                       contentFit="contain"
                       style={tw`w-10 h-10`}
-                      source={items.item.image}
+                      source={items?.item?.icon}
                     />
                   </View>
                   <Text
                     style={tw`font-LufgaRegular text-sm text-regularText pt-1`}
                   >
-                    {items.item.name}
+                    {items?.item?.name}
                   </Text>
                 </TouchableOpacity>
               );
@@ -151,9 +194,14 @@ const User_home = () => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={tw`gap-5 mt-2 pl-4 mb-10`}
-            data={ServicesData}
-            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={tw`gap-5 mt-2 px-4 mb-10`}
+            data={thirdPartyServices?.data}
+            keyExtractor={(item) => item?.id?.toString()}
+            ListEmptyComponent={
+              <Text style={tw`font-LufgaRegular text-sm text-regularText `}>
+                No Service Found yet
+              </Text>
+            }
             renderItem={({ item }) => {
               return (
                 <View style={tw`bg-white  w-80 rounded-3xl p-4`}>
@@ -168,7 +216,7 @@ const User_home = () => {
                           >
                             <Image
                               style={tw`w-10 h-10`}
-                              source={item.image}
+                              source={item?.icon}
                               contentFit="contain"
                             />
                           </TouchableOpacity>
@@ -176,58 +224,63 @@ const User_home = () => {
                             <Text
                               style={tw`font-LufgaMedium text-lg text-black`}
                             >
-                              {item.title}
+                              {item?.name}
                             </Text>
                             <Text
                               style={tw`font-LufgaMedium text-lg text-subText`}
                             >
-                              {item.providers} Providers
+                              {item?.providers_count} Providers
                             </Text>
                           </View>
                         </View>
                         <Text style={tw`font-LufgaMedium text-2xl text-black`}>
-                          ${item.price}
+                          ${item?.packages[0]?.price}
                         </Text>
                       </View>
 
                       {/* Description */}
                       <Text
-                        numberOfLines={2}
-                        style={tw`font-LufgaMedium text-lg text-black text-center py-5`}
+                        numberOfLines={4}
+                        style={tw`font-LufgaRegular text-sm text-black  py-5`}
                       >
-                        {item.description}
+                        {item?.packages[0]?.description}
                       </Text>
 
                       {/* Included */}
-                      <Text
-                        style={tw`font-LufgaRegular text-base text-subText`}
-                      >
+                      <Text style={tw`font-LufgaMedium text-base text-subText`}>
                         Included
                       </Text>
                       <View style={tw`gap-2 mb-4`}>
-                        {item?.included?.map((line, index) => (
-                          <View
-                            key={index}
-                            style={tw`flex-row items-center gap-2 mt-2`}
-                          >
-                            <View style={tw`w-2 h-2 rounded-full bg-black`} />
-                            <Text
-                              numberOfLines={2}
-                              style={tw`font-LufgaRegular text-sm text-black flex-1`}
+                        {item?.packages[0]?.included_services?.map(
+                          (line, index) => (
+                            <View
+                              key={index}
+                              style={tw`flex-row items-center gap-2 mt-2`}
                             >
-                              {line}
-                            </Text>
-                          </View>
-                        ))}
+                              <View style={tw`w-2 h-2 rounded-full bg-black`} />
+                              <Text
+                                numberOfLines={2}
+                                style={tw`font-LufgaRegular text-sm text-black flex-1`}
+                              >
+                                {line}
+                              </Text>
+                            </View>
+                          ),
+                        )}
                       </View>
                     </View>
 
                     {/* Button at bottom */}
                     <PrimaryButton
                       onPress={() => {
-                        router.push(
-                          "/user_role_sections/categoryPlaning/serviceProviderService"
-                        );
+                        router.push({
+                          pathname:
+                            "/user_role_sections/categoryPlaning/serviceProviderService",
+                          params: {
+                            category: item?.type,
+                            serviceId: item?.id,
+                          },
+                        });
                       }}
                       buttonTextStyle={tw`text-lg font-LufgaMedium`}
                       buttonContainerStyle={tw`mt-4 h-10`}
@@ -270,7 +323,7 @@ const User_home = () => {
                       <TouchableOpacity
                         onPress={() => {
                           router.push(
-                            "/user_role_sections/categoryPlaning/adminProviderService"
+                            "/user_role_sections/categoryPlaning/adminProviderService",
                           );
                         }}
                         activeOpacity={0.8}

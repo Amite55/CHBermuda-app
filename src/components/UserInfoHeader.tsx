@@ -7,18 +7,18 @@ import tw from "../lib/tailwind";
 import { getDynamicGreeting } from "./DynamicGreeting";
 
 interface IUserProps {
-  notificationOnPress: () => void;
-  cartOnPress: () => void;
-  profileOnPress: () => void;
-  userImage: any;
-  userName: string;
-  containerStyle: any;
-  userNameStyle: any;
-  greetingStyle: any;
-  isNotificationCount: number;
-  isCartCount: number;
-  notificationContentStyle: any;
-  notificationIcon: any;
+  notificationOnPress?: () => void;
+  cartOnPress?: () => void;
+  profileOnPress?: () => void;
+  userImage?: any;
+  userName?: string;
+  containerStyle?: any;
+  userNameStyle?: any;
+  greetingStyle?: any;
+  isNotificationCount?: number;
+  isCartCount?: number;
+  notificationContentStyle?: any;
+  notificationIcon?: any;
 }
 
 const UserInfoHeader = ({
@@ -57,11 +57,15 @@ const UserInfoHeader = ({
           >
             {getDynamicGreeting()}
           </Text>
-          <Text
-            style={[tw`font-LufgaMedium text-xl text-black`, userNameStyle]}
-          >
-            {userName}
-          </Text>
+          <View style={tw`max-w-44`}>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[tw`font-LufgaMedium text-xl text-black`, userNameStyle]}
+            >
+              {userName}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
       <View style={tw`flex-row items-center gap-2`}>
