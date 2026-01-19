@@ -11,7 +11,7 @@ interface ServicePlanCardProps {
   price: number;
   providers: number;
   description: string;
-  plan: string;
+  plan?: string;
   onPress: () => void;
 }
 
@@ -33,23 +33,25 @@ const ServicePlanCard = ({
       />
       {/* ------------------ plan name and price ---------------- */}
       <View style={tw`flex-row justify-between items-center pt-3`}>
-        <Text style={tw`font-LufgaMedium text-base text-black`}>
+        <Text
+          numberOfLines={3}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaMedium text-base text-black`}
+        >
           {planName}
         </Text>
-        <Text style={tw`font-LufgaMedium text-base text-black`}>
-          ${price}
-          <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-            /{plan}
-          </Text>
-        </Text>
       </View>
+      <Text style={tw`font-LufgaMedium text-base text-black self-end`}>
+        ${price}
+        <Text style={tw`font-LufgaRegular text-sm text-subText`}>/{plan}</Text>
+      </Text>
 
       {/* ------------------ plan description ---------------- */}
       <Text style={tw`font-LufgaRegular text-sm text-subText  pt-3`}>
         {description}
       </Text>
       {/* ---------------- if have an providers ---------------- */}
-      {providers && (
+      {providers > 0 && (
         <View
           style={tw`pt-3 bg-sky-200 rounded-lg px-3 py-1  justify-center items-center mt-3`}
         >

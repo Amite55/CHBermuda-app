@@ -138,7 +138,7 @@ const User_home = () => {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={tw`gap-5 mt-3  px-4 `}
             data={allCategory?.data}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item?.id?.toString()}
             renderItem={(items) => {
               return (
                 <TouchableOpacity
@@ -147,19 +147,31 @@ const User_home = () => {
                       router.push({
                         pathname:
                           "/user_role_sections/respiteCarePlaning/respiteCareAllPlan",
-                        params: { category: items?.item.type },
+                        params: {
+                          title: items?.item?.name,
+                          category: items?.item?.type,
+                          id: items?.item?.id,
+                        },
                       });
-                    } else if (items.item.type === "admin_service") {
+                    } else if (items?.item?.type === "admin_service") {
                       router.push({
                         pathname:
                           "/user_role_sections/categoryPlaning/adminProviderService",
-                        params: { category: items?.item.type },
+                        params: {
+                          title: items?.item?.name,
+                          category: items?.item.type,
+                          id: items?.item?.id,
+                        },
                       });
                     } else {
                       router.push({
                         pathname:
                           "/user_role_sections/categoryPlaning/serviceProviderService",
-                        params: { category: items?.item.type },
+                        params: {
+                          title: items?.item?.name,
+                          category: items?.item?.type,
+                          id: items?.item?.id,
+                        },
                       });
                     }
                   }}
@@ -277,8 +289,9 @@ const User_home = () => {
                           pathname:
                             "/user_role_sections/categoryPlaning/serviceProviderService",
                           params: {
+                            title: item?.name,
                             category: item?.type,
-                            serviceId: item?.id,
+                            id: item?.id,
                           },
                         });
                       }}

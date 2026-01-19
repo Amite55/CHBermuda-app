@@ -4,18 +4,49 @@ import {
   IconPlusBlack,
   IconRightCornerArrowWhite,
 } from "@/assets/icons";
-import { ImgRespiteCarePlan } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useGetRespiteCarePackageDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const RespiteCarePlaningDetails = () => {
-  const [selectedAddons, setSelectedAddons] = React.useState<string>("");
+  const { respiteId } = useLocalSearchParams();
+  const [addonPrice, setAddonPrice] = React.useState(0);
+  const [selectedAddons, setSelectedAddons] = React.useState<string[]>([]);
+  console.log(selectedAddons, "this is");
+
+  // ==================== api end point ====================
+  const { data: respiteDetails, isLoading: isRespiteDateLoading } =
+    useGetRespiteCarePackageDetailsQuery(respiteId);
+
+  // ================ handle select addon ==================
+  const handleSelectAddon = (addon: any) => {
+    setSelectedAddons((prevTitles) => {
+      const isSelected = prevTitles.includes(addon.title);
+
+      // price state update -------------------->
+      setAddonPrice((prevPrice) =>
+        isSelected
+          ? prevPrice - Number(addon?.price || 0)
+          : prevPrice + Number(addon?.price || 0),
+      );
+
+      return isSelected
+        ? prevTitles.filter((t) => t !== addon.title)
+        : [...prevTitles, addon.title];
+    });
+  };
+
+  if (isRespiteDateLoading) {
+    return <ServicePackageListSkeleton CARD_COUNT={0} />;
+  }
+
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
@@ -29,82 +60,74 @@ const RespiteCarePlaningDetails = () => {
         <Image
           contentFit="cover"
           style={tw`w-full h-40 rounded-3xl mt-3`}
-          source={ImgRespiteCarePlan}
+          source={respiteDetails?.data?.respite_care?.image}
         />
-        <View style={tw`flex-row justify-between items-center mt-4`}>
+        <Text
+          numberOfLines={3}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaMedium text-base text-black pt-3`}
+        >
+          {respiteDetails?.data?.respite_care?.title}
+        </Text>
+        <View style={tw`flex-row justify-between items-center `}>
           <View style={tw`flex-row items-center gap-1 `}>
             <SvgXml xml={IconDuration} />
             <Text style={tw`font-LufgaMedium text-base text-black`}>
-              Duration: N/A
+              Duration: {respiteDetails?.data?.respite_care?.duration} hour
             </Text>
           </View>
           <Text style={tw`font-LufgaMedium text-xl text-black`}>
-            $227
+            $ {respiteDetails?.data?.respite_care?.price}
             <Text style={tw`font-LufgaRegular text-sm text-gray-500`}>
-              / weekly
+              / {respiteDetails?.data?.respite_care?.type}
             </Text>
           </Text>
         </View>
         {/* ------------------ plan description ---------------- */}
         <Text style={tw`font-LufgaRegular text-sm text-subText  pt-3`}>
-          Lorem ipsum dolor sit amet consectetur. Dignissim vulputate elementum
-          vitae magna id. Eu vulputate scelerisque tincidunt mi. Faucibus
-          lobortis sed quis convallis massa nulla est eget ultricies. Quis
-          fringilla sollicitudin posuere luctus et urna molestie et senectus.
-          Eget purus odio in vestibulum tellus condimentum blandit fermentum.
+          {respiteDetails?.data?.respite_care?.description}
         </Text>
 
         {/* --------------- available addons ------------- */}
-        <Text style={tw`font-LufgaMedium text-xl text-black pt-3`}>
-          Available add-ons
-        </Text>
-
+        {respiteDetails?.data?.available_addons?.length > 0 ? (
+          <Text style={tw`font-LufgaMedium text-xl text-black pt-3`}>
+            Available add-ons
+          </Text>
+        ) : (
+          <Text
+            style={tw`font-LufgaMedium text-subText text-lg text-center mt-5`}
+          >
+            Not addons available
+          </Text>
+        )}
         {/* ------------- addons list ------------ */}
-        <View style={tw`gap-3 mt-3`}>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedAddons("Morning transition");
-            }}
-            activeOpacity={0.8}
-            style={tw`flex-row items-center gap-2 bg-white rounded-xl py-2 px-3`}
-          >
-            <SvgXml
-              xml={
-                selectedAddons === "Morning transition"
-                  ? IconBlueTick
-                  : IconPlusBlack
-              }
-            />
-            <Text style={tw`font-LufgaRegular text-black text-base`}>
-              Morning transition
-            </Text>
-            <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} />
-            <Text style={tw`font-LufgaMedium text-base text-black pt-3`}>
-              $15.00
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedAddons("Couples care");
-            }}
-            activeOpacity={0.8}
-            style={tw`flex-row items-center gap-2 bg-white rounded-xl py-2 px-3`}
-          >
-            <SvgXml
-              xml={
-                selectedAddons === "Couples care" ? IconBlueTick : IconPlusBlack
-              }
-            />
-            <Text style={tw`font-LufgaRegular text-black text-base`}>
-              Couples care
-            </Text>
-            <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} />
-            <Text style={tw`font-LufgaMedium text-base text-black `}>
-              $15.00
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {respiteDetails?.data?.available_addons?.length > 0 &&
+          respiteDetails?.data?.available_addons?.map((item) => (
+            <View key={item?.id} style={tw`gap-3 mt-3`}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleSelectAddon(item);
+                }}
+                activeOpacity={0.8}
+                style={tw`flex-row items-center gap-2 bg-white rounded-xl py-2 px-3`}
+              >
+                <SvgXml
+                  xml={
+                    selectedAddons.includes(item?.title)
+                      ? IconBlueTick
+                      : IconPlusBlack
+                  }
+                />
+                <Text style={tw`font-LufgaRegular text-black text-base`}>
+                  {item?.title}
+                </Text>
+                <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} />
+                <Text style={tw`font-LufgaMedium text-base text-black `}>
+                  ${item?.price}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
       </View>
 
       {!selectedAddons && (
@@ -115,18 +138,17 @@ const RespiteCarePlaningDetails = () => {
           buttonContainerStyle={tw`mt-2 h-10 `}
           onPress={() => {
             router.push(
-              "/user_role_sections/placingAdminOrderService/adminPlacingOrder"
+              "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
             );
           }}
         />
       )}
 
       {/* =================== you have an selected addon ================= */}
-
       {selectedAddons && (
         <View
           style={[
-            tw`absolute bottom-0 flex-1 left-0 right-0 bg-white p-3 shadow flex-row justify-between items-center`,
+            tw`absolute bottom-0 flex-1 left-0 right-0 bg-white px-5 py-3 shadow flex-row justify-between items-center`,
             {
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
@@ -134,14 +156,16 @@ const RespiteCarePlaningDetails = () => {
           ]}
         >
           <View>
-            <Text style={tw`font-LufgaMedium text-lg text-black`}>$ 275</Text>
+            <Text style={tw`font-LufgaMedium text-lg text-black`}>
+              $ {respiteDetails?.data?.respite_care?.price}
+            </Text>
             <View style={tw`flex-row items-center gap-2 `}>
               <Text style={tw`font-LufgaMedium text-base text-gray-500 `}>
-                + $15.00
+                + ${addonPrice}
               </Text>
               {/* <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} /> */}
               <Text style={tw`font-LufgaMedium text-base text-gray-500 `}>
-                1 add-on
+                {selectedAddons?.length} add-on
               </Text>
             </View>
           </View>
@@ -153,7 +177,7 @@ const RespiteCarePlaningDetails = () => {
             buttonContainerStyle={tw`w-32 rounded-md h-10 `}
             onPress={() => {
               router.push(
-                "/user_role_sections/placingAdminOrderService/adminPlacingOrder"
+                "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
               );
             }}
           />

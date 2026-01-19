@@ -2,6 +2,7 @@ import { IconRatingStar, IconRightCornerArrowWhite } from "@/assets/icons";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useLazyGetServiceWisePackageQuery } from "@/src/redux/Api/userHomeSlices";
+import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -10,7 +11,7 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const ServiceProviderService = () => {
-  const { category, serviceId } = useLocalSearchParams();
+  const { title, category, id } = useLocalSearchParams();
   const [page, setPage] = React.useState(1);
   const [hasmore, setHasMore] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -29,7 +30,7 @@ const ServiceProviderService = () => {
         const response = await serviceWisePackages({
           page: pageNum,
           per_page: 10,
-          service_id: serviceId,
+          service_id: id,
           _timestamp: Date.now(),
         }).unwrap();
         const newData = response?.data?.data || [];
@@ -49,7 +50,7 @@ const ServiceProviderService = () => {
         console.log(error, "not get package data ------------>");
       }
     },
-    [serviceWisePackages, serviceId],
+    [serviceWisePackages, id],
   );
 
   // ========= initial render =========
@@ -57,11 +58,14 @@ const ServiceProviderService = () => {
     loadData();
   }, [serviceWisePackages]);
 
+  if (isPackageLoading) {
+    return <ServicePackageListSkeleton CARD_COUNT={3} />;
+  }
+
   // ==================== render ====================
   const renderItem = ({ item }) => {
-    console.log(item, "this is single item --------------->");
     return (
-      <View>
+      <View style={tw`border rounded-xl p-2 border-gray-400`}>
         <Image
           source={item?.icon}
           style={tw`w-full h-40 rounded-3xl`}
@@ -87,7 +91,7 @@ const ServiceProviderService = () => {
         <TouchableOpacity
           activeOpacity={0.7}
           disabled
-          style={tw`flex-row items-center py-2`}
+          style={tw`flex-row items-center py-2 gap-2`}
         >
           <Image
             style={tw`w-10 h-10 rounded-full`}
@@ -112,8 +116,7 @@ const ServiceProviderService = () => {
 
         {/* ------------------ plan description ---------------- */}
         <Text style={tw`font-LufgaRegular text-sm text-subText  pt-3`}>
-          Ideal for independent seniors who value peace of mind and a gentle
-          helping hand. The Crystal Comfort Plan is thoughtfully designed
+          {item?.description}
         </Text>
         <PrimaryButton
           onPress={() => {
@@ -140,7 +143,7 @@ const ServiceProviderService = () => {
       ListHeaderComponent={() => {
         return (
           <BackTitleButton
-            title={category ? category.toString() : "Services"}
+            title={title ? title.toString() : "Services"}
             onPress={() => router.back()}
           />
         );
