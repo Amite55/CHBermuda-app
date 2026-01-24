@@ -92,6 +92,8 @@ const AdminProviderService = () => {
       ListEmptyComponent={renderEmptyComponent}
       onEndReached={handleLoadMore}
       onEndReachedThreshold={0.5}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       ListHeaderComponent={() => {
         return (
           <BackTitleButton
@@ -115,6 +117,8 @@ const AdminProviderService = () => {
                   "/user_role_sections/categoryPlaning/adminServiceDetails",
                 params: {
                   category: category ? category.toString() : "Services",
+                  title: title ? title.toString() : "Services",
+                  id: item?.id,
                 },
               });
             }}

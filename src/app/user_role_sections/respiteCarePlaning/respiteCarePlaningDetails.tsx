@@ -54,7 +54,7 @@ const RespiteCarePlaningDetails = () => {
     >
       <View style={tw`pb-2`}>
         <BackTitleButton
-          title={"Respite Services"}
+          title={"Respite Services dt"}
           onPress={() => router.back()}
         />
         <Image
@@ -130,7 +130,7 @@ const RespiteCarePlaningDetails = () => {
           ))}
       </View>
 
-      {!selectedAddons && (
+      {selectedAddons?.length === 0 && (
         <PrimaryButton
           buttonText="Book now"
           buttonTextStyle={tw`font-LufgaMedium text-base`}
@@ -145,7 +145,7 @@ const RespiteCarePlaningDetails = () => {
       )}
 
       {/* =================== you have an selected addon ================= */}
-      {selectedAddons && (
+      {selectedAddons?.length > 0 && (
         <View
           style={[
             tw`absolute bottom-0 flex-1 left-0 right-0 bg-white px-5 py-3 shadow flex-row justify-between items-center`,

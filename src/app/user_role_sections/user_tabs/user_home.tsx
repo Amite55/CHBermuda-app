@@ -49,7 +49,11 @@ const User_home = () => {
   const onRefresh = async () => {
     try {
       setRefreshing(true);
-      await Promise.all([profileRefetch(), refetch()]);
+      await Promise.all([
+        profileRefetch(),
+        refetch(),
+        isThirdPartyServicesFetching,
+      ]);
     } finally {
       setRefreshing(false);
     }

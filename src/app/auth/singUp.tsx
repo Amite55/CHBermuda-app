@@ -9,7 +9,6 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
-import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
@@ -40,7 +39,6 @@ const SingUp = () => {
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState<boolean>(false);
   const role = useRoleHooks();
-  const providerType = useGetProviderTypes();
   // =============== api end point =================
   const [registerInfo, { isLoading: isSingUpLoading }] = useRegisterMutation();
 
@@ -91,7 +89,7 @@ const SingUp = () => {
           error ||
           error?.data ||
           "Something went wrong please try again",
-        4000
+        4000,
       );
     }
   };
@@ -241,7 +239,7 @@ const SingUp = () => {
                       onPress={() => handleCheckBox()}
                       style={tw.style(
                         `border border-regularText w-5 h-5  justify-center items-center rounded-sm`,
-                        isChecked ? `bg-primaryBtn border-0` : `bg-transparent`
+                        isChecked ? `bg-primaryBtn border-0` : `bg-transparent`,
                       )}
                     >
                       {isChecked ? (

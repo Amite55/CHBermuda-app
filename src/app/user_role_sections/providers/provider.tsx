@@ -5,16 +5,97 @@ import {
 } from "@/assets/icons";
 import { ImgBennerImage } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useLazyGetAdminProviderByPackageIdQuery } from "@/src/redux/Api/userRole/orderSlices";
+import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect } from "react";
+import {
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const Provider = () => {
+  const { id } = useLocalSearchParams();
   const [isPlanPurchased, setIsPlanPurchased] = React.useState(true);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [page, setPage] = React.useState(1);
+  const [servicePackageData, setServicePackageData] = React.useState([]);
+
+  // ===================== api end point ====================
+  const [
+    adminServiceProvider,
+    {
+      isLoading: isAdminServiceProviderLoading,
+      isFetching: isAdminServiceProviderFetching,
+    },
+  ] = useLazyGetAdminProviderByPackageIdQuery();
+
+  // ============== get Data from api ==============
+  const getData = useCallback(
+    async (page = 1, isRefresh = false) => {
+      try {
+        const response = await adminServiceProvider({
+          page: page,
+          per_page: 10,
+          id: id,
+          _timestamp: Date.now(),
+        }).unwrap();
+        const newData = response?.data?.data || [];
+        const lastPage = response?.data?.last_page || 1;
+        if (isRefresh) {
+          setServicePackageData(newData);
+        } else if (page === 1) {
+          setServicePackageData(newData);
+        } else {
+          setServicePackageData((prevData) => [...prevData, ...newData]);
+        }
+        setHasMore(page < lastPage);
+      } catch (error: any) {
+        console.log(
+          error,
+          "Admin Service provider data not exit ____________>",
+        );
+      }
+    },
+    [id, adminServiceProvider],
+  );
+
+  // ============== initial render ===============
+  useEffect(() => {
+    getData(1);
+  }, [getData, id]);
+  // Handle pull to refresh
+  // =============== onRefresh ==================
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await Promise.all([isAdminServiceProviderFetching]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  // ============= handle load more data to pagination ============
+  const handleLoadMore = useCallback(async () => {
+    if (!isAdminServiceProviderFetching && hasMore) {
+      setPage((prevPage) => prevPage + 1);
+      await getData(page + 1);
+    }
+  }, [hasMore, isAdminServiceProviderFetching, page, hasMore]);
+
+  // ================ loading state     ===========
+  if (isAdminServiceProviderLoading) {
+    return <ServicePackageListSkeleton CARD_COUNT={4} />;
+  }
+
   return (
     <View style={tw`flex-1 bg-bgBaseColor px-5 `}>
       <BackTitleButton title="Providers" onPress={() => router.back()} />
@@ -35,12 +116,20 @@ const Provider = () => {
       {/* ====================== if plan is purchased ====================== */}
       {isPlanPurchased && (
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          data={servicePackageData}
           keyExtractor={(item, index) => index.toString()}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={tw`gap-4 pb-2 mt-3`}
-          renderItem={(item) => {
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onEndReached={handleLoadMore}
+          renderItem={({ item }) => {
+            console.log(item, "this is singe itel");
             return (
               <View style={tw`bg-white rounded-2xl p-4`}>
                 {/* ------------------ provider info ---------------- */}
@@ -63,11 +152,11 @@ const Provider = () => {
                     <Text
                       style={tw`font-LufgaMedium text-base text-regularText`}
                     >
-                      Elizabeth Olson
+                      {item?.provider?.name}
                     </Text>
 
                     <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Joined 16th July, 2024
+                      Joined {helpers.formatDate(item?.provider?.created_at)}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -78,14 +167,14 @@ const Provider = () => {
                     <Text
                       style={tw`font-LufgaRegular text-sm text-regularText`}
                     >
-                      4.0
+                      {item?.provider?.avg_rating || 0}
                     </Text>
                     <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      (8 reviews)
+                      ({item?.provider?.ratings_count || 0} reviews)
                     </Text>
                   </View>
                   <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    12 orders completed
+                    {item?.provider?.service_provided} orders completed
                   </Text>
                 </View>
 
@@ -95,9 +184,11 @@ const Provider = () => {
                   buttonContainerStyle={tw` h-10  `}
                   rightIcon={IconRightCornerArrowWhite}
                   onPress={() => {
-                    router.push(
-                      "/user_role_sections/providers/providerDetailsInfoAdmin"
-                    );
+                    router.push({
+                      pathname:
+                        "/user_role_sections/providers/providerDetailsInfoAdmin",
+                      params: { id: item?.provider?.id },
+                    });
                   }}
                 />
               </View>

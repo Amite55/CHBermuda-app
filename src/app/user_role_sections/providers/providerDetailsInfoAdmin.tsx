@@ -1,10 +1,12 @@
 import { IconLocation, IconRatingStar } from "@/assets/icons";
-import { ImgBennerImage, ImgProfileImg } from "@/assets/image";
+import { ImgBennerImage, ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useGetAdminProviderDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
   FlatList,
@@ -16,13 +18,27 @@ import {
 import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
 
-const providerDetailsInfoAdmin = () => {
+const ProviderDetailsInfoAdmin = () => {
+  const { id } = useLocalSearchParams();
+
+  // ================= api end point =================
+  const {
+    data: adminProviderDetails,
+    isLoading: isAdminProviderDetailsLoading,
+  } = useGetAdminProviderDetailsQuery(id);
+  console.log(
+    Number(adminProviderDetails?.data?.rating?.total_three_stars) / 100,
+    "this is admin details j------------>",
+  );
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw` pb-4 px-5 bg-bgBaseColor  `}
     >
-      <BackTitleButton title="Provider details" onPress={() => router.back()} />
+      <BackTitleButton
+        title="Provider details admin"
+        onPress={() => router.back()}
+      />
       {/* =--------------------------- provider info --------------------------- */}
       <TouchableOpacity
         activeOpacity={0.7}
@@ -42,17 +58,20 @@ const providerDetailsInfoAdmin = () => {
         <View>
           <View style={tw`flex-row items-center gap-2`}>
             <Text style={tw`font-LufgaMedium text-base text-regularText`}>
-              Elizabeth Olson
+              {adminProviderDetails?.data?.provider?.name}
             </Text>
             <Text
               style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
             >
-              12 order
+              {adminProviderDetails?.data?.provider?.completed_orders || 0}{" "}
+              order
             </Text>
           </View>
-
           <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-            Joined 16th July, 2024
+            Joined{" "}
+            {helpers.formatDate(
+              adminProviderDetails?.data?.provider?.created_at,
+            )}
           </Text>
         </View>
       </TouchableOpacity>
@@ -63,8 +82,8 @@ const providerDetailsInfoAdmin = () => {
           <Text style={tw`font-LufgaMedium text-base text-black`}>
             Location
           </Text>
-          <Text style={tw`font-LufgaRegular text-sm text-black`}>
-            Provider location goes here
+          <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+            {adminProviderDetails?.data?.provider?.address}
           </Text>
         </View>
       </View>
@@ -73,9 +92,11 @@ const providerDetailsInfoAdmin = () => {
 
       <View style={tw`flex-row items-center gap-1`}>
         <SvgXml xml={IconRatingStar} />
-        <Text style={tw`font-LufgaRegular text-sm text-regularText`}>4.0</Text>
-        <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-          (8 reviews)
+        <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
+          {adminProviderDetails?.data?.rating?.avg_rating || 0}
+        </Text>
+        <Text style={tw`font-LufgaRegular text-sm text-black`}>
+          ({adminProviderDetails?.data?.rating?.total_reviews || 0} reviews)
         </Text>
       </View>
 
@@ -88,7 +109,10 @@ const providerDetailsInfoAdmin = () => {
               5.0
             </Text>
             <Progress.Bar
-              progress={1}
+              progress={
+                Number(adminProviderDetails?.data?.rating?.total_five_stars) /
+                100
+              }
               color="#183E9F"
               unfilledColor="#D9D9D9"
               borderWidth={0}
@@ -109,7 +133,10 @@ const providerDetailsInfoAdmin = () => {
               4.0
             </Text>
             <Progress.Bar
-              progress={0.8}
+              progress={
+                Number(adminProviderDetails?.data?.rating?.total_four_stars) /
+                100
+              }
               color="#183E9F"
               unfilledColor="#D9D9D9"
               borderWidth={0}
@@ -130,7 +157,10 @@ const providerDetailsInfoAdmin = () => {
               3.0
             </Text>
             <Progress.Bar
-              progress={0.6}
+              progress={
+                Number(adminProviderDetails?.data?.rating?.total_three_stars) /
+                100
+              }
               color="#183E9F"
               unfilledColor="#D9D9D9"
               borderWidth={0}
@@ -151,7 +181,10 @@ const providerDetailsInfoAdmin = () => {
               2.0
             </Text>
             <Progress.Bar
-              progress={0.4}
+              progress={
+                Number(adminProviderDetails?.data?.rating?.total_two_stars) /
+                100
+              }
               color="#183E9F"
               unfilledColor="#D9D9D9"
               borderWidth={0}
@@ -172,7 +205,10 @@ const providerDetailsInfoAdmin = () => {
               1.0
             </Text>
             <Progress.Bar
-              progress={0.1}
+              progress={
+                Number(adminProviderDetails?.data?.rating?.total_one_stars) /
+                100
+              }
               color="#183E9F"
               unfilledColor="#D9D9D9"
               borderWidth={0}
@@ -193,34 +229,30 @@ const providerDetailsInfoAdmin = () => {
       </Text>
 
       <FlatList
-        data={[1, 2, 3, 4, 5]}
+        data={adminProviderDetails?.data?.reviews}
         keyExtractor={(item, index) => index.toString()}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         horizontal
         contentContainerStyle={tw`gap-4 pb-2 `}
-        renderItem={() => {
+        renderItem={({ item }) => {
           return (
             <View style={tw`bg-white rounded-2xl gap-4 w-80`}>
               <Text style={tw`font-LufgaRegular text-sm text-black p-4 `}>
-                I've been consistently impressed with the quality of service
-                provided by this website. They have exceeded my expectations and
-                delivered exceptional results. Highly recommended!
+                {item?.review}
               </Text>
               <View
-                style={tw`flex-row items-center justify-between bg-slate-100 p-2 rounded-xl`}
+                style={tw`flex-row items-center justify-between bg-slate-200 py-1.5 px-3 rounded-xl`}
               >
                 <View>
                   <Text style={tw`font-LufgaMedium text-base text-black`}>
-                    John D.
-                  </Text>
-                  <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    Company CEO
+                    {item?.user?.name}
                   </Text>
                 </View>
                 <Image
-                  source={ImgProfileImg}
+                  source={item?.user?.avatar}
                   style={tw`w-12 h-12 rounded-full `}
+                  placeholder={ImgPlaceholderProfile}
                 />
               </View>
             </View>
@@ -235,7 +267,7 @@ const providerDetailsInfoAdmin = () => {
         buttonContainerStyle={tw`mt-4 h-12 `}
         onPress={() => {
           router.push(
-            "/user_role_sections/placingAdminOrderService/adminPlacingOrder"
+            "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
           );
         }}
       />
@@ -243,4 +275,4 @@ const providerDetailsInfoAdmin = () => {
   );
 };
 
-export default providerDetailsInfoAdmin;
+export default ProviderDetailsInfoAdmin;

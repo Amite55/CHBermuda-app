@@ -10,7 +10,7 @@ interface BaseQueryArgs extends AxiosRequestConfig {
 }
 
 const baseQueryWithPath: BaseQueryFn<BaseQueryArgs, unknown, unknown> = async (
-  args
+  args,
 ) => {
   try {
     const token = await AsyncStorage.getItem("token");
@@ -75,6 +75,7 @@ export const api = createApi({
     "Package",
     "Service",
     "Category",
+    "Provider",
   ],
 });
 // export const imageUrl = process.env.EXPO_PUBLIC_IMG_URL;

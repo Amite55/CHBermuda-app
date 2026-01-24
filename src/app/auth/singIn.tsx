@@ -8,7 +8,6 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
-import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
@@ -40,17 +39,16 @@ const SingIn = () => {
   const [savedPassword, setSavedPassword] = React.useState("");
   const toast = useToastHelpers();
   const role = useRoleHooks();
-  const providerType = useGetProviderTypes();
 
   // =============== api end point =================
-  const [loginInfo, { isLoading: isLoginLoading }] = useLoginMutation();
+  const [singInInfo, { isLoading: isLoginLoading }] = useLoginMutation();
 
   // ==================== Validation Schema ====================
   const LoginSchema = Yup.object().shape({
     email: Yup.string()
       .matches(
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        "Please enter a valid email address"
+        "Please enter a valid email address",
       )
       .required("Email is required"),
     password: Yup.string()
@@ -58,13 +56,15 @@ const SingIn = () => {
       .required("Password is required"),
   });
 
+  // ============== remember me checkbox handler ================
   const handleCheckBox = async () => {
     const newValue = !isChecked;
     setIsChecked(newValue);
-    try {
-      await AsyncStorage.setItem("rememberMe", JSON.stringify(newValue));
-    } catch (error) {
-      console.log(error, "User Info Storage not save ---->");
+    await AsyncStorage.setItem("rememberMe", JSON.stringify(newValue));
+    if (!newValue) {
+      await AsyncStorage.removeItem("loginInfo");
+      setSavedEmail("");
+      setSavedPassword("");
     }
   };
 
@@ -76,34 +76,28 @@ const SingIn = () => {
         const payload = {
           ...values,
           role: role,
-          // ...(role === "PROVIDER" && { provider_type: providerType }),
         };
-        const res = await loginInfo(payload).unwrap();
+        const res = await singInInfo(payload).unwrap();
         // ------------- login info save async storage -------------
         if (isChecked) {
           await AsyncStorage.setItem(
-            "userInfo",
+            "loginInfo",
             JSON.stringify({
               email: values.email,
               password: values.password,
-            })
+            }),
           );
         } else {
-          await AsyncStorage.removeItem("rememberMe");
-          await AsyncStorage.removeItem("userInfo");
+          await AsyncStorage.removeItem("loginInfo");
         }
         if (res) {
           await AsyncStorage.setItem("token", res?.data?.access_token);
           if (res?.data?.user?.role === "USER") {
             router.replace("/user_role_sections/user_tabs/user_home");
           } else if (res?.data?.user?.role === "PROVIDER") {
-            if (providerType === "SERVICE_PROVIDER") {
-              router.replace(
-                "/serviceProvider/serviceProviderTabs/providerHome"
-              );
-            } else {
-              router.replace("/admin_provider/adminTabs/adminHome");
-            }
+            router.replace("/serviceProvider/serviceProviderTabs/providerHome");
+          } else if (res?.data?.user?.role === "ADMIN") {
+            router.replace("/admin_provider/adminTabs/adminHome");
           }
         }
       } catch (error: any) {
@@ -114,23 +108,40 @@ const SingIn = () => {
             error ||
             error?.data ||
             "Something went wrong please try again",
-          4000
+          4000,
         );
       }
     },
-    [role, providerType]
+    [role, isChecked],
   );
 
-  // ===================== initial render =====================
+  // -------------------- default render when you can add remember me ---------------------
   useEffect(() => {
     const loadData = async () => {
-      const check = await AsyncStorage.getItem("rememberMe");
-      const savedInfo = await AsyncStorage.getItem("userInfo");
-      if (savedInfo) {
-        const parsed = JSON.parse(savedInfo);
-        setIsChecked(true);
-        setSavedEmail(parsed.email);
-        setSavedPassword(parsed.password);
+      try {
+        const check = await AsyncStorage.getItem("rememberMe");
+        const rememberMeValue = check ? JSON.parse(check) : false;
+        if (rememberMeValue) {
+          const savedInfo = await AsyncStorage.getItem("loginInfo");
+          if (savedInfo) {
+            const parsed = JSON.parse(savedInfo);
+            setIsChecked(true);
+            setSavedEmail(parsed.email || "");
+            setSavedPassword(parsed.password || "");
+          }
+        } else {
+          await AsyncStorage.removeItem("loginInfo");
+          setIsChecked(false);
+          setSavedEmail("");
+          setSavedPassword("");
+        }
+      } catch (error) {
+        console.error("Error loading saved data:", error);
+        await AsyncStorage.removeItem("loginInfo");
+        await AsyncStorage.removeItem("rememberMe");
+        setIsChecked(false);
+        setSavedEmail("");
+        setSavedPassword("");
       }
     };
     loadData();
@@ -158,6 +169,7 @@ const SingIn = () => {
               initialValues={{ email: savedEmail, password: savedPassword }}
               onSubmit={(values) => handleSingIn(values)}
               validationSchema={LoginSchema}
+              enableReinitialize={true}
             >
               {({
                 handleChange,
@@ -224,7 +236,7 @@ const SingIn = () => {
                           `border border-regularText w-5 h-5  justify-center items-center rounded-sm`,
                           isChecked
                             ? `bg-primaryBtn border-0`
-                            : `bg-transparent`
+                            : `bg-transparent`,
                         )}
                       >
                         {isChecked ? (

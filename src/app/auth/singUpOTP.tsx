@@ -1,4 +1,5 @@
 import { ImgSplashLogo } from "@/assets/image";
+import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import {
@@ -27,6 +28,7 @@ const EnterOTP = () => {
   const [otpCode, setOtpCode] = React.useState("");
   const { email } = useLocalSearchParams();
   const toast = useToastHelpers();
+  const role = useRoleHooks();
 
   // ============= otp api end point =================
   const [otp, { isLoading: isOTPLoading }] = useVerifyOtpMutation();
@@ -43,6 +45,10 @@ const EnterOTP = () => {
         // ============= navigate to dynamic role ===================
         if (res?.data?.user?.role === "USER") {
           router.replace("/user_role_sections/user_tabs/user_home");
+        } else if (res?.data?.user?.role === "PROVIDER") {
+          router.replace("/serviceProvider/serviceProviderTabs/providerHome");
+        } else if (res?.data?.user?.role === "ADMIN") {
+          router.replace("/admin_provider/adminTabs/adminHome");
         }
       }
     } catch (error: any) {
@@ -53,7 +59,7 @@ const EnterOTP = () => {
           error ||
           error?.data ||
           "Invalid OTP please try again",
-        4000
+        4000,
       );
     }
   };
@@ -75,7 +81,7 @@ const EnterOTP = () => {
           error ||
           error?.data ||
           "OTP not send please try again",
-        4000
+        4000,
       );
     }
   };

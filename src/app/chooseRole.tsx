@@ -22,9 +22,7 @@ const ChooseRole = () => {
 
   const handleSetRole = async (role: string) => {
     await AsyncStorage.setItem("role", JSON.stringify(role));
-    if (role === "USER") {
-      router.push(`/auth/singIn`);
-    }
+    router.push(`/auth/singIn`);
   };
 
   // ================ Bottom Sheet ================
@@ -88,7 +86,7 @@ const ChooseRole = () => {
               delayPressOut={0}
               delayLongPress={1000}
               onPress={() => {
-                handleSetRole("PROVIDER");
+                // handleSetRole("PROVIDER");
                 handleProviderTypeModalOpen();
               }}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
@@ -99,7 +97,6 @@ const ChooseRole = () => {
                   Providers
                 </Text>
               </View>
-
               <SvgXml xml={IconRightTopConnerArrow} />
             </TouchableOpacity>
           </View>
@@ -128,9 +125,8 @@ const ChooseRole = () => {
               delayPressOut={0}
               delayLongPress={1000}
               onPress={async () => {
-                await AsyncStorage.setItem("providerTypes", "ADMIN_PROVIDER");
+                handleSetRole("ADMIN");
                 handleProviderTypeModalClose();
-                router.push("/auth/singIn");
               }}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
@@ -150,9 +146,8 @@ const ChooseRole = () => {
               delayPressOut={0}
               delayLongPress={1000}
               onPress={async () => {
-                await AsyncStorage.setItem("providerTypes", "SERVICE_PROVIDER");
+                handleSetRole("PROVIDER");
                 handleProviderTypeModalClose();
-                router.push("/auth/singIn");
               }}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
