@@ -101,7 +101,6 @@ const Provider = () => {
       <BackTitleButton title="Providers" onPress={() => router.back()} />
 
       {/* ====================== if plan is not purchased ====================== */}
-
       {!isPlanPurchased && (
         <View
           style={tw`flex-row justify-center items-center gap-2 border p-2 rounded-lg border-red-700 bg-red-100 mt-8`}
@@ -129,7 +128,6 @@ const Provider = () => {
           }
           onEndReached={handleLoadMore}
           renderItem={({ item }) => {
-            console.log(item, "this is singe itel");
             return (
               <View style={tw`bg-white rounded-2xl p-4`}>
                 {/* ------------------ provider info ---------------- */}

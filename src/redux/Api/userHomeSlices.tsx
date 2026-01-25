@@ -49,7 +49,7 @@ export const userHomeSlices = api.injectEndpoints({
     }),
     getThirdPartyProviderDetails: builder.query({
       query: (id) => ({
-        url: `/provider-details/${id}`,
+        url: `/thirdparty-provider-details/${id}`,
         method: "GET",
       }),
       providesTags: ["Package"],

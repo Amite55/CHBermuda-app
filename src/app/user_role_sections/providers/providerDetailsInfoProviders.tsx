@@ -1,8 +1,10 @@
 import { IconCrossWhite, IconLocation, IconRatingStar } from "@/assets/icons";
-import { ImgBennerImage, ImgProfileImg, ImgServiceImage } from "@/assets/image";
-import { ProviderServiceData } from "@/src/components/AllData";
+import { ImgPlaceholderProfile, ImgServiceImage } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useGetThirdPartyProviderDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -11,7 +13,7 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useRef } from "react";
 import {
   FlatList,
@@ -24,7 +26,14 @@ import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
 
 const ProviderDetailsInfoProviders = () => {
+  const { id } = useLocalSearchParams();
   const detailsBottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [serviceDetails, setServiceDetails] = React.useState<any>(null);
+
+  console.log(serviceDetails, "this is state ");
+  // =================== api end point ===================
+  const { data: providerDetailsData, isLoading: isProviderDetailsDataLoading } =
+    useGetThirdPartyProviderDetailsQuery(id);
 
   const handleDetailsModalOpen = useCallback(async () => {
     detailsBottomSheetModalRef.current?.present();
@@ -32,11 +41,58 @@ const ProviderDetailsInfoProviders = () => {
   const handleDetailsModalClose = useCallback(() => {
     detailsBottomSheetModalRef.current?.dismiss();
   }, []);
+
+  const handleServiceDetailsModal = useCallback(
+    async (id: string) => {
+      if (!id) return null;
+      try {
+        const findData = await providerDetailsData?.data?.packages?.find(
+          (item: any) => item?.id === id,
+        );
+        if (findData) {
+          setServiceDetails(findData);
+          handleDetailsModalOpen();
+        }
+      } catch (error: any) {
+        console.log(error, "Single service not get>>>>>>>>");
+      }
+    },
+    [id],
+  );
+
+  // ======================== max rating count array =======================
+  const ratingCounts = [
+    providerDetailsData?.data?.rating?.total_five_stars || 0,
+    providerDetailsData?.data?.rating?.total_four_stars || 0,
+    providerDetailsData?.data?.rating?.total_three_stars || 0,
+    providerDetailsData?.data?.rating?.total_two_stars || 0,
+    providerDetailsData?.data?.rating?.total_one_stars || 0,
+  ];
+  const maxRatingCount = Math.max(...ratingCounts, 1);
+  const fiveStarProgress =
+    (providerDetailsData?.data?.rating?.total_five_stars || 0) / maxRatingCount;
+  const fourStarProgress =
+    (providerDetailsData?.data?.rating?.total_four_stars || 0) / maxRatingCount;
+  const threeStarProgress =
+    (providerDetailsData?.data?.rating?.total_three_stars || 0) /
+    maxRatingCount;
+  const twoStarProgress =
+    (providerDetailsData?.data?.rating?.total_two_stars || 0) / maxRatingCount;
+  const oneStarProgress =
+    (providerDetailsData?.data?.rating?.total_one_stars || 0) / maxRatingCount;
+
+  // ================== loading state =================
+  if (isProviderDetailsDataLoading) {
+    return <ServicePackageListSkeleton CARD_COUNT={2} />;
+  }
+
   return (
     <BottomSheetModalProvider>
       <ScrollView
         style={tw`flex-1 bg-bgBaseColor`}
         contentContainerStyle={tw` pb-4 px-5 bg-bgBaseColor  `}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
       >
         <BackTitleButton
           title="Provider details"
@@ -51,51 +107,59 @@ const ProviderDetailsInfoProviders = () => {
           <View style={tw`relative`}>
             <Image
               style={tw`w-16 h-16 rounded-full`}
-              source={ImgBennerImage}
+              source={providerDetailsData?.data?.provider?.avatar}
               contentFit="contain"
-            />
-            <View
-              style={tw`w-2 h-2 bg-green-600 rounded-full absolute top-0 right-0`}
+              placeholder={ImgPlaceholderProfile}
             />
           </View>
           <View>
             <View style={tw`flex-row items-center gap-2`}>
               <Text style={tw`font-LufgaMedium text-base text-regularText`}>
-                Elizabeth Olson
+                {providerDetailsData?.data?.provider?.name?.length > 23
+                  ? `${providerDetailsData?.data?.provider?.name?.slice(0, 23)}...`
+                  : providerDetailsData?.data?.provider?.name}
               </Text>
               <Text
                 style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
               >
-                12 order
+                {providerDetailsData?.data?.provider?.completed_orders || 0}{" "}
+                order
               </Text>
             </View>
 
             <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-              Joined 16th July, 2024
+              Joined{" "}
+              {helpers.formatDate(
+                providerDetailsData?.data?.provider?.created_at,
+              )}
             </Text>
           </View>
         </TouchableOpacity>
         {/* ============================= provider service list section ============================= */}
         <View>
-          {ProviderServiceData.map((item) => {
+          {providerDetailsData?.data?.packages?.map((item) => {
             return (
               <View
                 key={item.id}
                 style={tw`bg-white rounded-xl mt-4 p-4 flex-row justify-between items-center`}
               >
-                <View>
-                  <Text style={tw`font-LufgaMedium text-lg text-black`}>
-                    {item.title}
+                <View style={tw`flex-shrink`}>
+                  <Text
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={tw`font-LufgaMedium text-base text-black`}
+                  >
+                    {item?.title}
                   </Text>
                   <Text style={tw`font-LufgaMedium text-base text-black`}>
-                    ₦ {item.price}
+                    $ {item?.price}
                   </Text>
                   <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    {item.duration}
+                    Duration: {item?.duration} hours
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => handleDetailsModalOpen()}
+                  onPress={() => handleServiceDetailsModal(item?.id)}
                   style={tw`px-4 py-2 bg-secondaryBtn2 rounded-lg`}
                   activeOpacity={0.7}
                 >
@@ -114,8 +178,8 @@ const ProviderDetailsInfoProviders = () => {
             <Text style={tw`font-LufgaMedium text-base text-black`}>
               Location
             </Text>
-            <Text style={tw`font-LufgaRegular text-sm text-black`}>
-              Provider location goes here
+            <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+              {providerDetailsData?.data?.provider?.address}
             </Text>
           </View>
         </View>
@@ -124,13 +188,13 @@ const ProviderDetailsInfoProviders = () => {
         <View style={tw`flex-row items-center gap-1`}>
           <SvgXml xml={IconRatingStar} />
           <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
-            4.0
+            {providerDetailsData?.data?.rating?.avg_rating || 0}
           </Text>
           <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-            (8 reviews)
+            ({providerDetailsData?.data?.rating?.total_reviews || 0} reviews)
           </Text>
         </View>
-
+        {/* ============================= rating section ============================ */}
         <View style={tw`my-6 bg-white rounded-2xl p-4 gap-2`}>
           {/* --------------------- rating excellent --------------------- */}
           <View style={tw`gap-2 flex-row items-center justify-between`}>
@@ -142,7 +206,7 @@ const ProviderDetailsInfoProviders = () => {
                 5.0
               </Text>
               <Progress.Bar
-                progress={1}
+                progress={fiveStarProgress}
                 color="#183E9F"
                 unfilledColor="#D9D9D9"
                 borderWidth={0}
@@ -165,7 +229,7 @@ const ProviderDetailsInfoProviders = () => {
                 4.0
               </Text>
               <Progress.Bar
-                progress={0.8}
+                progress={fourStarProgress}
                 color="#183E9F"
                 unfilledColor="#D9D9D9"
                 borderWidth={0}
@@ -188,7 +252,7 @@ const ProviderDetailsInfoProviders = () => {
                 3.0
               </Text>
               <Progress.Bar
-                progress={0.6}
+                progress={threeStarProgress}
                 color="#183E9F"
                 unfilledColor="#D9D9D9"
                 borderWidth={0}
@@ -211,7 +275,7 @@ const ProviderDetailsInfoProviders = () => {
                 2.0
               </Text>
               <Progress.Bar
-                progress={0.4}
+                progress={twoStarProgress}
                 color="#183E9F"
                 unfilledColor="#D9D9D9"
                 borderWidth={0}
@@ -234,7 +298,7 @@ const ProviderDetailsInfoProviders = () => {
                 1.0
               </Text>
               <Progress.Bar
-                progress={0.1}
+                progress={oneStarProgress}
                 color="#183E9F"
                 unfilledColor="#D9D9D9"
                 borderWidth={0}
@@ -253,34 +317,31 @@ const ProviderDetailsInfoProviders = () => {
           Reviews
         </Text>
         <FlatList
-          data={[1, 2, 3, 4, 5]}
+          data={providerDetailsData?.data?.reviews}
           keyExtractor={(item, index) => index.toString()}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           horizontal
           contentContainerStyle={tw`gap-4 pb-2 `}
-          renderItem={() => {
+          renderItem={({ item }) => {
             return (
-              <View style={tw`bg-white rounded-2xl gap-4 w-80`}>
+              <View style={tw` bg-white rounded-2xl gap-4 w-80`}>
                 <Text style={tw`font-LufgaRegular text-sm text-black p-4 `}>
-                  I've been consistently impressed with the quality of service
-                  provided by this website. They have exceeded my expectations
-                  and delivered exceptional results. Highly recommended!
+                  {item?.review}
                 </Text>
                 <View
-                  style={tw`flex-row items-center justify-between bg-slate-100 p-2 rounded-xl`}
+                  style={tw`flex-row items-center justify-between bg-slate-200 p-2 rounded-xl`}
                 >
                   <View>
                     <Text style={tw`font-LufgaMedium text-base text-black`}>
-                      John D.
-                    </Text>
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Company CEO
+                      {item?.user?.name}
                     </Text>
                   </View>
                   <Image
-                    source={ImgProfileImg}
+                    source={item?.user?.avatar}
                     style={tw`w-12 h-12 rounded-full `}
+                    contentFit="cover"
+                    placeholder={ImgPlaceholderProfile}
                   />
                 </View>
               </View>
@@ -325,13 +386,17 @@ const ProviderDetailsInfoProviders = () => {
           <View style={tw`p-4`}>
             <Image
               style={tw`w-full h-56 rounded-xl `}
-              source={ImgServiceImage}
+              source={serviceDetails?.icon}
+              contentFit="cover"
+              placeholder={ImgServiceImage}
             />
 
             {/* price */}
-            <View style={tw`flex-row items-center justify-between mt-4`}>
-              <Text style={tw`font-LufgaMedium text-base text-black`}>
-                Light cleaning
+            <View style={tw`flex-row gap-4 items-center justify-between mt-4`}>
+              <Text
+                style={tw`flex-shrink font-LufgaMedium text-base text-black`}
+              >
+                {serviceDetails?.title}
               </Text>
               <Text style={tw`font-LufgaMedium text-xl text-black`}>$65</Text>
             </View>
@@ -341,16 +406,15 @@ const ProviderDetailsInfoProviders = () => {
                 <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
 
                 <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Duration: 2 hours
+                  Duration: {serviceDetails?.duration} hours
                 </Text>
               </View>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
 
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Best for: Ongoing upkeep between {"/n"} deep cleans
-                </Text>
-              </View>
+              <Text
+                style={tw`font-LufgaRegular text-sm text-center text-black flex-1`}
+              >
+                {serviceDetails?.description}
+              </Text>
             </View>
 
             {/* Included Services: */}
@@ -358,42 +422,20 @@ const ProviderDetailsInfoProviders = () => {
             <Text style={tw`font-LufgaMedium text-base text-black pt-4`}>
               Included Services:
             </Text>
-            <View style={tw`gap-2 mt-4`}>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
+            <View style={tw`gap-2 mt-4 pl-3`}>
+              {serviceDetails?.included_services?.map((item: string) => {
+                return (
+                  <View key={item} style={tw`flex-row items-start gap-2 `}>
+                    <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
 
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Dusting and wiping of surfaces in living areas and bedrooms.
-                </Text>
-              </View>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
-
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Light kitchen wipe-down (counters, sink, stove exterior).
-                </Text>
-              </View>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
-
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Bathroom touch-up (toilet, sink, mirror).
-                </Text>
-              </View>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
-
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Sweeping or mopping high-traffic floors.
-                </Text>
-              </View>
-              <View style={tw`flex-row items-start gap-2 `}>
-                <View style={tw`w-2 h-2 rounded-full bg-black mt-1`} />
-
-                <Text style={tw`font-LufgaRegular text-sm text-black flex-1`}>
-                  Trash bin emptying and liner replacement.
-                </Text>
-              </View>
+                    <Text
+                      style={tw`font-LufgaRegular text-sm text-black flex-1`}
+                    >
+                      {item}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
             {/* =============== select button =============== */}
             <PrimaryButton
@@ -402,7 +444,7 @@ const ProviderDetailsInfoProviders = () => {
               onPress={() => {
                 handleDetailsModalClose();
                 router.push(
-                  "/user_role_sections/placingProviderOrderService/providerOrderDateTimePlacing"
+                  "/user_role_sections/placingProviderOrderService/providerOrderDateTimePlacing",
                 );
               }}
               buttonContainerStyle={tw`mt-6`}

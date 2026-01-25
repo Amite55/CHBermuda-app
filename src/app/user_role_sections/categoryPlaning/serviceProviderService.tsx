@@ -4,10 +4,18 @@ import tw from "@/src/lib/tailwind";
 import { useLazyGetServiceWisePackageQuery } from "@/src/redux/Api/userHomeSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import { PrimaryColor } from "@/src/utils/util";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const ServiceProviderService = () => {
@@ -42,6 +50,7 @@ const ServiceProviderService = () => {
         } else {
           setServicePackageData((prevData) => [...prevData, ...newData]);
         }
+        setHasMore(pageNum < lastPage);
         // =============== update page number ===============
         if (pageNum < lastPage) {
           setPage(pageNum + 1);
@@ -58,6 +67,26 @@ const ServiceProviderService = () => {
     loadData();
   }, [serviceWisePackages]);
 
+  // ============= on refresh control ===========
+  const onRefresh = () => {
+    try {
+      setRefreshing(true);
+      Promise.all([isPackageFetching]);
+    } catch (error: any) {
+      console.log(error, "this is wrong refresh ------------>");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+  // ============= load more =================
+  const handleLoadMore = useCallback(async () => {
+    if (isPackageFetching && hasmore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      await loadData(nextPage);
+    }
+  }, [loadData, isPackageFetching, hasmore, page]);
+
   if (isPackageLoading) {
     return <ServicePackageListSkeleton CARD_COUNT={3} />;
   }
@@ -72,7 +101,6 @@ const ServiceProviderService = () => {
           contentFit="cover"
         />
         {/* ------------------ plan name and price ---------------- */}
-
         <Text
           numberOfLines={2}
           ellipsizeMode="tail"
@@ -120,9 +148,11 @@ const ServiceProviderService = () => {
         </Text>
         <PrimaryButton
           onPress={() => {
-            router.push(
-              "/user_role_sections/providers/providerDetailsInfoProviders",
-            );
+            router.push({
+              pathname:
+                "/user_role_sections/providers/providerDetailsInfoProviders",
+              params: { id: item?.provider?.id },
+            });
           }}
           buttonText="See details"
           buttonTextStyle={tw`font-LufgaMedium text-base`}
@@ -135,6 +165,12 @@ const ServiceProviderService = () => {
   return (
     <FlatList
       data={servicePackageData}
+      refreshing={refreshing}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.5}
       keyExtractor={(item, index) => item?.id?.toString()}
       contentContainerStyle={tw` pb-4 px-5 bg-bgBaseColor gap-5`}
       style={tw`flex-1 bg-bgBaseColor`}
@@ -149,6 +185,19 @@ const ServiceProviderService = () => {
         );
       }}
       renderItem={renderItem}
+      ListFooterComponent={() => {
+        return (
+          <View style={tw`flex-1 items-center justify-center`}>
+            {hasmore ? (
+              <ActivityIndicator size="small" color={PrimaryColor} />
+            ) : (
+              <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                No more data
+              </Text>
+            )}
+          </View>
+        );
+      }}
     />
   );
 };

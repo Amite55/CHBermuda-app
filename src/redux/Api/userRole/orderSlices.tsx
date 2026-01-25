@@ -23,13 +23,7 @@ export const orderSlices = api.injectEndpoints({
       }),
       providesTags: ["Provider"],
     }),
-    getThirdPartyProviderDetails: builder.query({
-      query: (id) => ({
-        url: `/thirdparty-provider-details/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["Provider"],
-    }),
+
     booking: builder.mutation({
       query: (data) => ({
         url: "/booking",
@@ -47,6 +41,5 @@ export const {
   useGetThirdPartyProviderByServiceIdQuery,
   useLazyGetThirdPartyProviderByServiceIdQuery,
   useGetAdminProviderDetailsQuery,
-  useGetThirdPartyProviderDetailsQuery,
   useBookingMutation,
 } = orderSlices;
