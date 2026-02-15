@@ -6,6 +6,7 @@ import {
   ImgG,
 } from "@/assets/image";
 import { ServicesData } from "@/src/components/AllData";
+import CategoryItems from "@/src/components/CategoryItems";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
@@ -13,6 +14,7 @@ import {
   useGetAllCategoryQuery,
   useGetServiceThirdPartyQuery,
 } from "@/src/redux/Api/userHomeSlices";
+import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -60,12 +62,12 @@ const User_home = () => {
   };
 
   // =============== loading skeleton =================
-  // const isInitialLoading =
-  //   isProfileLoading || isCategoryLoading || isThirdPartyServicesLoading;
+  const isInitialLoading =
+    isProfileLoading || isCategoryLoading || isThirdPartyServicesLoading;
 
-  // if (isInitialLoading) {
-  //   return <UserHomeSkeleton />;
-  // }
+  if (isInitialLoading) {
+    return <UserHomeSkeleton />;
+  }
 
   return (
     <ScrollView
@@ -144,59 +146,7 @@ const User_home = () => {
             data={allCategory?.data}
             keyExtractor={(item) => item?.id?.toString()}
             renderItem={(items) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (items.item.type === "respite_care_service") {
-                      router.push({
-                        pathname:
-                          "/user_role_sections/respiteCarePlaning/respiteCareAllPlan",
-                        params: {
-                          title: items?.item?.name,
-                          category: items?.item?.type,
-                          id: items?.item?.id,
-                        },
-                      });
-                    } else if (items?.item?.type === "admin_service") {
-                      router.push({
-                        pathname:
-                          "/user_role_sections/categoryPlaning/adminProviderService",
-                        params: {
-                          title: items?.item?.name,
-                          category: items?.item.type,
-                          id: items?.item?.id,
-                        },
-                      });
-                    } else {
-                      router.push({
-                        pathname:
-                          "/user_role_sections/categoryPlaning/serviceProviderService",
-                        params: {
-                          title: items?.item?.name,
-                          category: items?.item?.type,
-                          id: items?.item?.id,
-                        },
-                      });
-                    }
-                  }}
-                  activeOpacity={0.9}
-                >
-                  <View
-                    style={tw`bg-white h-20 w-20 rounded-full items-center justify-center`}
-                  >
-                    <Image
-                      contentFit="contain"
-                      style={tw`w-10 h-10`}
-                      source={items?.item?.icon}
-                    />
-                  </View>
-                  <Text
-                    style={tw`font-LufgaRegular text-sm text-regularText pt-1`}
-                  >
-                    {items?.item?.name}
-                  </Text>
-                </TouchableOpacity>
-              );
+              return <CategoryItems items={items} />;
             }}
           />
         </View>

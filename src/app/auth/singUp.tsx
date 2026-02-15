@@ -75,6 +75,7 @@ const SingUp = () => {
         // ...(role === "PROVIDER" && { provider_type: providerType }),
       };
       const res = await registerInfo(payload).unwrap();
+      console.log(res, "sing up response with sing up screen >");
       if (res) {
         router.push({
           pathname: "/auth/singUpOTP",

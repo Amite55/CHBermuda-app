@@ -1,4 +1,5 @@
 import { IconNotification, IconShoppingCart } from "@/assets/icons";
+import { ImgPlaceholderProfile } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -49,7 +50,12 @@ const UserInfoHeader = ({
           activeOpacity={0.7}
           style={tw`h-14 w-14 rounded-full bg-white items-center justify-center`}
         >
-          <Image source={userImage} style={tw`w-12 h-12 rounded-full`} />
+          <Image
+            contentFit="cover"
+            placeholder={ImgPlaceholderProfile}
+            source={userImage}
+            style={tw`w-12 h-12 rounded-full`}
+          />
         </TouchableOpacity>
         <View>
           <Text

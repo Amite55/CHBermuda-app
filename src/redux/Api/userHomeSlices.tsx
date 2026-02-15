@@ -82,4 +82,5 @@ export const {
   useGetThirdPartyProviderDetailsQuery,
   useGetPackageTimeQuery,
   useGetAddonBundlesQuery,
+  useLazyGetAddonBundlesQuery,
 } = userHomeSlices;
