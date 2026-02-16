@@ -79,10 +79,11 @@ export const authSlices = api.injectEndpoints({
       invalidatesTags: ["Profile", "SingIn", "SingUp"],
     }),
     editProfile: builder.mutation({
-      query: (credentials) => ({
+      query: (formData) => ({
         url: "/edit-profile",
         method: "POST",
-        body: credentials,
+        body: formData,
+        headers: { "Content-Type": "multipart/form-data" },
       }),
       invalidatesTags: ["Profile"],
     }),
