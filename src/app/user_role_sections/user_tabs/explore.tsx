@@ -1,6 +1,4 @@
-import { IconCartWhite } from "@/assets/icons";
 import { ImgG } from "@/assets/image";
-import { ServicesData } from "@/src/components/AllData";
 import CategoryItems from "@/src/components/CategoryItems";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
@@ -9,19 +7,18 @@ import {
   useGetAllCategoryQuery,
   useLazyGetAddonBundlesQuery,
 } from "@/src/redux/Api/userHomeSlices";
+import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React, { useCallback, useEffect } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 
 const Explore = () => {
   const [addonsData, setAddonsData] = React.useState<any>([]);
   const [hasMore, setHasMore] = React.useState(true);
   const [page, setPage] = React.useState(1);
   const [refreshing, setRefreshing] = React.useState(false);
-
-  console.log(addonsData, "this is addons data ");
 
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
@@ -125,30 +122,34 @@ const Explore = () => {
             {/* Header */}
             <View>
               <View style={tw`flex-row justify-between items-center`}>
-                <View style={tw`flex-row items-center gap-2`}>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={tw`h-14 w-14 rounded-full bg-stone-200 items-center justify-center`}
-                  >
-                    <Image
-                      style={tw`w-10 h-10`}
-                      source={item.image}
-                      contentFit="contain"
-                    />
-                  </TouchableOpacity>
-                  <View>
-                    <Text style={tw`font-LufgaMedium text-xs text-black`}>
-                      {item.title}
-                    </Text>
-                    <Text style={tw`font-LufgaMedium text-sm text-subText`}>
-                      {item.providers} Providers
-                    </Text>
-                  </View>
+                {/* ============ ADD-ON ICONS   =============== */}
+                <View style={tw`flex-row items-center `}>
+                  {item?.addon_services?.length > 0 &&
+                    item?.addon_services?.map((img, index) => (
+                      <View
+                        style={[
+                          tw`bg-slate-100 rounded-full p-1 items-center`,
+                          {
+                            marginLeft: index === 0 ? 0 : -20,
+                            zIndex: 50 - index,
+                          },
+                        ]}
+                        key={img?.id}
+                      >
+                        <Image
+                          style={[
+                            tw`border border-white items-center justify-center rounded-full w-10 h-10`,
+                          ]}
+                          source={img?.service?.icon}
+                          contentFit="contain"
+                        />
+                      </View>
+                    ))}
                 </View>
 
                 <View style={tw`flex-row items-center`}>
                   <Text style={tw`font-LufgaMedium text-lg text-black`}>
-                    ${item.price}
+                    ${item?.price}
                   </Text>
                   <Text style={tw`font-LufgaMedium text-base text-subText`}>
                     /month
@@ -156,33 +157,51 @@ const Explore = () => {
                 </View>
               </View>
 
+              {/* title */}
+              <Text
+                numberOfLines={2}
+                style={tw`font-LufgaMedium text-base text-black py-4`}
+              >
+                {item?.title}
+              </Text>
+
               {/* Description */}
               <Text
                 numberOfLines={2}
-                style={tw`font-LufgaMedium text-base text-black py-5`}
+                style={tw`font-LufgaMedium text-xs text-subText mb-3`}
               >
-                {item.description}
+                {item?.description}
               </Text>
 
               {/* Included */}
-              <Text style={tw`font-LufgaRegular text-base text-subText`}>
+              <Text style={tw`font-LufgaRegular text-base text-regularText`}>
                 Included
               </Text>
               <View style={tw`gap-2 mb-4`}>
-                {item?.included?.map((line: string, index: number) => (
-                  <View
-                    key={index}
-                    style={tw`flex-row items-center gap-2 mt-2`}
+                {item?.included_services?.length > 0 ? (
+                  item?.included_services?.map(
+                    (line: string, index: number) => (
+                      <View
+                        key={index}
+                        style={tw`flex-row items-center gap-2 mt-2`}
+                      >
+                        <View style={tw`w-2 h-2 rounded-full bg-black`} />
+                        <Text
+                          numberOfLines={2}
+                          style={tw`font-LufgaRegular text-sm text-black flex-1`}
+                        >
+                          {line}
+                        </Text>
+                      </View>
+                    ),
+                  )
+                ) : (
+                  <Text
+                    style={tw`text-center justify-center text-subText text-xl `}
                   >
-                    <View style={tw`w-2 h-2 rounded-full bg-black`} />
-                    <Text
-                      numberOfLines={2}
-                      style={tw`font-LufgaRegular text-sm text-black flex-1`}
-                    >
-                      {line}
-                    </Text>
-                  </View>
-                ))}
+                    No included services
+                  </Text>
+                )}
               </View>
             </View>
 
@@ -191,8 +210,7 @@ const Explore = () => {
               onPress={() => router.push("/user_role_sections/cart")}
               buttonTextStyle={tw`text-lg font-LufgaMedium`}
               buttonContainerStyle={tw`mt-4 h-10`}
-              leftIcon={IconCartWhite}
-              buttonText="Add to Cart"
+              buttonText="Subscribe Now"
             />
           </View>
         </View>
@@ -200,15 +218,35 @@ const Explore = () => {
     );
   };
 
+  // ================= REFRESH FUNCTION ==================
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      await Promise.all([isCategoryFetching, isFetching, profileRefetch()]);
+    } catch (error: any) {
+      console.log(error, "this is wrong refresh ------------");
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  // ========= loading state ==================
+  if (isCategoryLoading || isAddonBundlesLoading || isProfileLoading) {
+    return <UserHomeSkeleton />;
+  }
+
   // ================= MAIN RETURN ==================
   return (
     <FlatList
-      data={ServicesData}
+      data={addonsData}
       keyExtractor={(_, index) => index.toString()}
       renderItem={renderAddonItem}
       ListHeaderComponent={RenderHeader}
       contentContainerStyle={tw`pb-16 bg-bgBaseColor`}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+      }
     />
   );
 };

@@ -1,11 +1,7 @@
-import {
-  ImgG,
-  ImgNoOrder,
-  ImgProfileImg,
-  ImgServiceImage,
-} from "@/assets/image";
+import { ImgG, ImgNoOrder, ImgServiceImage } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -15,6 +11,13 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 const Order = () => {
   const [orderStatus, setOrderStatus] = React.useState<any>("Pending");
   const [orderData, setOrderData] = React.useState<any>(true);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [page, setPage] = React.useState(1);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  // ============ hooks ==================
+  const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
+    useProfile();
 
   return (
     <ScrollView
@@ -27,8 +30,8 @@ const Order = () => {
         {/* ------------------- user header part ---------------- */}
         <UserInfoHeader
           containerStyle={tw`px-5`}
-          userName="Rohit"
-          userImage={ImgProfileImg}
+          userName={profileData?.data?.name}
+          userImage={profileData?.data?.avatar}
           cartOnPress={() => {
             router.push("/user_role_sections/cart");
           }}
@@ -66,13 +69,13 @@ const Order = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Pending"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Pending" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "Pending" ? "text-white" : "text-primaryBtn",
                 )}
               >
                 Pending
@@ -95,13 +98,13 @@ const Order = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Ongoing"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Ongoing" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "Ongoing" ? "text-white" : "text-primaryBtn",
                 )}
               >
                 Ongoing
@@ -124,13 +127,15 @@ const Order = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Completed"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Completed" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "Completed"
+                    ? "text-white"
+                    : "text-primaryBtn",
                 )}
               >
                 Completed

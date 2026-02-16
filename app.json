@@ -56,6 +56,12 @@
           "iosGoogleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA",
           "androidGoogleMapsApiKey": "AIzaSyA3swfjp2TwJ-AVCVuaPEtLUB8qKmrZOLA"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
       ]
     ],
     "experiments": {

@@ -12,9 +12,10 @@ import {
   IconSubscriptionPlan,
   IconSupport,
 } from "@/assets/icons";
-import { ImgG, ImgProfileImg } from "@/assets/image";
+import { ImgG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -35,6 +36,11 @@ import { SvgXml } from "react-native-svg";
 
 const User_Profile = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // ============ hooks ==================
+  const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
+    useProfile();
+
   return (
     <>
       <ScrollView
@@ -47,14 +53,14 @@ const User_Profile = () => {
           {/* ------------------- user header part ---------------- */}
           <UserInfoHeader
             containerStyle={tw`px-5`}
-            userName="Rohit"
-            userImage={ImgProfileImg}
+            userName={profileData?.data?.name}
+            userImage={profileData?.data?.avatar}
             cartOnPress={() => {
               router.push("/user_role_sections/cart");
             }}
             notificationOnPress={() => {
               router.push(
-                "/user_role_sections/notificationsUser/notifications"
+                "/user_role_sections/notificationsUser/notifications",
               );
             }}
             profileOnPress={() => {
@@ -73,9 +79,9 @@ const User_Profile = () => {
             endIconOnPress={() => {
               router.push("/auth/editProfile");
             }}
-            titleText="Mr. Lopez"
-            subTitleText="example@gmail.com"
-            image={ImgProfileImg}
+            titleText={profileData?.data?.name}
+            subTitleText={profileData?.data?.email}
+            image={profileData?.data?.avatar}
             imageStyle={tw`w-20 h-20 rounded-full `}
             endIcon={IconEditPen}
             containerStyle={tw`py-4`}
