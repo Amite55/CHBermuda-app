@@ -1,12 +1,22 @@
 import { ImgAbout } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useGetPagesQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
+import RenderHtml from "react-native-render-html";
 
 const BoutAboutUs = () => {
+  const { width } = useWindowDimensions();
+
+  // ================= api end  point ==================
+  const { data, isLoading } = useGetPagesQuery("About Us");
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -21,19 +31,12 @@ const BoutAboutUs = () => {
         style={tw`w-full h-48 my-4`}
         source={ImgAbout}
       />
-
-      <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
-        Lorem ipsum dolor sit amet consectetur. Blandit elementum eu nisi sed
-        turpis pellentesque sagittis. Risus consequat orci risus risus tincidunt
-        eget nunc aliquam. Et phasellus nisl donec eget erat tincidunt sem.
-        Vitae et morbi amet tempus eleifend consectetur cursus quam enim.
-      </Text>
-      <Text style={tw`font-LufgaRegular text-sm text-regularText mt-4`}>
-        Lorem ipsum dolor sit amet consectetur. Blandit elementum eu nisi sed
-        turpis pellentesque sagittis. Risus consequat orci risus risus tincidunt
-        eget nunc aliquam. Et phasellus nisl donec eget erat tincidunt sem.
-        Vitae et morbi amet tempus eleifend consectetur cursus quam enim.
-      </Text>
+      {/*  Render backend HTML here */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <RenderHtml contentWidth={width} source={{ html: data?.data?.text }} />
+      )}
     </ScrollView>
   );
 };

@@ -47,23 +47,30 @@ const EditProfile = () => {
   const handleProfileImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images", "videos"],
+        mediaTypes: ["images"],
         allowsEditing: true,
         // aspect: [4, 4],
         quality: 1,
       });
-      if (!result.canceled) {
+      if (!result.canceled && result.assets.length > 0) {
         setImage(result.assets[0].uri);
         const selectedImage = result.assets[0];
-        let filename = selectedImage.fileName;
-        let match = /\.(\w+)$/.exec(filename);
-        let type = match ? `image/${match[1]}` : `image`;
+
+        const filename =
+          selectedImage.fileName ??
+          selectedImage.uri.split("/").pop() ??
+          `image_${Date.now()}.jpg`;
+
+        const extMatch = /\.(\w+)$/.exec(filename);
+        const mime = extMatch ? `image/${extMatch[1]}` : "image/jpeg";
         const formData = new FormData();
+
         formData.append("photo", {
           uri: selectedImage.uri,
           name: filename,
-          type,
-        });
+          type: mime,
+        } as any);
+        console.log(formData, "this is form data ");
         const res = await editProfilePicture(formData).unwrap();
         if (res) {
           toast.success(
@@ -164,6 +171,7 @@ const EditProfile = () => {
                   )}
                   <TouchableOpacity
                     onPress={handleProfileImage}
+                    disabled={isImageLoading}
                     activeOpacity={0.7}
                     style={tw`absolute right-4/12 -bottom-1 w-10 h-10 items-center justify-center rounded-full bg-primaryBtn`}
                   >

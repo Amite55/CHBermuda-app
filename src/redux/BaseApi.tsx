@@ -76,6 +76,8 @@ export const api = createApi({
     "Service",
     "Category",
     "Provider",
+    "Plan",
+    "Pages",
   ],
 });
 // export const imageUrl = process.env.EXPO_PUBLIC_IMG_URL;

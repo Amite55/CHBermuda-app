@@ -67,6 +67,9 @@ export const authSlices = api.injectEndpoints({
         url: "/edit-profile-picture",
         method: "POST",
         body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
       invalidatesTags: ["Profile"],
     }),
@@ -83,7 +86,6 @@ export const authSlices = api.injectEndpoints({
         url: "/edit-profile",
         method: "POST",
         body: formData,
-        headers: { "Content-Type": "multipart/form-data" },
       }),
       invalidatesTags: ["Profile"],
     }),
