@@ -89,7 +89,7 @@ const RespiteCareAllPlan = () => {
     return <ServicePackageListSkeleton CARD_COUNT={3} />;
   }
 
-  const RenderItem = ({ item }) => {
+  const RenderItem = ({ item }: any) => {
     return (
       <View style={tw`py-3`}>
         <Image

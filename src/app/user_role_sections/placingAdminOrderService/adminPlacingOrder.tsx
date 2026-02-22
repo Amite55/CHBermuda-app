@@ -39,7 +39,7 @@ const AdminPlacingOrder = () => {
         >
           <View>
             <BackTitleButton
-              title="Placing order"
+              title="Placing order admin"
               onPress={() => router.back()}
             />
             {/* ------------- service name ------------ */}
@@ -188,7 +188,7 @@ const AdminPlacingOrder = () => {
           <PrimaryButton
             onPress={() => {
               router.push(
-                "/user_role_sections/placingAdminOrderService/adminOrderTimePlacing"
+                "/user_role_sections/placingAdminOrderService/adminOrderTimePlacing",
               );
             }}
             buttonText="Next"

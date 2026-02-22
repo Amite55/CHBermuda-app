@@ -47,6 +47,7 @@ const CustomRespiteCare = () => {
           response?.message || "Respite Care send successfully",
           3000,
         );
+        router.back();
       }
     } catch (error: any) {
       console.log(error, "New respite Care not send ");

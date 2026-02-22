@@ -24,12 +24,15 @@ const RespiteCarePlaningDetails = () => {
   // ==================== api end point ====================
   const { data: respiteDetails, isLoading: isRespiteDateLoading } =
     useGetRespiteCarePackageDetailsQuery(respiteId);
+  // console.log(
+  //   respiteDetails?.data?.respite_care,
+  //   "this is respite care details ",
+  // );
 
   // ================ handle select addon ==================
   const handleSelectAddon = (addon: any) => {
     setSelectedAddons((prevTitles) => {
-      const isSelected = prevTitles.includes(addon.title);
-
+      const isSelected = prevTitles.includes(addon.id);
       // price state update -------------------->
       setAddonPrice((prevPrice) =>
         isSelected
@@ -38,14 +41,31 @@ const RespiteCarePlaningDetails = () => {
       );
 
       return isSelected
-        ? prevTitles.filter((t) => t !== addon.title)
-        : [...prevTitles, addon.title];
+        ? prevTitles.filter((t) => t !== addon.id)
+        : [...prevTitles, addon.id];
     });
   };
 
   if (isRespiteDateLoading) {
     return <ServicePackageListSkeleton CARD_COUNT={0} />;
   }
+
+  // const result = selectedAddons.reduce((acc, value, index) => {
+  //   acc[`id[${index + 1}]`] = value;
+  //   return acc;
+  // }, {});
+
+  const respiteDetailsData = {
+    serviceImage: respiteDetails?.data?.respite_care?.image,
+    serviceName: respiteDetails?.data?.respite_care?.title,
+    respiteId: respiteId,
+    ...(selectedAddons.length > 0 && { respiteAddons: selectedAddons }),
+    ...(addonPrice > 0
+      ? {
+          price: Number(respiteDetails?.data?.respite_care?.price) + addonPrice,
+        }
+      : { price: respiteDetails?.data?.respite_care?.price }),
+  };
 
   return (
     <ScrollView
@@ -54,7 +74,7 @@ const RespiteCarePlaningDetails = () => {
     >
       <View style={tw`pb-2`}>
         <BackTitleButton
-          title={"Respite Services dt"}
+          title={"Respite Services"}
           onPress={() => router.back()}
         />
         <Image
@@ -113,7 +133,7 @@ const RespiteCarePlaningDetails = () => {
               >
                 <SvgXml
                   xml={
-                    selectedAddons.includes(item?.title)
+                    selectedAddons.includes(item?.id)
                       ? IconBlueTick
                       : IconPlusBlack
                   }
