@@ -30,7 +30,6 @@ const ProviderDetailsInfoProviders = () => {
   const detailsBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [serviceDetails, setServiceDetails] = React.useState<any>(null);
 
-  console.log(serviceDetails, "this is state ");
   // =================== api end point ===================
   const { data: providerDetailsData, isLoading: isProviderDetailsDataLoading } =
     useGetThirdPartyProviderDetailsQuery(id);
@@ -42,13 +41,15 @@ const ProviderDetailsInfoProviders = () => {
     detailsBottomSheetModalRef.current?.dismiss();
   }, []);
 
+  // ================== if user selected service then show service details in modal ==================
   const handleServiceDetailsModal = useCallback(
     async (id: string) => {
       if (!id) return null;
       try {
         const findData = await providerDetailsData?.data?.packages?.find(
-          (item: any) => item?.id === id,
+          (item: any) => String(item?.id) === String(id),
         );
+        console.log(findData, "this is selected id ");
         if (findData) {
           setServiceDetails(findData);
           handleDetailsModalOpen();
@@ -57,7 +58,7 @@ const ProviderDetailsInfoProviders = () => {
         console.log(error, "Single service not get>>>>>>>>");
       }
     },
-    [id],
+    [providerDetailsData],
   );
 
   // ======================== max rating count array =======================
@@ -95,7 +96,7 @@ const ProviderDetailsInfoProviders = () => {
         showsHorizontalScrollIndicator={false}
       >
         <BackTitleButton
-          title="Provider details"
+          title="Provider details no no "
           onPress={() => router.back()}
         />
         {/* =--------------------------- provider info --------------------------- */}

@@ -7,13 +7,15 @@ import {
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetRespiteCarePackageDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const RespiteCarePlaningDetails = () => {
   const { respiteId } = useLocalSearchParams();
@@ -21,6 +23,27 @@ const RespiteCarePlaningDetails = () => {
   const [selectedAddons, setSelectedAddons] = React.useState<string[]>([]);
   console.log(selectedAddons, "this is");
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(
+      updateBooking({
+        serviceType: "admin",
+        serviceId: "service_123",
+        providerId: "provider_456",
+        addons: ["addon_1", "addon_2"],
+        billingInfo: {
+          name: "John Doe",
+          email: " example.com",
+          phone: "123-456-7890",
+        },
+        date: "2023-09-30",
+        time: "14:00",
+        subscriptionId: "sub_123",
+        paymentMethod: "card",
+      }),
+    );
+  }, []);
   // ==================== api end point ====================
   const { data: respiteDetails, isLoading: isRespiteDateLoading } =
     useGetRespiteCarePackageDetailsQuery(respiteId);

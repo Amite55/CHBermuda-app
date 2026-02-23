@@ -22,8 +22,16 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useSelector } from "react-redux";
 
 const AdminPlacingOrder = () => {
+  const booking = useSelector((state: any) => state.booking);
+
+  console.log(
+    booking,
+    "this is booking from placing order page------------------",
+  );
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
