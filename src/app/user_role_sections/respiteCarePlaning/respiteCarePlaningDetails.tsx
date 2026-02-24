@@ -12,7 +12,7 @@ import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkelet
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useDispatch } from "react-redux";
@@ -21,36 +21,31 @@ const RespiteCarePlaningDetails = () => {
   const { respiteId } = useLocalSearchParams();
   const [addonPrice, setAddonPrice] = React.useState(0);
   const [selectedAddons, setSelectedAddons] = React.useState<string[]>([]);
-  console.log(selectedAddons, "this is");
+  // console.log(selectedAddons, "this is");
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  const stateBookingData = () => {
     dispatch(
       updateBooking({
-        serviceType: "admin",
-        serviceId: "service_123",
-        providerId: "provider_456",
-        addons: ["addon_1", "addon_2"],
-        billingInfo: {
-          name: "John Doe",
-          email: " example.com",
-          phone: "123-456-7890",
+        booking_type: "respite_care",
+        amount: addonPrice
+          ? addonPrice + Number(respiteDetails?.data?.respite_care?.price || 0)
+          : respiteDetails?.data?.respite_care?.price,
+        respiteCarePackageDetails: {
+          respiteCareId: respiteDetails?.data?.respite_care?.id,
+          name: respiteDetails?.data?.respite_care?.title,
+          addons: selectedAddons,
+          respiteCareImage: respiteDetails?.data?.respite_care?.image,
         },
-        date: "2023-09-30",
-        time: "14:00",
-        subscriptionId: "sub_123",
-        paymentMethod: "card",
       }),
     );
-  }, []);
+  };
+
   // ==================== api end point ====================
   const { data: respiteDetails, isLoading: isRespiteDateLoading } =
     useGetRespiteCarePackageDetailsQuery(respiteId);
-  // console.log(
-  //   respiteDetails?.data?.respite_care,
-  //   "this is respite care details ",
-  // );
+  console.log(respiteDetails?.data, "this is respite care details");
 
   // ================ handle select addon ==================
   const handleSelectAddon = (addon: any) => {

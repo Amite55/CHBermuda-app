@@ -1,32 +1,68 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-type ServiceType = "admin" | "respite" | "third_party" | null;
 
-interface BookingStateType {
-  serviceType: ServiceType;
-  serviceId: string | null;
-  providerId: string | null;
-  date: string | null;
-  time: string | null;
-  addons: string[];
-  subscriptionId: string | null;
-  paymentMethod: string | null;
-  billingInfo: {
-    name: string;
-    email: string;
-    phone: string;
-  } | null;
+// ============= user info type for billing info ==============
+interface userInfoType {
+  name: string;
+  email: string;
+  location: string;
+  userImage: string;
+}
+// ============== provider info type for booking ==============
+interface providerInfoType {
+  providerId: string;
+  providerName: string;
+  providerLocation: string;
+  providerContact: string;
+  review: number;
+  rating: number;
+  totalOrders: number;
+  providerImage: string;
 }
 
+// ================= respite care package details type =================
+interface respiteCarePackageDetailsType {
+  respiteCareId: string;
+  name: string;
+  respiteCareImage: string;
+  addons: string[];
+}
+// ================= admin service package details type =================
+interface adminServicePackageDetailsType {
+  serviceId: string;
+  title: string;
+  serviceImage: string;
+  used: number;
+  total: number;
+  remaining: number;
+}
+interface thirdPartyServicePackageDetailsType {
+  duration: string;
+}
+// ================ booking state type =================
+interface BookingStateType {
+  booking_type: string | null;
+  date: string | null;
+  time: string | null;
+  amount: number | null;
+  subscriptionId: string | null;
+  userInfo: userInfoType | null;
+  providerInfo: providerInfoType | null;
+  respiteCarePackageDetails: respiteCarePackageDetailsType | null;
+  adminServicePackageDetails: adminServicePackageDetailsType | null;
+  thirdPartyServicePackageDetails: thirdPartyServicePackageDetailsType | null;
+}
+// ================= initial state ================
 const initialState: BookingStateType = {
-  serviceType: null,
-  serviceId: null,
-  providerId: null,
+  booking_type: null,
   date: null,
   time: null,
-  addons: [],
   subscriptionId: null,
-  paymentMethod: null,
-  billingInfo: null,
+  amount: 0,
+  userInfo: null,
+  providerInfo: null,
+  respiteCarePackageDetails: null,
+  adminServicePackageDetails: null,
+  thirdPartyServicePackageDetails: null,
 };
 
 const bookingSlices = createSlice({
@@ -34,7 +70,7 @@ const bookingSlices = createSlice({
   initialState: initialState,
   reducers: {
     setServiceType: (state, action) => {
-      state.serviceType = action.payload;
+      state.booking_type = action.payload;
     },
 
     updateBooking(state, action: PayloadAction<Partial<BookingStateType>>) {
