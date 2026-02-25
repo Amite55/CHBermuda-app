@@ -1,15 +1,38 @@
 import { IconRightArrow } from "@/assets/icons";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
+import { useDispatch } from "react-redux";
 
 const AdminOrderTimePlacing = () => {
   const [selected, setSelected] = React.useState<string>("");
   const today = new Date().toISOString().split("T")[0];
+  const dispatch = useDispatch();
+  const toast = useToastHelpers();
+
+  const handleStateUpdate = () => {
+    try {
+      if (!selected) {
+        return toast.warning("Please select a date to proceed!");
+      }
+      dispatch(
+        updateBooking({
+          date: selected,
+        }),
+      );
+      router.push(
+        "/user_role_sections/placingAdminOrderService/confirmDetailsAdminOrders",
+      );
+    } catch (error) {
+      console.log(error, "time Scheduling not updated----->");
+    }
+  };
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -39,7 +62,7 @@ const AdminOrderTimePlacing = () => {
               textSectionTitleColor: "#111",
               selectedDayBackgroundColor: "#183E9F",
               selectedDayTextColor: "#fff",
-              todayTextColor: "#183E9F",
+              todayTextColor: "#183E",
               dayTextColor: "#111",
               textDisabledColor: "#A4A4A4",
               arrowColor: "orange",
@@ -52,7 +75,7 @@ const AdminOrderTimePlacing = () => {
               [selected]: {
                 selected: true,
                 disableTouchEvent: true,
-                selectedDotColor: "orange",
+                selectedColor: "#183E9F",
               },
             }}
             minDate={today}
@@ -63,9 +86,7 @@ const AdminOrderTimePlacing = () => {
       {/* ==================== submit button ==================== */}
       <PrimaryButton
         onPress={() => {
-          router.push(
-            "/user_role_sections/placingAdminOrderService/confirmDetailsAdminOrders"
-          );
+          handleStateUpdate();
         }}
         buttonText="Next"
         buttonContainerStyle={tw`mt-6 `}

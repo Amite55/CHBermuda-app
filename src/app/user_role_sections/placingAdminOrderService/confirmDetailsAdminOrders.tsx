@@ -28,11 +28,16 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useSelector } from "react-redux";
 
 const ConfirmDetailsAdminOrders = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const booking = useSelector((state: any) => state.booking);
 
+  console.log(booking, "this is booking -------->");
+
+  // ====================== modal open and close function =======================
   const handleEditModalOpen = useCallback(async () => {
     editBottomSheetModalRef.current?.present();
   }, []);

@@ -21,8 +21,6 @@ const RespiteCarePlaningDetails = () => {
   const { respiteId } = useLocalSearchParams();
   const [addonPrice, setAddonPrice] = React.useState(0);
   const [selectedAddons, setSelectedAddons] = React.useState<string[]>([]);
-  // console.log(selectedAddons, "this is");
-
   const dispatch = useDispatch();
 
   const stateBookingData = () => {
@@ -45,7 +43,6 @@ const RespiteCarePlaningDetails = () => {
   // ==================== api end point ====================
   const { data: respiteDetails, isLoading: isRespiteDateLoading } =
     useGetRespiteCarePackageDetailsQuery(respiteId);
-  console.log(respiteDetails?.data, "this is respite care details");
 
   // ================ handle select addon ==================
   const handleSelectAddon = (addon: any) => {
@@ -175,6 +172,7 @@ const RespiteCarePlaningDetails = () => {
           rightIcon={IconRightCornerArrowWhite}
           buttonContainerStyle={tw`mt-2 h-10 `}
           onPress={() => {
+            stateBookingData();
             router.push(
               "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
             );
@@ -214,6 +212,7 @@ const RespiteCarePlaningDetails = () => {
             // rightIcon={IconRightCornerArrowWhite}
             buttonContainerStyle={tw`w-32 rounded-md h-10 `}
             onPress={() => {
+              stateBookingData();
               router.push(
                 "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
               );
