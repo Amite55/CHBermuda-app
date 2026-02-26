@@ -5,14 +5,13 @@ interface userInfoType {
   name: string;
   email: string;
   location: string;
-  userImage: string;
+  userImage: string | null;
 }
 // ============== provider info type for booking ==============
 interface providerInfoType {
   providerId: string;
   providerName: string;
   providerLocation: string;
-  providerContact: string;
   review: number;
   rating: number;
   totalOrders: number;
@@ -38,12 +37,18 @@ interface adminServicePackageDetailsType {
 interface thirdPartyServicePackageDetailsType {
   duration: string;
 }
+interface packageInfoType {
+  id: string;
+  title: string;
+  price: number;
+}
 // ================ booking state type =================
 interface BookingStateType {
   booking_type: string | null;
   date: string | null;
   time: string | null;
   amount: number | null;
+  packageInfo: packageInfoType | null;
   subscriptionId: string | null;
   userInfo: userInfoType | null;
   providerInfo: providerInfoType | null;
@@ -58,6 +63,7 @@ const initialState: BookingStateType = {
   time: null,
   subscriptionId: null,
   amount: 0,
+  packageInfo: null,
   userInfo: null,
   providerInfo: null,
   respiteCarePackageDetails: null,

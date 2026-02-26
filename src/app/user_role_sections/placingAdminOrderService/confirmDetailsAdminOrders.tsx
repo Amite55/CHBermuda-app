@@ -1,14 +1,17 @@
 import {
   IconCrossWhite,
   IconEditPen,
-  IconLocationPrimary,
   IconOrderPlaceWhite,
   IconRatingStar,
   IconSuccessIcon,
 } from "@/assets/icons";
-import { ImgBennerImage, ImgServiceImage } from "@/assets/image";
+import { ImgBennerImage } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import {
+  resetBooking,
+  updateBooking,
+} from "@/src/redux/appStore/bookingSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -18,6 +21,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import { Formik } from "formik";
 import React, { useCallback, useRef, useState } from "react";
 import {
   Modal,
@@ -28,14 +32,51 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
+// ================= user form type =================
+interface userInfoType {
+  fullName: string;
+  email: string;
+  location: string;
+}
 
 const ConfirmDetailsAdminOrders = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const booking = useSelector((state: any) => state.booking);
+  const dispatch = useDispatch();
 
   console.log(booking, "this is booking -------->");
+
+  const handleStateBookingData = (userInfo: userInfoType) => {
+    try {
+      dispatch(
+        updateBooking({
+          userInfo: {
+            name: userInfo.fullName,
+            email: userInfo.email,
+            location: userInfo.location,
+          },
+        }),
+      );
+      handleEditModalClose();
+    } catch (error) {
+      console.log(error, "redux not stored------->");
+    }
+  };
+
+  // ==================== Validation Schema ====================
+  const validationSchema = Yup.object().shape({
+    fullName: Yup.string().required("Full name is required"),
+    email: Yup.string()
+      .matches(
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        "Please enter a valid email address",
+      )
+      .required("Email is required"),
+    location: Yup.string().required("Location is required"),
+  });
 
   // ====================== modal open and close function =======================
   const handleEditModalOpen = useCallback(async () => {
@@ -57,38 +98,43 @@ const ConfirmDetailsAdminOrders = () => {
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
           Service
         </Text>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          disabled
-          style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
+        {/* ============= service card ============== */}
+        <View
+          style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
         >
           <Image
             style={tw`w-16 h-16 rounded-full`}
-            source={ImgServiceImage}
-            contentFit="contain"
+            source={booking?.respiteCarePackageDetails?.respiteCareImage}
+            contentFit="cover"
           />
-          <View>
-            <Text style={tw`font-LufgaMedium text-base text-regularText`}>
-              Elizabeth Olson
-            </Text>
-
-            <Text style={tw`font-LufgaRegular text-sm text-black`}>
-              Cristal comfort plan
-            </Text>
-
-            <View style={tw`flex-row items-center gap-2 mt-1`}>
-              <Text style={tw`font-LufgaMedium text-xs text-subText pt-1`}>
-                Used: 1
+          <View style={tw`flex-1 `}>
+            <View style={tw` flex-1 flex-row  items-center  gap-2`}>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+              >
+                {booking?.respiteCarePackageDetails?.name}
               </Text>
-              <Text style={tw`font-LufgaMedium text-xs text-subText pt-1`}>
-                Remaining: 2
+              <Text
+                style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+              >
+                {booking?.respiteCarePackageDetails?.addons?.length || 0} addons
               </Text>
-              <Text style={tw`font-LufgaSemiBold text-xs text-subText pt-1`}>
-                Total: 3
+            </View>
+
+            <View style={tw`flex-row items-center gap-1`}>
+              <Text
+                style={tw`font-LufgaRegular text-sm items-center text-black`}
+              >
+                Total price :{" "}
+              </Text>
+              <Text style={tw`font-LufgaBold text-base`}>
+                ${Number(booking?.amount || 0).toFixed(2)}
               </Text>
             </View>
           </View>
-        </TouchableOpacity>
+        </View>
 
         {/* ------------- provider name ------------ */}
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
@@ -130,7 +176,9 @@ const ConfirmDetailsAdminOrders = () => {
             </View>
           </View>
         </TouchableOpacity>
-        {/* ------------- provider name ------------ */}
+
+        {/* ------------- provider name  end ------------ */}
+
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
           Billing information
         </Text>
@@ -140,7 +188,7 @@ const ConfirmDetailsAdminOrders = () => {
             <View>
               <Text style={tw`font-LufgaMedium text-lg text-black`}>Name</Text>
               <Text style={tw`font-LufgaRegular text-base text-subText`}>
-                Mr. Lopez
+                {booking?.userInfo?.name}
               </Text>
             </View>
             <TouchableOpacity
@@ -154,7 +202,7 @@ const ConfirmDetailsAdminOrders = () => {
           <View>
             <Text style={tw`font-LufgaMedium text-lg text-black`}>Email</Text>
             <Text style={tw`font-LufgaRegular text-base text-subText`}>
-              example@gmail.com
+              {booking?.userInfo?.email}
             </Text>
           </View>
           {/* location */}
@@ -164,7 +212,7 @@ const ConfirmDetailsAdminOrders = () => {
               Location
             </Text>
             <Text style={tw`font-LufgaRegular text-base text-subText`}>
-              Dhaka, Bangladesh
+              {booking?.userInfo?.location}
             </Text>
           </View>
         </View>
@@ -175,11 +223,13 @@ const ConfirmDetailsAdminOrders = () => {
         </Text>
         <View style={tw`px-5 py-4 bg-white  rounded-xl mt-1`}>
           <Text style={tw`font-LufgaMedium text-lg text-black`}>
-            Mon, Aug 27, 2025
+            {booking?.date}
           </Text>
-          <Text style={tw`font-LufgaRegular text-base text-subText`}>
-            02:00 PM - 11:00 PM
-          </Text>
+          {booking?.booking_type === "respite_care" ? null : (
+            <Text style={tw`font-LufgaRegular text-base text-subText`}>
+              02:00 PM - 11:00 PM
+            </Text>
+          )}
         </View>
       </View>
 
@@ -197,7 +247,7 @@ const ConfirmDetailsAdminOrders = () => {
       {/* ============================ logout modal =========================== */}
 
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => {
@@ -226,7 +276,8 @@ const ConfirmDetailsAdminOrders = () => {
                 buttonTextStyle={tw`text-lg font-LufgaMedium`}
                 onPress={() => {
                   setIsModalVisible(false);
-                  router.push("/user_role_sections/user_tabs/user_home");
+                  dispatch(resetBooking());
+                  router.replace("/user_role_sections/user_tabs/user_home");
                 }}
                 buttonContainerStyle={tw`w-full`}
               />
@@ -250,101 +301,133 @@ const ConfirmDetailsAdminOrders = () => {
             />
           )}
         >
-          <BottomSheetScrollView contentContainerStyle={tw`flex-1  bg-white`}>
-            {/* ----------------- header title part ---------------- */}
-            <View
-              style={tw`flex-row items-center justify-between bg-primaryBtn py-2 px-4 rounded-t-2xl`}
-            >
-              <View />
-              <Text style={tw`font-LufgaMedium text-sm text-white`}>
-                Feedback
-              </Text>
-              <TouchableOpacity onPress={() => handleEditModalClose()}>
-                <SvgXml xml={IconCrossWhite} />
-              </TouchableOpacity>
-            </View>
+          <Formik
+            initialValues={{
+              fullName: booking?.userInfo?.name || "",
+              email: booking?.userInfo?.email || "",
+              location: booking?.userInfo?.location || "",
+            }}
+            onSubmit={(values) => handleStateBookingData(values)}
+            validationSchema={validationSchema}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              errors,
+              touched,
+              values,
+            }) => (
+              <BottomSheetScrollView
+                contentContainerStyle={tw`flex-1  bg-white`}
+              >
+                {/* ----------------- header title part ---------------- */}
+                <View
+                  style={tw`flex-row items-center justify-between bg-primaryBtn py-2 px-4 rounded-t-2xl`}
+                >
+                  <View />
+                  <Text style={tw`font-LufgaMedium text-sm text-white`}>
+                    Feedback
+                  </Text>
+                  <TouchableOpacity onPress={() => handleEditModalClose()}>
+                    <SvgXml xml={IconCrossWhite} />
+                  </TouchableOpacity>
+                </View>
 
-            <View style={tw`px-5 mt-4 flex-1`}>
-              {/* ----------------- input form ---------------- */}
-              <Text
-                style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-              >
-                Billing information
-              </Text>
-              {/* input form */}
+                <View style={tw`px-5 mt-4 flex-1`}>
+                  {/* ----------------- input form ---------------- */}
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                  >
+                    Billing information
+                  </Text>
+                  {/* input form */}
 
-              {/*  ``````````````` name input ````````````` */}
-              <Text
-                style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-              >
-                Full Name
-              </Text>
-              <View
-                style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
-              >
-                <TextInput
-                  defaultValue="John Doe"
-                  placeholder="Enter your Full Name"
-                  placeholderTextColor="#535353"
-                  style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
+                  {/*  ``````````````` name input ````````````` */}
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                  >
+                    Full Name
+                  </Text>
+                  <View
+                    style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
+                  >
+                    <TextInput
+                      value={values.fullName}
+                      onChangeText={handleChange("fullName")}
+                      onBlur={handleBlur("fullName")}
+                      defaultValue="John Doe"
+                      placeholder="Enter your Full Name"
+                      placeholderTextColor="#535353"
+                      style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
+                    />
+                  </View>
+                  {errors.fullName && touched.fullName && (
+                    <Text style={tw`text-red-500 text-xs mt-1`}>
+                      {errors.fullName}
+                    </Text>
+                  )}
+
+                  {/*  ``````````````` Email input ````````````` */}
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                  >
+                    Email
+                  </Text>
+                  <View
+                    style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
+                  >
+                    <TextInput
+                      value={values.email}
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
+                      placeholder="Enter your Email"
+                      placeholderTextColor="#535353"
+                      style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
+                    />
+                  </View>
+                  {errors.email && touched.email && (
+                    <Text style={tw`text-red-500 text-xs mt-1`}>
+                      {errors.email}
+                    </Text>
+                  )}
+
+                  {/*  ``````````````` Location input ````````````` */}
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                  >
+                    Location
+                  </Text>
+                  <View
+                    style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
+                  >
+                    <TextInput
+                      value={values.location}
+                      onChangeText={handleChange("location")}
+                      onBlur={handleBlur("location")}
+                      placeholder="Enter your Location "
+                      placeholderTextColor="#535353"
+                      style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
+                    />
+                  </View>
+                  {errors.location && touched.location && (
+                    <Text style={tw`text-red-500 text-xs mt-1`}>
+                      {errors.location}
+                    </Text>
+                  )}
+                </View>
+
+                {/* ============================ submit button ============================ */}
+                <PrimaryButton
+                  onPress={handleSubmit}
+                  buttonText="Save changes"
+                  buttonContainerStyle={tw`my-4 mx-5`}
+                  buttonTextStyle={tw`text-lg font-LufgaMedium`}
+                  leftIcon={IconOrderPlaceWhite}
                 />
-              </View>
-
-              {/*  ``````````````` Email input ````````````` */}
-              <Text
-                style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-              >
-                Email
-              </Text>
-              <View
-                style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
-              >
-                <TextInput
-                  defaultValue="Jexample@gmail.com"
-                  placeholder="Enter your Email"
-                  placeholderTextColor="#535353"
-                  style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
-                />
-              </View>
-
-              {/*  ``````````````` Location input ````````````` */}
-              <Text
-                style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-              >
-                Location
-              </Text>
-              <View
-                style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3 `}
-              >
-                <TextInput
-                  defaultValue="New York, USA"
-                  placeholder="Enter your Location "
-                  placeholderTextColor="#535353"
-                  style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
-                />
-              </View>
-
-              {/* ============================ enter your current location ============================ */}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={tw`mt-4 flex-row items-center gap-2 justify-center `}
-              >
-                <SvgXml xml={IconLocationPrimary} />
-                <Text style={tw`font-LufgaMedium text-lg text-primaryBtn`}>
-                  Use my current location
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* ============================ submit button ============================ */}
-            <PrimaryButton
-              onPress={() => handleEditModalClose()}
-              buttonText="Save changes"
-              buttonContainerStyle={tw`my-4 mx-5`}
-              buttonTextStyle={tw`text-lg font-LufgaMedium`}
-              leftIcon={IconOrderPlaceWhite}
-            />
-          </BottomSheetScrollView>
+              </BottomSheetScrollView>
+            )}
+          </Formik>
         </BottomSheetModal>
       </BottomSheetModalProvider>
     </ScrollView>

@@ -3,7 +3,7 @@ import {
   IconRatingStar,
   IconRightArrow,
 } from "@/assets/icons";
-import { ImgBennerImage } from "@/assets/image";
+import { ImgPlaceholderProfile } from "@/assets/image";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
@@ -39,6 +39,8 @@ const AdminPlacingOrder = () => {
   const [keyboardVisible, setKeyboardVisible] = React.useState(false);
   const booking = useSelector((state: any) => state.booking);
   const dispatch = useDispatch();
+
+  console.log(booking, "this is booking order");
 
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
@@ -128,50 +130,56 @@ const AdminPlacingOrder = () => {
                   onPress={() => router.back()}
                 />
                 {/* ------------- service name ------------ */}
-                <Text
-                  style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-                >
-                  Service
-                </Text>
-                {/* ============= service card ============== */}
-                <View
-                  style={tw` flex-row items-center gap-4 px-4 py-3 bg-white  rounded-xl`}
-                >
-                  <Image
-                    style={tw`w-16 h-16 rounded-full`}
-                    source={
-                      booking?.respiteCarePackageDetails?.respiteCareImage
-                    }
-                    contentFit="cover"
-                  />
-                  <View style={tw`flex-1 `}>
-                    <View style={tw` flex-1 flex-row  items-center  gap-2`}>
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={tw`font-LufgaMedium text-base text-regularText flex-1`}
-                      >
-                        {booking?.respiteCarePackageDetails?.name}
-                        asdfasdfgsdfsdfgdg
-                      </Text>
-                      <Text
-                        style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-                      >
-                        {booking?.respiteCarePackageDetails?.addons?.length ||
-                          0}{" "}
-                        addons
-                      </Text>
-                    </View>
-
-                    <Text style={tw`font-LufgaRegular text-sm text-black`}>
-                      Total price :{" "}
-                      <Text style={tw`font-LufgaBold text-base`}>
-                        ${booking?.amount || 0}
-                      </Text>
+                {booking?.booking_type === "respite_care" && (
+                  <View>
+                    <Text
+                      style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                    >
+                      Service
                     </Text>
-                  </View>
-                </View>
+                    {/* ============= service card ============== */}
+                    <View
+                      style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+                    >
+                      <Image
+                        style={tw`w-16 h-16 rounded-full`}
+                        source={
+                          booking?.respiteCarePackageDetails?.respiteCareImage
+                        }
+                        contentFit="cover"
+                      />
+                      <View style={tw`flex-1 `}>
+                        <View style={tw` flex-1 flex-row  items-center  gap-2`}>
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                          >
+                            {booking?.respiteCarePackageDetails?.name}
+                          </Text>
+                          <Text
+                            style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                          >
+                            {booking?.respiteCarePackageDetails?.addons
+                              ?.length || 0}{" "}
+                            addons
+                          </Text>
+                        </View>
 
+                        <View style={tw`flex-row items-center gap-1`}>
+                          <Text
+                            style={tw`font-LufgaRegular text-sm items-center text-black`}
+                          >
+                            Total price :{" "}
+                          </Text>
+                          <Text style={tw`font-LufgaBold text-base`}>
+                            ${Number(booking?.amount || 0).toFixed(2)}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                )}
                 {/* ------------- provider name ------------ */}
                 <Text
                   style={tw`font-LufgaMedium text-base text-regularText mt-2`}
@@ -179,21 +187,24 @@ const AdminPlacingOrder = () => {
                   Provider
                 </Text>
                 {/* =============== provider card info =============== */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
+                <View
                   style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
                 >
                   <Image
                     style={tw`w-16 h-16 rounded-full`}
-                    source={ImgBennerImage}
+                    source={booking?.providerInfo?.providerImage}
                     contentFit="contain"
+                    placeholder={ImgPlaceholderProfile}
                   />
-                  <View>
+                  <View style={tw`flex-1`}>
                     <View style={tw`flex-row items-center gap-2`}>
                       <Text
-                        style={tw`font-LufgaMedium text-base text-regularText`}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                        style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
                       >
-                        Elizabeth Olson
+                        {booking?.providerInfo?.providerName}
+                        adfasdfasdfasdfasdfasdf
                       </Text>
                       <Text
                         style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
@@ -217,7 +228,7 @@ const AdminPlacingOrder = () => {
                       </Text>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
                 {/* ------------- provider name ------------ */}
                 <Text
                   style={tw`font-LufgaMedium text-base text-regularText mt-2`}

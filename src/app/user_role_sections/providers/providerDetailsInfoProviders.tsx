@@ -4,6 +4,7 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useGetThirdPartyProviderDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
@@ -24,11 +25,13 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const ProviderDetailsInfoProviders = () => {
   const { id } = useLocalSearchParams();
   const detailsBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [serviceDetails, setServiceDetails] = React.useState<any>(null);
+  const dispatch = useDispatch();
 
   // =================== api end point ===================
   const { data: providerDetailsData, isLoading: isProviderDetailsDataLoading } =
@@ -49,7 +52,6 @@ const ProviderDetailsInfoProviders = () => {
         const findData = await providerDetailsData?.data?.packages?.find(
           (item: any) => String(item?.id) === String(id),
         );
-        console.log(findData, "this is selected id ");
         if (findData) {
           setServiceDetails(findData);
           handleDetailsModalOpen();
@@ -82,6 +84,41 @@ const ProviderDetailsInfoProviders = () => {
   const oneStarProgress =
     (providerDetailsData?.data?.rating?.total_one_stars || 0) / maxRatingCount;
 
+  // ============== handle state store in redux and navigate to scheduling page ==============
+  const handleStateUpdate = () => {
+    try {
+      dispatch(
+        updateBooking({
+          providerInfo: {
+            providerId: providerDetailsData?.data?.provider?.id,
+            providerName: providerDetailsData?.data?.provider?.name,
+            providerLocation: providerDetailsData?.data?.provider?.address,
+            providerImage: providerDetailsData?.data?.provider?.avatar,
+            totalOrders:
+              providerDetailsData?.data?.provider?.completed_orders || 0,
+            rating: providerDetailsData?.data?.rating?.avg_rating || 0,
+            review: providerDetailsData?.data?.rating?.total_reviews || 0,
+          },
+          packageInfo: {
+            id: serviceDetails?.id,
+            title: serviceDetails?.title,
+            price: serviceDetails?.price,
+          },
+        }),
+      );
+
+      handleDetailsModalClose();
+      router.push(
+        "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
+      );
+    } catch (error) {
+      console.log(
+        error,
+        "Provider data state not included in third party provider>>",
+      );
+    }
+  };
+
   // ================== loading state =================
   if (isProviderDetailsDataLoading) {
     return <ServicePackageListSkeleton CARD_COUNT={2} />;
@@ -96,7 +133,7 @@ const ProviderDetailsInfoProviders = () => {
         showsHorizontalScrollIndicator={false}
       >
         <BackTitleButton
-          title="Provider details no no "
+          title="Provider details info"
           onPress={() => router.back()}
         />
         {/* =--------------------------- provider info --------------------------- */}
@@ -443,10 +480,10 @@ const ProviderDetailsInfoProviders = () => {
               buttonText="Select"
               buttonTextStyle={tw`font-LufgaMedium text-base`}
               onPress={() => {
-                handleDetailsModalClose();
-                router.push(
-                  "/user_role_sections/placingProviderOrderService/providerOrderDateTimePlacing",
-                );
+                handleStateUpdate();
+                // router.push(
+                //   "/user_role_sections/placingProviderOrderService/providerOrderDateTimePlacing",
+                // );
               }}
               buttonContainerStyle={tw`mt-6`}
             />
