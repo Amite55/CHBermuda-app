@@ -46,6 +46,7 @@ interface packageInfoType {
 interface BookingStateType {
   booking_type: string | null;
   date: string | null;
+  package_time_id: string | null;
   time: string | null;
   amount: number | null;
   packageInfo: packageInfoType | null;
@@ -63,6 +64,7 @@ const initialState: BookingStateType = {
   time: null,
   subscriptionId: null,
   amount: 0,
+  package_time_id: null,
   packageInfo: null,
   userInfo: null,
   providerInfo: null,

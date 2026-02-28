@@ -272,7 +272,7 @@ const SingUp = () => {
                       tw`mb-5`,
                       !isChecked && tw`bg-gray-500 pointer-events-none`,
                     ]}
-                    buttonText="Sign UP"
+                    buttonText="Sign up"
                     onPress={handleSubmit}
                   />
 

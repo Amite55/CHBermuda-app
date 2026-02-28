@@ -40,8 +40,6 @@ const AdminPlacingOrder = () => {
   const booking = useSelector((state: any) => state.booking);
   const dispatch = useDispatch();
 
-  console.log(booking, "this is booking order");
-
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
@@ -204,7 +202,6 @@ const AdminPlacingOrder = () => {
                         style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
                       >
                         {booking?.providerInfo?.providerName}
-                        adfasdfasdfasdfasdfasdf
                       </Text>
                       <Text
                         style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}

@@ -104,6 +104,7 @@ const ProviderDetailsInfoProviders = () => {
             title: serviceDetails?.title,
             price: serviceDetails?.price,
           },
+          booking_type: "thirdparty_booking",
         }),
       );
 
@@ -175,39 +176,47 @@ const ProviderDetailsInfoProviders = () => {
         </TouchableOpacity>
         {/* ============================= provider service list section ============================= */}
         <View>
-          {providerDetailsData?.data?.packages?.map((item) => {
-            return (
-              <View
-                key={item.id}
-                style={tw`bg-white rounded-xl mt-4 p-4 flex-row justify-between items-center`}
-              >
-                <View style={tw`flex-shrink`}>
-                  <Text
-                    numberOfLines={2}
-                    ellipsizeMode="tail"
-                    style={tw`font-LufgaMedium text-base text-black`}
-                  >
-                    {item?.title}
-                  </Text>
-                  <Text style={tw`font-LufgaMedium text-base text-black`}>
-                    $ {item?.price}
-                  </Text>
-                  <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    Duration: {item?.duration} hours
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => handleServiceDetailsModal(item?.id)}
-                  style={tw`px-4 py-2 bg-secondaryBtn2 rounded-lg`}
-                  activeOpacity={0.7}
+          {providerDetailsData?.data?.packages?.length > 0 ? (
+            providerDetailsData?.data?.packages?.map((item) => {
+              return (
+                <View
+                  key={item.id}
+                  style={tw`bg-white rounded-xl mt-4 p-4 flex-row justify-between items-center`}
                 >
-                  <Text style={tw`font-LufgaRegular text-sm text-primaryBtn`}>
-                    See details
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+                  <View style={tw`flex-shrink`}>
+                    <Text
+                      numberOfLines={2}
+                      ellipsizeMode="tail"
+                      style={tw`font-LufgaMedium text-base text-black`}
+                    >
+                      {item?.title}
+                    </Text>
+                    <Text style={tw`font-LufgaMedium text-base text-black`}>
+                      $ {item?.price}
+                    </Text>
+                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                      Duration: {item?.duration} hours
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => handleServiceDetailsModal(item?.id)}
+                    style={tw`px-4 py-2 bg-secondaryBtn2 rounded-lg`}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={tw`font-LufgaRegular text-sm text-primaryBtn`}>
+                      See details
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })
+          ) : (
+            <Text
+              style={tw`font-LufgaMedium text-base text-center text-subText mt-4`}
+            >
+              No services found for this provider
+            </Text>
+          )}
         </View>
         {/* --------------------------- provider location --------------------------- */}
         <View style={tw`flex-row items-center gap-4  my-3`}>
