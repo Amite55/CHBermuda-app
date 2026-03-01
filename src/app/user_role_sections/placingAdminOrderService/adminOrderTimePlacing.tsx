@@ -38,7 +38,7 @@ const AdminOrderTimePlacing = () => {
         return toast.warning("Please select a date to proceed!");
       }
       if (booking?.booking_type === "thirdparty_booking") {
-        if (!booking?.package_time_id) {
+        if (!bookingTime) {
           return toast.warning("Please select a time slot to proceed!");
         }
       }

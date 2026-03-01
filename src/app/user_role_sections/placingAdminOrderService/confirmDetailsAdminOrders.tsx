@@ -5,7 +5,7 @@ import {
   IconRatingStar,
   IconSuccessIcon,
 } from "@/assets/icons";
-import { ImgBennerImage } from "@/assets/image";
+import { ImgPlaceholderProfile, ImgSplashLogo } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import {
@@ -98,85 +98,128 @@ const ConfirmDetailsAdminOrders = () => {
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
           Service
         </Text>
-        {/* ============= service card ============== */}
-        <View
-          style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
-        >
-          <Image
-            style={tw`w-16 h-16 rounded-full`}
-            source={booking?.respiteCarePackageDetails?.respiteCareImage}
-            contentFit="cover"
-          />
-          <View style={tw`flex-1 `}>
-            <View style={tw` flex-1 flex-row  items-center  gap-2`}>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={tw`font-LufgaMedium text-base text-regularText flex-1`}
-              >
-                {booking?.respiteCarePackageDetails?.name}
-              </Text>
-              <Text
-                style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-              >
-                {booking?.respiteCarePackageDetails?.addons?.length || 0} addons
-              </Text>
-            </View>
+        {/* ============= if respite care service card ============== */}
+        {booking?.booking_type === "respite_care" && (
+          <View
+            style={tw`flex-1 flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+          >
+            <Image
+              style={tw`w-16 h-16 rounded-full`}
+              source={booking?.respiteCarePackageDetails?.respiteCareImage}
+              contentFit="cover"
+              placeholder={ImgSplashLogo}
+            />
+            <View style={tw`flex-1 `}>
+              <View style={tw` flex-1 flex-row  items-center gap-2`}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                >
+                  {booking?.respiteCarePackageDetails?.name}
+                </Text>
+                <Text
+                  style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                >
+                  {booking?.respiteCarePackageDetails?.addons?.length || 0}{" "}
+                  addons
+                </Text>
+              </View>
 
-            <View style={tw`flex-row items-center gap-1`}>
-              <Text
-                style={tw`font-LufgaRegular text-sm items-center text-black`}
-              >
-                Total price :{" "}
-              </Text>
-              <Text style={tw`font-LufgaBold text-base`}>
-                ${Number(booking?.amount || 0).toFixed(2)}
-              </Text>
+              <View style={tw`flex-row items-center gap-1`}>
+                <Text
+                  style={tw`font-LufgaRegular text-sm items-center text-black`}
+                >
+                  Total price :{" "}
+                </Text>
+                <Text style={tw`font-LufgaBold text-base`}>
+                  ${Number(booking?.amount || 0).toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ------------------- if third party provider exist =================== */}
+        {booking?.booking_type === "thirdparty_booking" && (
+          <View
+            style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+          >
+            <Image
+              style={tw`w-16 h-16 rounded-full`}
+              source={booking?.packageInfo?.servicePackageImage}
+              contentFit="cover"
+              placeholder={ImgSplashLogo}
+            />
+            <View style={tw`flex-1 `}>
+              <View style={tw` flex-1 flex-row  items-center  gap-2`}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                >
+                  {booking?.packageInfo?.title}
+                </Text>
+              </View>
+
+              <View style={tw`flex-row items-center gap-1`}>
+                <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                  Duration: {booking?.packageInfo?.duration}
+                </Text>
+                <Text
+                  style={tw`font-LufgaRegular text-sm items-center text-black pl-2`}
+                >
+                  Price :{" "}
+                </Text>
+                <Text style={tw`font-LufgaBold text-base`}>
+                  ${Number(booking?.packageInfo?.price || 0).toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* ------------- provider name ------------ */}
+        <View>
+          <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
+            Provider
+          </Text>
+          <View
+            style={tw` flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
+          >
+            <Image
+              style={tw`w-16 h-16 rounded-full`}
+              source={booking?.providerInfo?.providerImage}
+              contentFit="contain"
+              placeholder={ImgPlaceholderProfile}
+            />
+            <View style={tw`flex-1`}>
+              <View style={tw`flex-1 flex-row items-center gap-2`}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
+                >
+                  {booking?.providerInfo?.providerName}
+                </Text>
+                <Text
+                  style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                >
+                  {booking?.providerInfo?.totalOrders || 0} order
+                </Text>
+              </View>
+              <View style={tw`flex-row items-center gap-1`}>
+                <SvgXml xml={IconRatingStar} />
+                <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
+                  {booking?.providerInfo?.rating || 0} rating
+                </Text>
+                <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                  ({booking?.providerInfo?.review || 0} reviews)
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-
-        {/* ------------- provider name ------------ */}
-        <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
-          Provider
-        </Text>
-        <TouchableOpacity
-          disabled
-          activeOpacity={0.7}
-          style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
-        >
-          <Image
-            style={tw`w-16 h-16 rounded-full`}
-            source={ImgBennerImage}
-            contentFit="contain"
-          />
-          <View>
-            <View style={tw`flex-row items-center gap-2`}>
-              <Text style={tw`font-LufgaMedium text-base text-regularText`}>
-                Elizabeth Olson
-              </Text>
-              <Text
-                style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-              >
-                12 order
-              </Text>
-            </View>
-
-            <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-              Cristal comfort plan
-            </Text>
-            <View style={tw`flex-row items-center gap-1`}>
-              <SvgXml xml={IconRatingStar} />
-              <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
-                4.0
-              </Text>
-              <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                (8 reviews)
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-
         {/* ------------- provider name  end ------------ */}
 
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>

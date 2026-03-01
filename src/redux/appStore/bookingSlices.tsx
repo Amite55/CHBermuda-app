@@ -41,6 +41,8 @@ interface packageInfoType {
   id: string;
   title: string;
   price: number;
+  servicePackageImage: string;
+  duration: string;
 }
 // ================ booking state type =================
 interface BookingStateType {

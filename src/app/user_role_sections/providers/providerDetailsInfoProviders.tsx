@@ -103,6 +103,8 @@ const ProviderDetailsInfoProviders = () => {
             id: serviceDetails?.id,
             title: serviceDetails?.title,
             price: serviceDetails?.price,
+            duration: serviceDetails?.duration,
+            servicePackageImage: serviceDetails?.icon,
           },
           booking_type: "thirdparty_booking",
         }),
