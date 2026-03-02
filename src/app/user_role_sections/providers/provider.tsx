@@ -127,7 +127,7 @@ const Provider = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           onEndReached={handleLoadMore}
-          renderItem={({ item }) => {
+          renderItem={({ item }: any) => {
             return (
               <View style={tw`bg-white rounded-2xl p-4`}>
                 {/* ------------------ provider info ---------------- */}

@@ -128,56 +128,59 @@ const AdminPlacingOrder = () => {
                   onPress={() => router.back()}
                 />
                 {/* ------------- service name ------------ */}
-                {booking?.booking_type === "respite_care" && (
-                  <View>
-                    <Text
-                      style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-                    >
-                      Service
-                    </Text>
-                    {/* ============= service card ============== */}
-                    <View
-                      style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
-                    >
-                      <Image
-                        style={tw`w-16 h-16 rounded-full`}
-                        source={
-                          booking?.respiteCarePackageDetails?.respiteCareImage
-                        }
-                        contentFit="cover"
-                      />
-                      <View style={tw`flex-1 `}>
-                        <View style={tw` flex-1 flex-row  items-center  gap-2`}>
-                          <Text
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                            style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                {booking?.booking_type === "respite_care" ||
+                  (booking?.booking_type === "admin_booking" && (
+                    <View>
+                      <Text
+                        style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                      >
+                        Service
+                      </Text>
+                      {/* ============= service card ============== */}
+                      <View
+                        style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+                      >
+                        <Image
+                          style={tw`w-16 h-16 rounded-full`}
+                          source={
+                            booking?.respiteCarePackageDetails?.respiteCareImage
+                          }
+                          contentFit="cover"
+                        />
+                        <View style={tw`flex-1 `}>
+                          <View
+                            style={tw` flex-1 flex-row  items-center  gap-2`}
                           >
-                            {booking?.respiteCarePackageDetails?.name}
-                          </Text>
-                          <Text
-                            style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-                          >
-                            {booking?.respiteCarePackageDetails?.addons
-                              ?.length || 0}{" "}
-                            addons
-                          </Text>
-                        </View>
+                            <Text
+                              numberOfLines={1}
+                              ellipsizeMode="tail"
+                              style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                            >
+                              {booking?.respiteCarePackageDetails?.name}
+                            </Text>
+                            <Text
+                              style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                            >
+                              {booking?.respiteCarePackageDetails?.addons
+                                ?.length || 0}{" "}
+                              addons
+                            </Text>
+                          </View>
 
-                        <View style={tw`flex-row items-center gap-1`}>
-                          <Text
-                            style={tw`font-LufgaRegular text-sm items-center text-black`}
-                          >
-                            Total price :{" "}
-                          </Text>
-                          <Text style={tw`font-LufgaBold text-base`}>
-                            ${Number(booking?.amount || 0).toFixed(2)}
-                          </Text>
+                          <View style={tw`flex-row items-center gap-1`}>
+                            <Text
+                              style={tw`font-LufgaRegular text-sm items-center text-black`}
+                            >
+                              Total price :{" "}
+                            </Text>
+                            <Text style={tw`font-LufgaBold text-base`}>
+                              ${Number(booking?.amount || 0).toFixed(2)}
+                            </Text>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                )}
+                  ))}
                 {/* ------------- provider name ------------ */}
                 <Text
                   style={tw`font-LufgaMedium text-base text-regularText mt-2`}

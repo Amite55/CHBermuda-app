@@ -22,6 +22,9 @@ const RespiteCarePlaningDetails = () => {
   const [addonPrice, setAddonPrice] = React.useState(0);
   const [selectedAddons, setSelectedAddons] = React.useState<string[]>([]);
   const dispatch = useDispatch();
+  // ==================== api end point ====================
+  const { data: respiteDetails, isLoading: isRespiteDateLoading } =
+    useGetRespiteCarePackageDetailsQuery(respiteId);
 
   const stateBookingData = () => {
     dispatch(
@@ -39,10 +42,6 @@ const RespiteCarePlaningDetails = () => {
       }),
     );
   };
-
-  // ==================== api end point ====================
-  const { data: respiteDetails, isLoading: isRespiteDateLoading } =
-    useGetRespiteCarePackageDetailsQuery(respiteId);
 
   // ================ handle select addon ==================
   const handleSelectAddon = (addon: any) => {
@@ -83,108 +82,115 @@ const RespiteCarePlaningDetails = () => {
   };
 
   return (
-    <ScrollView
-      style={tw`flex-1 bg-bgBaseColor`}
-      contentContainerStyle={[tw` px-5 flex-grow justify-between`]}
-    >
-      <View style={tw`pb-2`}>
-        <BackTitleButton
-          title={"Respite Services"}
-          onPress={() => router.back()}
-        />
-        <Image
-          contentFit="cover"
-          style={tw`w-full h-40 rounded-3xl mt-3`}
-          source={respiteDetails?.data?.respite_care?.image}
-        />
-        <Text
-          numberOfLines={3}
-          ellipsizeMode="tail"
-          style={tw`font-LufgaMedium text-base text-black pt-3`}
-        >
-          {respiteDetails?.data?.respite_care?.title}
-        </Text>
-        <View style={tw`flex-row justify-between items-center `}>
-          <View style={tw`flex-row items-center gap-1 `}>
-            <SvgXml xml={IconDuration} />
-            <Text style={tw`font-LufgaMedium text-base text-black`}>
-              Duration: {respiteDetails?.data?.respite_care?.duration} hour
+    <View style={tw`flex-1 bg-bgBaseColor`}>
+      <ScrollView
+        style={tw`flex-1 `}
+        contentContainerStyle={[
+          tw`px-5 flex-grow justify-between `,
+          selectedAddons?.length > 0 && tw`pb-28`,
+        ]}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={tw`pb-2`}>
+          <BackTitleButton
+            title={"Respite Services its"}
+            onPress={() => router.back()}
+          />
+          <Image
+            contentFit="cover"
+            style={tw`w-full h-40 rounded-3xl mt-3`}
+            source={respiteDetails?.data?.respite_care?.image}
+          />
+          <Text
+            numberOfLines={3}
+            ellipsizeMode="tail"
+            style={tw`font-LufgaMedium text-base text-black pt-3`}
+          >
+            {respiteDetails?.data?.respite_care?.title}
+          </Text>
+          <View style={tw`flex-row justify-between items-center `}>
+            <View style={tw`flex-row items-center gap-1 `}>
+              <SvgXml xml={IconDuration} />
+              <Text style={tw`font-LufgaMedium text-base text-black`}>
+                Duration: {respiteDetails?.data?.respite_care?.duration} hour
+              </Text>
+            </View>
+            <Text style={tw`font-LufgaMedium text-xl text-black`}>
+              $ {respiteDetails?.data?.respite_care?.price}
+              <Text style={tw`font-LufgaRegular text-sm text-gray-500`}>
+                / {respiteDetails?.data?.respite_care?.type}
+              </Text>
             </Text>
           </View>
-          <Text style={tw`font-LufgaMedium text-xl text-black`}>
-            $ {respiteDetails?.data?.respite_care?.price}
-            <Text style={tw`font-LufgaRegular text-sm text-gray-500`}>
-              / {respiteDetails?.data?.respite_care?.type}
+          {/* ------------------ plan description ---------------- */}
+          <Text style={tw`font-LufgaRegular text-sm text-subText  pt-3`}>
+            {respiteDetails?.data?.respite_care?.description}
+          </Text>
+
+          {/* --------------- available addons ------------- */}
+          {respiteDetails?.data?.available_addons?.length > 0 ? (
+            <Text style={tw`font-LufgaMedium text-xl text-black pt-3`}>
+              Available add-ons
             </Text>
-          </Text>
+          ) : (
+            <Text
+              style={tw`font-LufgaMedium text-subText text-lg text-center mt-5`}
+            >
+              Not addons available
+            </Text>
+          )}
+          {/* ------------- addons list ------------ */}
+          {respiteDetails?.data?.available_addons?.length > 0 &&
+            respiteDetails?.data?.available_addons?.map((item) => (
+              <View key={item?.id} style={tw`gap-3 mt-3`}>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleSelectAddon(item);
+                  }}
+                  activeOpacity={0.8}
+                  style={tw`flex-row items-center gap-2 bg-white rounded-xl py-2 px-3`}
+                >
+                  <SvgXml
+                    xml={
+                      selectedAddons.includes(item?.id)
+                        ? IconBlueTick
+                        : IconPlusBlack
+                    }
+                  />
+                  <Text style={tw`font-LufgaRegular text-black text-base`}>
+                    {item?.title}
+                  </Text>
+                  <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} />
+                  <Text style={tw`font-LufgaMedium text-base text-black `}>
+                    ${item?.price}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ))}
         </View>
-        {/* ------------------ plan description ---------------- */}
-        <Text style={tw`font-LufgaRegular text-sm text-subText  pt-3`}>
-          {respiteDetails?.data?.respite_care?.description}
-        </Text>
 
-        {/* --------------- available addons ------------- */}
-        {respiteDetails?.data?.available_addons?.length > 0 ? (
-          <Text style={tw`font-LufgaMedium text-xl text-black pt-3`}>
-            Available add-ons
-          </Text>
-        ) : (
-          <Text
-            style={tw`font-LufgaMedium text-subText text-lg text-center mt-5`}
-          >
-            Not addons available
-          </Text>
+        {selectedAddons?.length === 0 && (
+          <PrimaryButton
+            buttonText="Book now"
+            buttonTextStyle={tw`font-LufgaMedium text-base`}
+            rightIcon={IconRightCornerArrowWhite}
+            buttonContainerStyle={tw`mt-2 h-10 `}
+            onPress={() => {
+              stateBookingData();
+              router.push(
+                "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
+              );
+            }}
+          />
         )}
-        {/* ------------- addons list ------------ */}
-        {respiteDetails?.data?.available_addons?.length > 0 &&
-          respiteDetails?.data?.available_addons?.map((item) => (
-            <View key={item?.id} style={tw`gap-3 mt-3`}>
-              <TouchableOpacity
-                onPress={() => {
-                  handleSelectAddon(item);
-                }}
-                activeOpacity={0.8}
-                style={tw`flex-row items-center gap-2 bg-white rounded-xl py-2 px-3`}
-              >
-                <SvgXml
-                  xml={
-                    selectedAddons.includes(item?.id)
-                      ? IconBlueTick
-                      : IconPlusBlack
-                  }
-                />
-                <Text style={tw`font-LufgaRegular text-black text-base`}>
-                  {item?.title}
-                </Text>
-                <View style={tw`w-1.5 h-1.5 rounded-full bg-slate-400 `} />
-                <Text style={tw`font-LufgaMedium text-base text-black `}>
-                  ${item?.price}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-      </View>
-
-      {selectedAddons?.length === 0 && (
-        <PrimaryButton
-          buttonText="Book now"
-          buttonTextStyle={tw`font-LufgaMedium text-base`}
-          rightIcon={IconRightCornerArrowWhite}
-          buttonContainerStyle={tw`mt-2 h-10 `}
-          onPress={() => {
-            stateBookingData();
-            router.push(
-              "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
-            );
-          }}
-        />
-      )}
+      </ScrollView>
 
       {/* =================== you have an selected addon ================= */}
       {selectedAddons?.length > 0 && (
         <View
           style={[
-            tw`absolute bottom-0 flex-1 left-0 right-0 bg-white px-5 py-3 shadow flex-row justify-between items-center`,
+            tw`absolute bottom-0 flex-1 left-0 right-0 bg-white px-5 py-3 shadow flex-row justify-between items-center z-10 `,
             {
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
@@ -220,7 +226,7 @@ const RespiteCarePlaningDetails = () => {
           />
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 

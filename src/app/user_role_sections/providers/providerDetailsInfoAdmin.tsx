@@ -4,6 +4,7 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useGetAdminProviderDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -17,15 +18,51 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const ProviderDetailsInfoAdmin = () => {
   const { id } = useLocalSearchParams();
+  const dispatch = useDispatch();
 
   // ================= api end point =================
   const {
     data: adminProviderDetails,
     isLoading: isAdminProviderDetailsLoading,
   } = useGetAdminProviderDetailsQuery(id);
+
+  console.log(
+    adminProviderDetails?.data,
+    "this is admin provider details ------------------->",
+  );
+
+  // =------------------- SET service info in redux store ---------------------
+  const handleStateUpdate = () => {
+    try {
+      dispatch(
+        updateBooking({
+          booking_type: "admin_booking",
+          providerInfo: {
+            providerId: adminProviderDetails?.data?.provider?.id,
+            providerName: adminProviderDetails?.data?.provider?.name,
+            providerImage: adminProviderDetails?.data?.provider?.avatar,
+            providerLocation: adminProviderDetails?.data?.provider?.address,
+            totalOrders: adminProviderDetails?.data?.provider?.completed_orders,
+            rating: adminProviderDetails?.data?.rating?.avg_rating || 0,
+            review: adminProviderDetails?.data?.rating?.total_reviews || 0,
+          },
+        }),
+      );
+    } catch (error: any) {
+      console.log(
+        error,
+        "Admin service provider service not added in this section ----------->",
+      );
+    } finally {
+      router.push(
+        "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
+      );
+    }
+  };
 
   // ======================== max rating count array =======================
   const ratingCounts = [
@@ -53,7 +90,9 @@ const ProviderDetailsInfoAdmin = () => {
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}
-      contentContainerStyle={tw`flex-grow justify-between pb-4 px-5 bg-bgBaseColor  `}
+      contentContainerStyle={tw`flex-grow justify-between px-5 bg-bgBaseColor  `}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
     >
       <View>
         <BackTitleButton
@@ -277,9 +316,7 @@ const ProviderDetailsInfoAdmin = () => {
         buttonTextStyle={tw`font-LufgaMedium text-base`}
         buttonContainerStyle={tw`mt-4 h-12 `}
         onPress={() => {
-          router.push(
-            "/user_role_sections/placingAdminOrderService/adminPlacingOrder",
-          );
+          handleStateUpdate();
         }}
       />
     </ScrollView>

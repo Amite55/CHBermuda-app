@@ -16,6 +16,10 @@ const AdminServiceDetails = () => {
   // ============== api end point ==================
   const { data: adminServiceDetails, isLoading: isAdminServiceDetailsLoading } =
     useGetAdminPackageDetailsQuery(id);
+  console.log(
+    adminServiceDetails,
+    "this admin service package details -------------------->",
+  );
 
   // ================ if loading state
   if (isAdminServiceDetailsLoading) {
@@ -23,7 +27,7 @@ const AdminServiceDetails = () => {
   }
   return (
     <ScrollView
-      contentContainerStyle={tw` pb-2 px-5 bg-bgBaseColor  flex-grow justify-between`}
+      contentContainerStyle={tw` px-5 bg-bgBaseColor  flex-grow justify-between`}
       style={tw`flex-1 bg-bgBaseColor`}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}

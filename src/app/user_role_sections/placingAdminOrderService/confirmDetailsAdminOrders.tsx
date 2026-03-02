@@ -164,10 +164,10 @@ const ConfirmDetailsAdminOrders = () => {
 
               <View style={tw`flex-row items-center gap-1`}>
                 <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                  Duration: {booking?.packageInfo?.duration}
+                  Duration: {booking?.packageInfo?.duration} hours
                 </Text>
                 <Text
-                  style={tw`font-LufgaRegular text-sm items-center text-black pl-2`}
+                  style={tw`font-LufgaMedium text-sm items-center text-black pl-2`}
                 >
                   Price :{" "}
                 </Text>
@@ -180,46 +180,48 @@ const ConfirmDetailsAdminOrders = () => {
         )}
 
         {/* ------------- provider name ------------ */}
-        <View>
-          <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
-            Provider
-          </Text>
-          <View
-            style={tw` flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
-          >
-            <Image
-              style={tw`w-16 h-16 rounded-full`}
-              source={booking?.providerInfo?.providerImage}
-              contentFit="contain"
-              placeholder={ImgPlaceholderProfile}
-            />
-            <View style={tw`flex-1`}>
-              <View style={tw`flex-1 flex-row items-center gap-2`}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
-                >
-                  {booking?.providerInfo?.providerName}
-                </Text>
-                <Text
-                  style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-                >
-                  {booking?.providerInfo?.totalOrders || 0} order
-                </Text>
-              </View>
-              <View style={tw`flex-row items-center gap-1`}>
-                <SvgXml xml={IconRatingStar} />
-                <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
-                  {booking?.providerInfo?.rating || 0} rating
-                </Text>
-                <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                  ({booking?.providerInfo?.review || 0} reviews)
-                </Text>
+        {booking?.booking_type === "thirdparty_booking" && (
+          <View>
+            <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
+              Provider
+            </Text>
+            <View
+              style={tw` flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
+            >
+              <Image
+                style={tw`w-16 h-16 rounded-full`}
+                source={booking?.providerInfo?.providerImage}
+                contentFit="contain"
+                placeholder={ImgPlaceholderProfile}
+              />
+              <View style={tw`flex-1`}>
+                <View style={tw`flex-1 flex-row items-center gap-2`}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
+                  >
+                    {booking?.providerInfo?.providerName}
+                  </Text>
+                  <Text
+                    style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                  >
+                    {booking?.providerInfo?.totalOrders || 0} order
+                  </Text>
+                </View>
+                <View style={tw`flex-row items-center gap-1`}>
+                  <SvgXml xml={IconRatingStar} />
+                  <Text style={tw`font-LufgaRegular text-sm text-regularText`}>
+                    {booking?.providerInfo?.rating || 0} rating
+                  </Text>
+                  <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                    ({booking?.providerInfo?.review || 0} reviews)
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
+        )}
         {/* ------------- provider name  end ------------ */}
 
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
