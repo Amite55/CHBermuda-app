@@ -3,6 +3,7 @@ import { ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetAdminPackageDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
@@ -10,16 +11,36 @@ import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const AdminServiceDetails = () => {
   const { category, id, title } = useLocalSearchParams();
+  const dispatch = useDispatch();
   // ============== api end point ==================
   const { data: adminServiceDetails, isLoading: isAdminServiceDetailsLoading } =
     useGetAdminPackageDetailsQuery(id);
-  console.log(
-    adminServiceDetails,
-    "this admin service package details -------------------->",
-  );
+  const handleSetReduxState = () => {
+    try {
+      dispatch(
+        updateBooking({
+          packageInfo: {
+            duration: adminServiceDetails?.data?.duration,
+            id: adminServiceDetails?.data?.id,
+            price: adminServiceDetails?.data?.price,
+            servicePackageImage: adminServiceDetails?.data?.icon,
+            title: adminServiceDetails?.data?.title,
+          },
+        }),
+      );
+    } catch (error: any) {
+      console.log(error, "Redux state not stored data ");
+    } finally {
+      router.push({
+        pathname: "/user_role_sections/providers/provider",
+        params: { id: id },
+      });
+    }
+  };
 
   // ================ if loading state
   if (isAdminServiceDetailsLoading) {
@@ -83,10 +104,7 @@ const AdminServiceDetails = () => {
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
-              router.push({
-                pathname: "/user_role_sections/providers/provider",
-                params: { id: id },
-              });
+              handleSetReduxState();
             }}
             style={tw`flex-row justify-between items-center `}
           >

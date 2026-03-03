@@ -2,6 +2,12 @@ import { api } from "../../BaseApi";
 
 export const orderSlices = api.injectEndpoints({
   endpoints: (builder) => ({
+    getUserOrder: builder.query({
+      query: ({ page, per_page, status }) => ({
+        url: `/user-orders?per_page=${per_page}&page=${page}&status=${status}`,
+        method: "GET",
+      }),
+    }),
     getAdminProviderByPackageId: builder.query({
       query: ({ id, page, per_page }) => ({
         url: `/admin-provider-by-package-id/${id}?per_page=${per_page}&page=${page}`,
@@ -23,8 +29,7 @@ export const orderSlices = api.injectEndpoints({
       }),
       providesTags: ["Provider"],
     }),
-
-    booking: builder.mutation({
+    bookingSubscription: builder.mutation({
       query: (data) => ({
         url: "/booking",
         method: "POST",
@@ -32,14 +37,79 @@ export const orderSlices = api.injectEndpoints({
       }),
       invalidatesTags: ["Booking"],
     }),
+    bookingSuccessRespiteCare: builder.mutation({
+      query: (data) => ({
+        url: "/respite-care-booking",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    bookingSuccessThirdParty: builder.mutation({
+      query: (data) => ({
+        url: "/thirdparty-booking",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    getBookingDetails: builder.query({
+      query: (id) => ({
+        url: `/bookings/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Booking"],
+    }),
+    getDeliveryRequestDetails: builder.query({
+      query: (id) => ({
+        url: `/delivery-request/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Booking"],
+    }),
+    declineDeliveryRequest: builder.mutation({
+      query: (id) => ({
+        url: `/decline-delivery-request/${id}`,
+        method: "POST",
+        body: {
+          _method: "PUT",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    acceptDeliveryRequest: builder.mutation({
+      query: (id) => ({
+        url: `/accept-delivery-request/${id}`,
+        method: "POST",
+        body: {
+          _method: "PUT",
+        },
+      }),
+      invalidatesTags: ["Booking"],
+    }),
+    cancelDeliveryRequest: builder.mutation({
+      query: (id) => ({
+        url: `/cancel-booking/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Booking"],
+    }),
   }),
 });
 
 export const {
+  useGetUserOrderQuery,
   useGetAdminProviderByPackageIdQuery,
   useLazyGetAdminProviderByPackageIdQuery,
   useGetThirdPartyProviderByServiceIdQuery,
   useLazyGetThirdPartyProviderByServiceIdQuery,
   useGetAdminProviderDetailsQuery,
-  useBookingMutation,
+  useBookingSubscriptionMutation,
+  useBookingSuccessRespiteCareMutation,
+  useBookingSuccessThirdPartyMutation,
+  useGetBookingDetailsQuery,
+  useGetDeliveryRequestDetailsQuery,
+  useDeclineDeliveryRequestMutation,
+  useAcceptDeliveryRequestMutation,
+  useCancelDeliveryRequestMutation,
 } = orderSlices;

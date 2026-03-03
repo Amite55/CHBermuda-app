@@ -30,11 +30,6 @@ const ProviderDetailsInfoAdmin = () => {
     isLoading: isAdminProviderDetailsLoading,
   } = useGetAdminProviderDetailsQuery(id);
 
-  console.log(
-    adminProviderDetails?.data,
-    "this is admin provider details ------------------->",
-  );
-
   // =------------------- SET service info in redux store ---------------------
   const handleStateUpdate = () => {
     try {

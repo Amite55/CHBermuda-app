@@ -27,12 +27,12 @@ interface respiteCarePackageDetailsType {
 }
 // ================= admin service package details type =================
 interface adminServicePackageDetailsType {
-  serviceId: string;
+  serviceId: string | any | null;
   title: string;
   serviceImage: string;
-  used: number;
-  total: number;
-  remaining: number;
+  used: number | null;
+  total: number | null;
+  remaining: number | null;
 }
 interface thirdPartyServicePackageDetailsType {
   duration: string;

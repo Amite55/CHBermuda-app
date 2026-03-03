@@ -1,9 +1,5 @@
-import {
-  IconLocationPrimary,
-  IconRatingStar,
-  IconRightArrow,
-} from "@/assets/icons";
-import { ImgPlaceholderProfile } from "@/assets/image";
+import { IconRatingStar, IconRightArrow } from "@/assets/icons";
+import { ImgPlaceholderProfile, ImgSplashLogo } from "@/assets/image";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
@@ -20,7 +16,6 @@ import {
   ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -119,117 +114,145 @@ const AdminPlacingOrder = () => {
               style={tw`flex-1 bg-bgBaseColor`}
               contentContainerStyle={[
                 tw` px-5 flex-grow justify-between`,
-                keyboardVisible ? tw`pb-10 pt-3` : tw`pb-2`,
+                keyboardVisible ? tw`pb-10 pt-3` : tw`pb-0`,
               ]}
             >
               <View>
                 <BackTitleButton
-                  title="Placing order admin"
+                  title="Placing order"
                   onPress={() => router.back()}
                 />
                 {/* ------------- service name ------------ */}
-                {booking?.booking_type === "respite_care" ||
-                  (booking?.booking_type === "admin_booking" && (
+
+                <View>
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+                  >
+                    Service
+                  </Text>
+                  {/* ============= service card ============== */}
+                  <View
+                    style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+                  >
+                    <Image
+                      style={tw`w-16 h-16 rounded-full`}
+                      source={
+                        booking?.booking_type === "respite_care"
+                          ? booking?.respiteCarePackageDetails?.respiteCareImage
+                          : booking?.packageInfo?.servicePackageImage
+                      }
+                      contentFit="cover"
+                      placeholder={ImgSplashLogo}
+                    />
+                    <View style={tw`flex-1 `}>
+                      <View style={tw` flex-1 flex-row  items-center  gap-2`}>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                        >
+                          {booking?.booking_type === "respite_care"
+                            ? booking?.respiteCarePackageDetails?.name
+                            : booking?.packageInfo?.title}
+                        </Text>
+                        {booking?.booking_type === "respite_care" && (
+                          <Text
+                            style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                          >
+                            {booking?.respiteCarePackageDetails?.addons
+                              ?.length || 0}{" "}
+                            addons
+                          </Text>
+                        )}
+                      </View>
+
+                      <View style={tw`gap-1 `}>
+                        {booking?.booking_type === "admin_booking" && (
+                          <Text
+                            style={tw`font-LufgaRegular text-sm items-center text-black`}
+                          >
+                            Duration : {booking?.packageInfo?.duration} hours
+                          </Text>
+                        )}
+                        <View style={tw`flex-row items-center gap-1`}>
+                          <Text
+                            style={tw`font-LufgaRegular text-sm items-center text-black`}
+                          >
+                            Total price :{" "}
+                          </Text>
+                          <Text style={tw`font-LufgaBold text-base`}>
+                            $
+                            {booking?.booking_type === "respite_care"
+                              ? Number(booking?.amount || 0).toFixed(2)
+                              : Number(
+                                  booking?.packageInfo?.price || 0,
+                                ).toFixed(2)}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                {booking?.booking_type === "admin_booking" ||
+                  (booking?.booking_type === "thirdparty_booking" && (
                     <View>
+                      {/* ------------- provider name ------------ */}
                       <Text
                         style={tw`font-LufgaMedium text-base text-regularText mt-2`}
                       >
-                        Service
+                        Provider
                       </Text>
-                      {/* ============= service card ============== */}
+                      {/* =============== provider card info =============== */}
                       <View
-                        style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
+                        style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
                       >
                         <Image
                           style={tw`w-16 h-16 rounded-full`}
-                          source={
-                            booking?.respiteCarePackageDetails?.respiteCareImage
-                          }
-                          contentFit="cover"
+                          source={booking?.providerInfo?.providerImage}
+                          contentFit="contain"
+                          placeholder={ImgPlaceholderProfile}
                         />
-                        <View style={tw`flex-1 `}>
-                          <View
-                            style={tw` flex-1 flex-row  items-center  gap-2`}
-                          >
+                        <View style={tw`flex-1`}>
+                          <View style={tw`flex-row items-center gap-2`}>
                             <Text
-                              numberOfLines={1}
                               ellipsizeMode="tail"
-                              style={tw`font-LufgaMedium text-base text-regularText flex-1`}
+                              numberOfLines={1}
+                              style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
                             >
-                              {booking?.respiteCarePackageDetails?.name}
+                              {booking?.providerInfo?.providerName}
                             </Text>
                             <Text
-                              style={tw`  font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+                              style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
                             >
-                              {booking?.respiteCarePackageDetails?.addons
-                                ?.length || 0}{" "}
-                              addons
+                              12 order
                             </Text>
                           </View>
 
+                          <Text
+                            style={tw`font-LufgaRegular text-sm text-subText`}
+                          >
+                            {booking?.packageInfo?.title}
+                          </Text>
                           <View style={tw`flex-row items-center gap-1`}>
+                            <SvgXml xml={IconRatingStar} />
                             <Text
-                              style={tw`font-LufgaRegular text-sm items-center text-black`}
+                              style={tw`font-LufgaRegular text-sm text-regularText`}
                             >
-                              Total price :{" "}
+                              {booking?.providerInfo?.rating || 0.0}
                             </Text>
-                            <Text style={tw`font-LufgaBold text-base`}>
-                              ${Number(booking?.amount || 0).toFixed(2)}
+                            <Text
+                              style={tw`font-LufgaRegular text-sm text-subText`}
+                            >
+                              ({booking?.providerInfo?.review || 0} reviews)
                             </Text>
                           </View>
                         </View>
                       </View>
+                      {/* ------------- provider name ------------ */}
                     </View>
                   ))}
-                {/* ------------- provider name ------------ */}
-                <Text
-                  style={tw`font-LufgaMedium text-base text-regularText mt-2`}
-                >
-                  Provider
-                </Text>
-                {/* =============== provider card info =============== */}
-                <View
-                  style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
-                >
-                  <Image
-                    style={tw`w-16 h-16 rounded-full`}
-                    source={booking?.providerInfo?.providerImage}
-                    contentFit="contain"
-                    placeholder={ImgPlaceholderProfile}
-                  />
-                  <View style={tw`flex-1`}>
-                    <View style={tw`flex-row items-center gap-2`}>
-                      <Text
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                        style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
-                      >
-                        {booking?.providerInfo?.providerName}
-                      </Text>
-                      <Text
-                        style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
-                      >
-                        12 order
-                      </Text>
-                    </View>
 
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Cristal comfort plan
-                    </Text>
-                    <View style={tw`flex-row items-center gap-1`}>
-                      <SvgXml xml={IconRatingStar} />
-                      <Text
-                        style={tw`font-LufgaRegular text-sm text-regularText`}
-                      >
-                        4.0
-                      </Text>
-                      <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                        (8 reviews)
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                {/* ------------- provider name ------------ */}
                 <Text
                   style={tw`font-LufgaMedium text-base text-regularText mt-2`}
                 >
@@ -311,20 +334,7 @@ const AdminPlacingOrder = () => {
                     {errors.location}
                   </Text>
                 )}
-
-                {/* ============================ enter your current location ============================ */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={tw`mt-4 flex-row items-center gap-2 justify-center `}
-                >
-                  <SvgXml xml={IconLocationPrimary} />
-                  <Text style={tw`font-LufgaMedium text-lg text-primaryBtn`}>
-                    Use my current location
-                  </Text>
-                </TouchableOpacity>
               </View>
-
-              {/* ==================== submit button ==================== */}
 
               <PrimaryButton
                 onPress={() => {

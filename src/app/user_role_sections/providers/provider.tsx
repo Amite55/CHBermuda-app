@@ -3,7 +3,7 @@ import {
   IconRatingStar,
   IconRightCornerArrowWhite,
 } from "@/assets/icons";
-import { ImgBennerImage } from "@/assets/image";
+import { ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
@@ -98,7 +98,7 @@ const Provider = () => {
 
   return (
     <View style={tw`flex-1 bg-bgBaseColor px-5 `}>
-      <BackTitleButton title="Providers" onPress={() => router.back()} />
+      <BackTitleButton title="Providers " onPress={() => router.back()} />
 
       {/* ====================== if plan is not purchased ====================== */}
       {!isPlanPurchased && (
@@ -136,16 +136,13 @@ const Provider = () => {
                   disabled
                   style={tw`flex-row items-center py-2 gap-4`}
                 >
-                  <View style={tw`relative`}>
-                    <Image
-                      style={tw`w-12 h-12 rounded-full`}
-                      source={ImgBennerImage}
-                      contentFit="contain"
-                    />
-                    <View
-                      style={tw`absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full`}
-                    />
-                  </View>
+                  <Image
+                    style={tw`w-12 h-12 rounded-full`}
+                    source={item?.provider?.avatar}
+                    contentFit="contain"
+                    placeholder={ImgPlaceholderProfile}
+                  />
+
                   <View>
                     <Text
                       style={tw`font-LufgaMedium text-base text-regularText`}

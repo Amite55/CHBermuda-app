@@ -90,15 +90,15 @@ const ConfirmDetailsAdminOrders = () => {
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       style={tw`flex-1 bg-bgBaseColor`}
-      contentContainerStyle={tw`pb-3 px-5 flex-grow justify-between`}
+      contentContainerStyle={tw` px-5 flex-grow justify-between`}
     >
       <View>
         <BackTitleButton title="Placing order" onPress={() => router.back()} />
         {/* ------------- service name ------------ */}
         <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
-          Service
+          Services
         </Text>
-        {/* ============= if respite care service card ============== */}
+        {/* ============= if respite care and admin service - service card ============== */}
         {booking?.booking_type === "respite_care" && (
           <View
             style={tw`flex-1 flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
@@ -139,9 +139,9 @@ const ConfirmDetailsAdminOrders = () => {
             </View>
           </View>
         )}
-
         {/* ------------------- if third party provider exist =================== */}
-        {booking?.booking_type === "thirdparty_booking" && (
+        {(booking?.booking_type === "thirdparty_booking" ||
+          booking?.booking_type === "admin_booking") && (
           <View
             style={tw` flex-row items-center gap-2 px-4 py-3 bg-white  rounded-xl`}
           >
@@ -169,7 +169,7 @@ const ConfirmDetailsAdminOrders = () => {
                 <Text
                   style={tw`font-LufgaMedium text-sm items-center text-black pl-2`}
                 >
-                  Price :{" "}
+                  Price :
                 </Text>
                 <Text style={tw`font-LufgaBold text-base`}>
                   ${Number(booking?.packageInfo?.price || 0).toFixed(2)}
@@ -180,7 +180,8 @@ const ConfirmDetailsAdminOrders = () => {
         )}
 
         {/* ------------- provider name ------------ */}
-        {booking?.booking_type === "thirdparty_booking" && (
+        {(booking?.booking_type === "thirdparty_booking" ||
+          booking?.booking_type === "admin_booking") && (
           <View>
             <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
               Provider
@@ -270,9 +271,10 @@ const ConfirmDetailsAdminOrders = () => {
           <Text style={tw`font-LufgaMedium text-lg text-black`}>
             {booking?.date}
           </Text>
-          {booking?.booking_type === "respite_care" ? null : (
+          {booking?.booking_type === "respite_care" ||
+          booking?.booking_type === "admin_booking" ? null : (
             <Text style={tw`font-LufgaRegular text-base text-subText`}>
-              02:00 PM - 11:00 PM
+              {booking?.time}
             </Text>
           )}
         </View>
