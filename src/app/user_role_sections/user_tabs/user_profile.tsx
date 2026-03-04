@@ -7,6 +7,7 @@ import {
   IconLock,
   IconLogout,
   IconPrivacyPolicy,
+  IconRightCornerArrowGray,
   IconRightCornerArrowGreen,
   IconRightTopConnerArrow,
   IconSubscriptionPlan,
@@ -17,6 +18,7 @@ import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -40,6 +42,9 @@ const User_Profile = () => {
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
+  console.log(activePlans?.data?.length, "a;la;a;");
 
   return (
     <>
@@ -91,11 +96,24 @@ const User_Profile = () => {
             onPress={() => {
               router.push("/user_role_sections/activePlan");
             }}
-            titleText="2 active plans"
+            titleText={
+              activePlans?.data?.length > 0
+                ? `${activePlans?.data?.length}` + " " + "Active Plan"
+                : "0 Active Plan"
+            }
             subTitleText="Tap to see details"
             icon={IconDiamond}
-            containerStyle={tw`py-4 border border-[#00AD2E] bg-[#EFFFF3]`}
-            endIcon={IconRightCornerArrowGreen}
+            containerStyle={[
+              tw`py-4 border  `,
+              activePlans?.data?.length > 0
+                ? tw`border-[#00AD2E] bg-[#EFFFF3]`
+                : tw`border-subText bg-slate-200`,
+            ]}
+            endIcon={
+              activePlans?.data?.length > 0
+                ? IconRightCornerArrowGreen
+                : IconRightCornerArrowGray
+            }
           />
 
           {/* ========================== user setting menu ========================== */}

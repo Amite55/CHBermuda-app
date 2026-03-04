@@ -1,11 +1,18 @@
 import { IconGetterThen } from "@/assets/icons";
 import { ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import {
+  useCreatePaymentIntentMutation,
+  useSubscriptionSuccessAdminPackageORBundleMutation,
+} from "@/src/redux/Api/paymentSlices";
 import { useGetAdminPackageDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import { useStripe } from "@stripe/stripe-react-native";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -13,32 +20,130 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useDispatch } from "react-redux";
 
+interface IPaymentSubscriptionType {
+  subscription_type: string;
+  package_id: string;
+  payment_intent_id: string;
+  amount: number;
+}
+
 const AdminServiceDetails = () => {
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { category, id, title } = useLocalSearchParams();
+  const toast = useToastHelpers();
   const dispatch = useDispatch();
+
   // ============== api end point ==================
   const { data: adminServiceDetails, isLoading: isAdminServiceDetailsLoading } =
     useGetAdminPackageDetailsQuery(id);
-  const handleSetReduxState = () => {
+  const [createPaymentIntent, { isLoading: isCreatingPaymentIntentLoading }] =
+    useCreatePaymentIntentMutation();
+  const [confirmSubscription, { isLoading: isConfirmSubscriptionLoading }] =
+    useSubscriptionSuccessAdminPackageORBundleMutation();
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
+
+  const adminPackages = activePlans?.data?.filter(
+    (item: any) => item?.subscription_type === "admin_package",
+  );
+
+  const findPurchasedPlan = adminPackages?.find((subscription: any) =>
+    subscription?.subscription_items?.some(
+      (subItem: any) =>
+        String(subItem?.package?.id) === String(adminServiceDetails?.data?.id),
+    ),
+  );
+
+  const findPlanId = findPurchasedPlan?.subscription_items?.find(
+    (subItem: any) =>
+      String(subItem?.package_id) === String(adminServiceDetails?.data?.id),
+  );
+
+  // =============== if user selected service then show service details in modal ================
+  const handleSetReduxState = (packageId: string) => {
     try {
-      dispatch(
-        updateBooking({
-          packageInfo: {
-            duration: adminServiceDetails?.data?.duration,
-            id: adminServiceDetails?.data?.id,
-            price: adminServiceDetails?.data?.price,
-            servicePackageImage: adminServiceDetails?.data?.icon,
-            title: adminServiceDetails?.data?.title,
-          },
-        }),
-      );
+      if (packageId === adminServiceDetails?.data?.id) {
+        dispatch(
+          updateBooking({
+            packageInfo: {
+              duration: adminServiceDetails?.data?.duration,
+              id: adminServiceDetails?.data?.id,
+              price: adminServiceDetails?.data?.price,
+              servicePackageImage: adminServiceDetails?.data?.icon,
+              title: adminServiceDetails?.data?.title,
+            },
+          }),
+        );
+        router.push({
+          pathname: "/user_role_sections/providers/provider",
+          params: { id: id },
+        });
+      } else {
+        toast.warning("Please buy the plan and access the service", 4000);
+      }
     } catch (error: any) {
       console.log(error, "Redux state not stored data ");
-    } finally {
-      router.push({
-        pathname: "/user_role_sections/providers/provider",
-        params: { id: id },
+    }
+  };
+
+  // ====================== send stripe payment modal request and payment ======================
+  const handleSubscription = async () => {
+    try {
+      const intentData = {
+        amount: Number(adminServiceDetails?.data?.price),
+        currency: "USD",
+      };
+      const responseIntent = await createPaymentIntent(intentData).unwrap();
+      if (!responseIntent?.data?.client_secret) {
+        toast.warning("Something went wrong please try again", 3000);
+        return;
+      }
+      const subscriptionPaymentData = {
+        subscription_type: "admin_package",
+        package_id: adminServiceDetails?.data?.id,
+        payment_intent_id: responseIntent?.data?.client_secret,
+        amount: Number(adminServiceDetails?.data?.price),
+      };
+      // ==================== call payment modal ===================
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: "Example, Inc.",
+        paymentIntentClientSecret: responseIntent?.data?.client_secret,
       });
+      if (initError) {
+        // handle error----------
+        toast.showError(
+          initError?.message ||
+            initError ||
+            "Something went wrong please try again",
+        );
+      } else {
+        checkout(subscriptionPaymentData);
+      }
+    } catch (error: any) {
+      console.log(error, "Payment intent not created ----->");
+    }
+  };
+
+  // ================= when if open the stripe payment sheet to call this this function ================
+  const checkout = async (subscriptionData: IPaymentSubscriptionType) => {
+    try {
+      const { error } = await presentPaymentSheet();
+      if (error) {
+        toast.showError(
+          error?.message || error || "Something went wrong please try again",
+        );
+      } else {
+        const response = await confirmSubscription(subscriptionData).unwrap();
+        console.log(response, "this response with stripe payment resoner ");
+        if (response) {
+          toast.success(
+            response?.message || "Active plans retrieved successfully",
+            3000,
+          );
+        }
+      }
+    } catch (error: any) {
+      console.log(error, "Payment not success in your subscription------>");
     }
   };
 
@@ -100,11 +205,11 @@ const AdminServiceDetails = () => {
         </View>
 
         {/* =    all provider info    in this service   */}
-        {adminServiceDetails?.data?.providers?.length > 0 && (
+        {adminServiceDetails?.data?.providers?.length > 0 ? (
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
-              handleSetReduxState();
+              handleSetReduxState(findPlanId?.package_id);
             }}
             style={tw`flex-row justify-between items-center `}
           >
@@ -128,16 +233,34 @@ const AdminServiceDetails = () => {
               <SvgXml xml={IconGetterThen} />
             </View>
           </TouchableOpacity>
+        ) : (
+          <Text style={tw`text-center text-subText font-LufgaMedium`}>
+            No provider found
+          </Text>
         )}
       </View>
 
       <PrimaryButton
-        buttonText="Subscribe"
+        buttonText={
+          findPlanId?.package_id === adminServiceDetails?.data?.id
+            ? "Purchased"
+            : "Subscribe"
+        }
+        disabled={
+          isCreatingPaymentIntentLoading ||
+          isConfirmSubscriptionLoading ||
+          findPlanId?.package_id === adminServiceDetails?.data?.id
+        }
+        loading={isCreatingPaymentIntentLoading || isConfirmSubscriptionLoading}
         buttonTextStyle={tw`font-LufgaMedium text-base`}
-        buttonContainerStyle={tw`mt-2 h-12`}
-        // onPress={() => {
-        //   router.push("/user_role_sections/cart");
-        // }}
+        buttonContainerStyle={[
+          tw`mt-2 h-12`,
+          findPlanId?.package_id === adminServiceDetails?.data?.id &&
+            tw`bg-green-500`,
+        ]}
+        onPress={() => {
+          handleSubscription();
+        }}
       />
     </ScrollView>
   );

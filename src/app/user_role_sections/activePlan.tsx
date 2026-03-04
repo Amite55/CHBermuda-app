@@ -1,6 +1,7 @@
 import { ImgCategoryNurse, ImgService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
@@ -8,6 +9,11 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
 
 const ActivePlan = () => {
+  // ================== api end point ================
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
+
+  console.log(activePlans, "this active plans --------------->");
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -15,7 +21,7 @@ const ActivePlan = () => {
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={[tw`px-5 `]}
     >
-      <BackTitleButton title="Notifications" onPress={() => router.back()} />
+      <BackTitleButton title="Active plans" onPress={() => router.back()} />
       <Text style={tw`font-LufgaSemiBold text-xl text-black mt-4 mb-2`}>
         Single Plan
       </Text>
