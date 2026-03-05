@@ -44,7 +44,6 @@ const User_Profile = () => {
     useProfile();
   const { data: activePlans, isLoading: isActivePlansLoading } =
     useGetActivePlansQuery({});
-  console.log(activePlans?.data?.length, "a;la;a;");
 
   return (
     <>

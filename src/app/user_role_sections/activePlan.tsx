@@ -1,4 +1,4 @@
-import { ImgCategoryNurse, ImgService } from "@/assets/image";
+import { ImgCategoryNurse } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
@@ -13,7 +13,10 @@ const ActivePlan = () => {
   const { data: activePlans, isLoading: isActivePlansLoading } =
     useGetActivePlansQuery({});
 
-  console.log(activePlans, "this active plans --------------->");
+  const findActiveAdminPlanArray = activePlans?.data?.filter(
+    (item: any) => item?.subscription_type === "admin_package",
+  );
+
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -27,56 +30,73 @@ const ActivePlan = () => {
       </Text>
       {/* ================== single plan start hare ================== */}
       <View>
-        {[1, 2].map((item) => {
+        {findActiveAdminPlanArray.map((item: any, index: number) => {
+          const totalDays = item?.subscription_duration.split(" ")[0];
+          const totalRemainingDays =
+            Number(item?.subscription_days_remaining) / Number(totalDays);
+
           return (
             <TouchableOpacity
               activeOpacity={0.9}
-              onPress={() => {
-                router.push({
-                  pathname:
-                    "/user_role_sections/categoryPlaning/adminServiceDetails",
-                  params: {
-                    // category: category ? category.toString() : "Services",
-                    category: "Services Details",
-                  },
-                });
-              }}
-              key={item}
+              // onPress={() => {
+              //   router.push({
+              //     pathname:
+              //       "/user_role_sections/categoryPlaning/adminServiceDetails",
+              //     params: {
+              //       // category: category ? category.toString() : "Services",
+              //       category: "Services Details",
+              //     },
+              //   });
+              // }}
+              key={item?.id}
             >
               <Image
-                style={tw`w-full h-40 rounded-3xl mt-2`}
-                source={ImgService}
+                style={tw`w-full h-36 rounded-3xl mt-2`}
+                source={item?.subscription_items?.[0]?.package?.service?.icon}
+                contentFit="contain"
               />
-              <View style={tw`flex-row justify-between items-center mt-2`}>
-                <Text style={tw`font-LufgaMedium text-black text-base `}>
-                  Crystal Comfort Plan
+              <View
+                style={tw`flex-1 flex-row justify-between items-center gap-1 mt-2`}
+              >
+                <Text
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={tw`flex-1 font-LufgaMedium text-black text-base `}
+                >
+                  {item?.subscription_items?.[0]?.package?.title}
                 </Text>
                 <Text
-                  style={tw`border border-green-600 rounded-md font-LufgaMedium text-green-600 text-sm px-2 py-1 bg-green-100`}
+                  style={[
+                    tw`border  rounded-md font-LufgaMedium text-sm px-2 py-1 `,
+                    item?.status === "active"
+                      ? tw`border-green-600 text-green-600 bg-green-100`
+                      : tw`border-red-600 text-red-600 bg-red-100`,
+                  ]}
                 >
-                  Active
+                  {item?.status === "active" ? "Active" : "Inactive"}
                 </Text>
               </View>
-              <Text style={tw`font-LufgaRegular text-sm text-subText pt-2`}>
-                Ideal for independent seniors who value peace of mind and a
-                gentle helping hand...
+              <Text style={tw`font-LufgaRegular text-sm text-subText pt-1`}>
+                {item?.subscription_items?.[0]?.package?.description}
               </Text>
               {/* ---------------------- plan progress bar start hare  ---------------------- */}
               <View
-                style={tw`flex-row justify-center gap-3 pb-4 items-center mt-4`}
+                style={tw`flex-row justify-center gap-3 pb-5 items-center mt-1`}
               >
                 <View
-                  style={tw`bg-white rounded-3xl w-[47%]  items-center gap-1 py-2`}
+                  style={tw`bg-white rounded-3xl w-[46%]  items-center gap-1 py-2`}
                 >
                   <Text style={tw`font-LufgaRegular text-sm text-subText`}>
                     Days remaining
                   </Text>
                   <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                    25 days
+                    {item?.subscription_days_remaining} {"/"}{" "}
+                    {item?.subscription_duration}
                   </Text>
+
                   <Progress.Circle
-                    progress={0.6}
-                    size={90}
+                    progress={totalRemainingDays}
+                    size={85}
                     thickness={10}
                     color="#183E9F"
                     unfilledColor="#D9D9D9"
@@ -88,11 +108,11 @@ const ActivePlan = () => {
                     End date:
                   </Text>
                   <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                    02-10-2025
+                    {item?.end_date}
                   </Text>
                 </View>
 
-                <View style={tw`rounded-2xl w-[47%] gap-3`}>
+                <View style={tw`rounded-2xl w-[46%] gap-3`}>
                   <View
                     style={tw`bg-white rounded-2xl items-center gap-3 px-2 py-3`}
                   >
