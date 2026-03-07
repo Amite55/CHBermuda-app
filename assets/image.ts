@@ -27,3 +27,4 @@ export const ImgProviderBG = require("@/assets/images/providerRoleBG.png");
 export const ImgEmployees = require("@/assets/images/employees.png");
 export const ImgRespiteCarePlan = require("@/assets/images/respitePlan.jpg");
 export const ImgPlaceholderProfile = require("@/assets/images/placeholderProfileImge.png");
+export const ImgPlaceholderService = require("@/assets/images/servicePlaceholder.png");

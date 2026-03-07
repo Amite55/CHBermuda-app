@@ -134,7 +134,6 @@ const AdminServiceDetails = () => {
         );
       } else {
         const response = await confirmSubscription(subscriptionData).unwrap();
-        console.log(response, "this response with stripe payment resoner ");
         if (response) {
           toast.success(
             response?.message || "Active plans retrieved successfully",

@@ -1,20 +1,35 @@
-import { ImgCategoryNurse } from "@/assets/image";
+import { ImgPlaceholderService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Progress from "react-native-progress";
 
 const ActivePlan = () => {
   // ================== api end point ================
   const { data: activePlans, isLoading: isActivePlansLoading } =
     useGetActivePlansQuery({});
-
+  // ================== filter active admin plan ================
   const findActiveAdminPlanArray = activePlans?.data?.filter(
     (item: any) => item?.subscription_type === "admin_package",
+  );
+  // ==================== filtered by bundle plans ====================
+  const findActiveBundlePlanArray = activePlans?.data?.filter(
+    (item: any) => item?.subscription_type === "bundle",
+  );
+
+  console.log(
+    findActiveBundlePlanArray,
+    "there is active bundle _________________>",
   );
 
   return (
@@ -26,7 +41,7 @@ const ActivePlan = () => {
     >
       <BackTitleButton title="Active plans" onPress={() => router.back()} />
       <Text style={tw`font-LufgaSemiBold text-xl text-black mt-4 mb-2`}>
-        Single Plan
+        Admin Plan
       </Text>
       {/* ================== single plan start hare ================== */}
       <View>
@@ -34,20 +49,32 @@ const ActivePlan = () => {
           const totalDays = item?.subscription_duration.split(" ")[0];
           const totalRemainingDays =
             Number(item?.subscription_days_remaining) / Number(totalDays);
+          // =============== weekly plan progress =============
+          const weeklyProgress =
+            Number(item?.subscription_items?.[0]?.weekly_visits) /
+            Number(item?.subscription_items?.[0]?.package?.weekly_visits);
+          // =============== monthly plan progress =============
+          const monthlyProgress =
+            Number(item?.subscription_items?.[0]?.monthly_visits) /
+            Number(item?.subscription_items?.[0]?.package?.monthly_visits);
 
           return (
             <TouchableOpacity
               activeOpacity={0.9}
-              // onPress={() => {
-              //   router.push({
-              //     pathname:
-              //       "/user_role_sections/categoryPlaning/adminServiceDetails",
-              //     params: {
-              //       // category: category ? category.toString() : "Services",
-              //       category: "Services Details",
-              //     },
-              //   });
-              // }}
+              onPress={() => {
+                router.push({
+                  pathname:
+                    "/user_role_sections/categoryPlaning/adminServiceDetails",
+                  params: {
+                    id: item?.subscription_items?.[0]?.package?.id,
+                    title:
+                      item?.subscription_items?.[0]?.package?.service?.name ||
+                      "Service Details",
+                    // category: item?.subscription_items?.[0]?.package?.service?.type,
+                    category: "admin_service",
+                  },
+                });
+              }}
               key={item?.id}
             >
               <Image
@@ -79,10 +106,10 @@ const ActivePlan = () => {
               <Text style={tw`font-LufgaRegular text-sm text-subText pt-1`}>
                 {item?.subscription_items?.[0]?.package?.description}
               </Text>
-              {/* ---------------------- plan progress bar start hare  ---------------------- */}
               <View
                 style={tw`flex-row justify-center gap-3 pb-5 items-center mt-1`}
               >
+                {/* ---------------------- plan progress bar start hare  ---------------------- */}
                 <View
                   style={tw`bg-white rounded-3xl w-[46%]  items-center gap-1 py-2`}
                 >
@@ -93,7 +120,6 @@ const ActivePlan = () => {
                     {item?.subscription_days_remaining} {"/"}{" "}
                     {item?.subscription_duration}
                   </Text>
-
                   <Progress.Circle
                     progress={totalRemainingDays}
                     size={85}
@@ -112,6 +138,7 @@ const ActivePlan = () => {
                   </Text>
                 </View>
 
+                {/* ---------------------- plan limitation  ---------------------- */}
                 <View style={tw`rounded-2xl w-[46%] gap-3`}>
                   <View
                     style={tw`bg-white rounded-2xl items-center gap-3 px-2 py-3`}
@@ -120,11 +147,15 @@ const ActivePlan = () => {
                       Weekly visit
                     </Text>
                     <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                      Used: 1 of 2
+                      Used: {item?.subscription_items?.[0]?.weekly_visits || 0}{" "}
+                      of{" "}
+                      {item?.subscription_items?.[0]?.package?.weekly_visits ||
+                        0}
                     </Text>
+                    {/* ============= weekly plan progress ============= */}
                     <Progress.Bar
                       width={100}
-                      progress={0.6}
+                      progress={weeklyProgress}
                       color="#183E9F"
                       unfilledColor="#D9D9D9"
                       borderWidth={0}
@@ -138,11 +169,15 @@ const ActivePlan = () => {
                       Weekly visit
                     </Text>
                     <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                      Used: 1 of 2
+                      Used: {item?.subscription_items?.[0]?.monthly_visits || 0}{" "}
+                      of{" "}
+                      {item?.subscription_items?.[0]?.package?.monthly_visits ||
+                        0}
                     </Text>
+                    {/* ============= monthly plan progress ============= */}
                     <Progress.Bar
                       width={100}
-                      progress={0.4}
+                      progress={monthlyProgress}
                       color="#183E9F"
                       unfilledColor="#D9D9D9"
                       borderWidth={0}
@@ -157,12 +192,17 @@ const ActivePlan = () => {
         })}
       </View>
       {/* ================== single plan end hare ================== */}
+
       {/* ==================== adom/multiple plan start here =================== */}
-      <Text style={tw`font-LufgaSemiBold text-xl text-black mt-4 mb-2`}>
+      <Text style={tw`font-LufgaSemiBold text-xl text-black mt-5 mb-2`}>
         Bundle Plan
       </Text>
       <View>
-        {[1, 2].map((item) => {
+        {findActiveBundlePlanArray.map((item: any) => {
+          // ============= calculate progress =============
+          const totalDays = item?.subscription_duration.split(" ")[0];
+          const totalRemainingDays =
+            Number(item?.subscription_days_remaining) / Number(totalDays);
           return (
             <TouchableOpacity
               onPress={() => {
@@ -178,55 +218,72 @@ const ActivePlan = () => {
               key={item}
               style={tw``}
             >
-              <View
-                style={tw`flex-row items-center justify-center bg-white py-4 rounded-2xl gap-2`}
-              >
-                {[1, 2].map((i) => {
-                  return (
+              <View style={tw`w-full bg-white py-4 rounded-2xl`}>
+                <FlatList
+                  data={item?.subscription_items}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(i) => i?.id?.toString()}
+                  contentContainerStyle={[
+                    tw`px-4 items-center`,
+                    { flexGrow: 1, justifyContent: "center" },
+                  ]}
+                  renderItem={({ item: i }) => (
                     <View
-                      key={i}
-                      style={tw`bg-slate-100 h-14 w-14 rounded-full items-center justify-center`}
+                      key={i?.id}
+                      style={tw`bg-slate-100 h-14 w-14 rounded-full items-center justify-center mx-1.5`}
                     >
                       <Image
                         contentFit="contain"
                         style={tw`w-8 h-8`}
-                        source={ImgCategoryNurse}
+                        source={i?.service?.icon}
+                        placeholder={ImgPlaceholderService}
                       />
                     </View>
-                  );
-                })}
+                  )}
+                />
               </View>
-              <View style={tw`flex-row justify-between items-center mt-2`}>
-                <Text style={tw`font-LufgaMedium text-black text-base `}>
-                  Essential Comfort Bundle
+              {/* =============== bundle plan name =============== */}
+              <View
+                style={tw`flex-1 flex-row justify-between items-center gap-1 mt-4`}
+              >
+                <Text
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={tw`flex-1 font-LufgaMedium text-black text-base `}
+                >
+                  {item?.addon?.title}
                 </Text>
                 <Text
-                  style={tw`border border-green-600 rounded-md font-LufgaMedium text-green-600 text-sm px-2 py-1 bg-green-100`}
+                  style={[
+                    tw`border  rounded-md font-LufgaMedium text-sm px-2 py-1 `,
+                    item?.status === "active"
+                      ? tw`border-green-600 text-green-600 bg-green-100`
+                      : tw`border-red-600 text-red-600 bg-red-100`,
+                  ]}
                 >
-                  Active
+                  {item?.status === "active" ? "Active" : "Inactive"}
                 </Text>
               </View>
-              <Text style={tw`font-LufgaRegular text-sm text-subText pt-2`}>
-                Enjoy reliable support with services designed to ease your daily
-                routine.
+              <Text style={tw`font-LufgaRegular text-sm text-subText pt-1`}>
+                {item?.addon?.description}
               </Text>
 
               {/* ---------------------- plan progress bar start hare  ---------------------- */}
-              <View
-                style={tw`flex-row justify-center gap-3 pb-4 items-center mt-4`}
-              >
+              <View style={tw` gap-3 pb-4 items-center mt-4`}>
                 <View
-                  style={tw`bg-white rounded-3xl w-[47%]  items-center gap-1 py-2`}
+                  style={tw`bg-white rounded-3xl w-full  items-center gap-1 py-2`}
                 >
                   <Text style={tw`font-LufgaRegular text-sm text-subText`}>
                     Days remaining
                   </Text>
                   <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                    25 days
+                    {item?.subscription_days_remaining} {"/"}{" "}
+                    {item?.subscription_duration}
                   </Text>
                   <Progress.Circle
-                    progress={0.6}
-                    size={90}
+                    progress={totalRemainingDays}
+                    size={100}
                     thickness={10}
                     color="#183E9F"
                     unfilledColor="#D9D9D9"
@@ -234,45 +291,29 @@ const ActivePlan = () => {
                     animated={true}
                     showsText={false}
                   />
-                  <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    End date:
-                  </Text>
-                  <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                    02-10-2025
-                  </Text>
+                  <View style={tw`flex-row justify-center gap-1`}>
+                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+                      End date:
+                    </Text>
+                    <Text style={tw`font-LufgaMedium text-sm text-black`}>
+                      {item?.end_date}
+                    </Text>
+                  </View>
                 </View>
 
-                <View style={tw`rounded-2xl w-[47%] gap-3`}>
+                <View style={tw`rounded-2xl w-full gap-3`}>
                   <View
-                    style={tw`bg-white rounded-2xl items-center gap-3 px-2 py-3`}
+                    style={tw`bg-white rounded-2xl items-center gap-2 px-2 py-3`}
                   >
                     <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Weekly visit
+                      Meal delivery
                     </Text>
                     <Text style={tw`font-LufgaMedium text-sm text-black`}>
                       Used: 1 of 2
                     </Text>
                     <Progress.Bar
-                      width={100}
+                      width={300}
                       progress={0.6}
-                      color="#183E9F"
-                      unfilledColor="#D9D9D9"
-                      borderWidth={0}
-                      animated={true}
-                    />
-                  </View>
-                  <View
-                    style={tw`bg-white rounded-2xl items-center gap-3 px-4 py-3`}
-                  >
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Weekly visit
-                    </Text>
-                    <Text style={tw`font-LufgaMedium text-sm text-black`}>
-                      Used: 1 of 2
-                    </Text>
-                    <Progress.Bar
-                      width={100}
-                      progress={0.4}
                       color="#183E9F"
                       unfilledColor="#D9D9D9"
                       borderWidth={0}
