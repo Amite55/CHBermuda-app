@@ -71,7 +71,6 @@ const SingIn = () => {
   // ==================== handle sing in =====================
   const handleSingIn = useCallback(
     async (values: any) => {
-      console.log(values.email);
       try {
         const payload = {
           ...values,
