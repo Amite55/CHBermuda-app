@@ -8,6 +8,7 @@ import {
 import { ImgProfileImg, ImgProviderBG, ImgServiceImage } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -23,6 +24,13 @@ import {
 import { SvgXml } from "react-native-svg";
 
 const ProviderHome = () => {
+  // profile query get --------------->
+  // ============= hooks ==================
+  const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
+    useProfile();
+
+  console.log(profileData?.data, "this is profile name ");
+
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -37,14 +45,14 @@ const ProviderHome = () => {
           <UserInfoHeader
             containerStyle={tw`px-5`}
             notificationContentStyle={tw`bg-[#FFFFFF33] `}
-            userName="Provider"
-            userImage={ImgProfileImg}
+            userName={profileData?.data?.name}
+            userImage={profileData?.data?.avatar}
             notificationIcon={IconNotificationWhite}
             greetingStyle={tw`text-white `}
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/serviceProvider/notificationProvider/notifications"
+                "/serviceProvider/notificationProvider/notifications",
               );
             }}
             profileOnPress={() => {}}

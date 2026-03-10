@@ -30,6 +30,7 @@ const Provider = () => {
   const [page, setPage] = React.useState(1);
   const [servicePackageData, setServicePackageData] = React.useState([]);
 
+  console.log(id, "this is id ------------>");
   // ===================== api end point ====================
   const [
     adminServiceProvider,
