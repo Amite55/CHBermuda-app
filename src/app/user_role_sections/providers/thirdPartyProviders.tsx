@@ -14,7 +14,6 @@ const ThirdPartyProviders = () => {
   const [page, setPage] = React.useState(1);
   const [servicePackageData, setServicePackageData] = React.useState([]);
   const { id } = useLocalSearchParams();
-  console.log(servicePackageData, "this is package id 0--------..");
 
   //   ================== api end point   ==================
   const [
@@ -62,14 +61,15 @@ const ThirdPartyProviders = () => {
 
   // Handle pull to refresh
   // =============== onRefresh ==================
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
       await Promise.all([isThirdPartyProviderServiceFetching]);
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [isThirdPartyProviderServiceFetching]);
+
   // ============= handle load more data to pagination ============
   const handleLoadMore = useCallback(async () => {
     if (!isThirdPartyProviderServiceFetching && hasMore) {
@@ -86,8 +86,6 @@ const ThirdPartyProviders = () => {
   return (
     <View style={tw`flex-1 bg-bgBaseColor px-5 `}>
       <BackTitleButton title="Providers " onPress={() => router.back()} />
-
-      {/* ====================== if plan is purchased ====================== */}
 
       <FlatList
         data={servicePackageData}
@@ -106,14 +104,19 @@ const ThirdPartyProviders = () => {
           return (
             <ProviderInfoCard
               key={item?.id}
-              //   onPress={}
+              onPress={() => {
+                router.push({
+                  pathname:
+                    "/user_role_sections/providers/providerDetailsInfoProviders",
+                  params: { id: item?.id },
+                });
+              }}
               providerAvgRating={item?.ratings_avg_rating}
               providerImg={item?.avatar}
               providerJoinedDate={helpers.formatTime(item?.created_at)}
               providerName={item?.name}
               providerPackageCount={item?.service_provided}
-              //   providerReviewCount={}
-              //   providerServiceCount={}
+              providerReviewCount={item?.ratings_count}
             />
           );
         }}

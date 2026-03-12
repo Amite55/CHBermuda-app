@@ -5,7 +5,7 @@ import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useGetThirdPartyProviderDetailsQuery } from "@/src/redux/Api/userHomeSlices";
 import { updateBooking } from "@/src/redux/appStore/bookingSlices";
-import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
+import ProviderDetailsSkeleton from "@/src/Skeletion/ProviderDetailsSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -25,13 +25,15 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SvgXml } from "react-native-svg";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const ProviderDetailsInfoProviders = () => {
   const { id } = useLocalSearchParams();
   const detailsBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [serviceDetails, setServiceDetails] = React.useState<any>(null);
   const dispatch = useDispatch();
+  const booking = useSelector((state: any) => state.booking);
+  console.log(booking, "hare is redux state booking data ???????");
 
   // =================== api end point ===================
   const { data: providerDetailsData, isLoading: isProviderDetailsDataLoading } =
@@ -124,7 +126,7 @@ const ProviderDetailsInfoProviders = () => {
 
   // ================== loading state =================
   if (isProviderDetailsDataLoading) {
-    return <ServicePackageListSkeleton CARD_COUNT={2} />;
+    return <ProviderDetailsSkeleton />;
   }
 
   return (
@@ -193,9 +195,11 @@ const ProviderDetailsInfoProviders = () => {
                     >
                       {item?.title}
                     </Text>
-                    <Text style={tw`font-LufgaMedium text-base text-black`}>
-                      $ {item?.price}
-                    </Text>
+                    {booking?.subscriptionId === null && (
+                      <Text style={tw`font-LufgaMedium text-base text-black`}>
+                        $ {item?.price}
+                      </Text>
+                    )}
                     <Text style={tw`font-LufgaRegular text-sm text-subText`}>
                       Duration: {item?.duration} hours
                     </Text>
@@ -447,7 +451,11 @@ const ProviderDetailsInfoProviders = () => {
               >
                 {serviceDetails?.title}
               </Text>
-              <Text style={tw`font-LufgaMedium text-xl text-black`}>$65</Text>
+              {booking?.subscriptionId === null && (
+                <Text style={tw`font-LufgaMedium text-base text-black`}>
+                  ${serviceDetails?.price}
+                </Text>
+              )}
             </View>
             {/* description */}
             <View style={tw`gap-2 mt-4`}>

@@ -1,25 +1,13 @@
-import {
-  IconInterGative,
-  IconRatingStar,
-  IconRightCornerArrowWhite,
-} from "@/assets/icons";
-import { ImgPlaceholderProfile } from "@/assets/image";
+import { IconInterGative } from "@/assets/icons";
+import ProviderInfoCard from "@/src/components/ProviderInfoCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useLazyGetAdminProviderByPackageIdQuery } from "@/src/redux/Api/userRole/orderSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
-import PrimaryButton from "@/src/utils/PrimaryButton";
-import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect } from "react";
-import {
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const Provider = () => {
@@ -30,7 +18,6 @@ const Provider = () => {
   const [page, setPage] = React.useState(1);
   const [servicePackageData, setServicePackageData] = React.useState([]);
 
-  console.log(id, "this is id ------------>");
   // ===================== api end point ====================
   const [
     adminServiceProvider,
@@ -130,64 +117,24 @@ const Provider = () => {
           onEndReached={handleLoadMore}
           renderItem={({ item }: any) => {
             return (
-              <View style={tw`bg-white rounded-2xl p-4`}>
-                {/* ------------------ provider info ---------------- */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  disabled
-                  style={tw`flex-row items-center py-2 gap-4`}
-                >
-                  <Image
-                    style={tw`w-12 h-12 rounded-full`}
-                    source={item?.provider?.avatar}
-                    contentFit="contain"
-                    placeholder={ImgPlaceholderProfile}
-                  />
-
-                  <View>
-                    <Text
-                      style={tw`font-LufgaMedium text-base text-regularText`}
-                    >
-                      {item?.provider?.name}
-                    </Text>
-
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      Joined {helpers.formatDate(item?.provider?.created_at)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <View style={tw`gap-1 my-2`}>
-                  <View style={tw`flex-row items-center gap-1`}>
-                    <SvgXml xml={IconRatingStar} />
-                    <Text
-                      style={tw`font-LufgaRegular text-sm text-regularText`}
-                    >
-                      {item?.provider?.avg_rating || 0}
-                    </Text>
-                    <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                      ({item?.provider?.ratings_count || 0} reviews)
-                    </Text>
-                  </View>
-                  <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                    {item?.provider?.service_provided} orders completed
-                  </Text>
-                </View>
-
-                <PrimaryButton
-                  buttonText="See details"
-                  buttonTextStyle={tw`font-LufgaRegular text-base`}
-                  buttonContainerStyle={tw` h-10  `}
-                  rightIcon={IconRightCornerArrowWhite}
-                  onPress={() => {
-                    router.push({
-                      pathname:
-                        "/user_role_sections/providers/providerDetailsInfoAdmin",
-                      params: { id: item?.provider?.id },
-                    });
-                  }}
-                />
-              </View>
+              <ProviderInfoCard
+                key={item?.id}
+                onPress={() => {
+                  router.push({
+                    pathname:
+                      "/user_role_sections/providers/providerDetailsInfoAdmin",
+                    params: { id: item?.provider?.id },
+                  });
+                }}
+                providerAvgRating={item?.provider?.avg_rating || 0}
+                providerImg={item?.provider?.avatar}
+                providerJoinedDate={helpers.formatDate(
+                  item?.provider?.created_at,
+                )}
+                providerName={item?.provider?.name}
+                providerPackageCount={item?.provider?.service_provided}
+                providerReviewCount={item?.provider?.ratings_count || 0}
+              />
             );
           }}
         />

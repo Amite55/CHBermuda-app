@@ -2,6 +2,7 @@ import { ImgPlaceholderService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -15,9 +16,11 @@ import {
   View,
 } from "react-native";
 import * as Progress from "react-native-progress";
+import { useDispatch } from "react-redux";
 
 const ActivePlan = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const dispatch = useDispatch();
   // ================== api end point ================
   const {
     data: activePlans,
@@ -38,6 +41,42 @@ const ActivePlan = () => {
   const findActiveBundlePlanArray = activePlans?.data?.filter(
     (item: any) => item?.subscription_type === "bundle",
   );
+
+  // ============== bundle plan and addons plan service =================
+  const handleBundlePlanButton = (serviceItem: any) => {
+    try {
+      dispatch(
+        updateBooking({
+          subscriptionId: serviceItem?.subscription_id,
+        }),
+      );
+      if (serviceItem?.package?.service?.type === "admin_service") {
+        router.push({
+          pathname: "/user_role_sections/categoryPlaning/adminServiceDetails",
+          params: {
+            id: serviceItem?.package_id,
+            title: serviceItem?.service?.name || "Service Details",
+            // category: item?.subscription_items?.[0]?.package?.service?.type,
+            category: serviceItem?.package?.service?.type,
+          },
+        });
+      } else if (serviceItem?.package?.service?.type === "thirdparty_service") {
+        dispatch(
+          updateBooking({
+            booking_type: "thirdparty_service",
+          }),
+        );
+        router?.push({
+          pathname: "/user_role_sections/providers/thirdPartyProviders",
+          params: {
+            id: serviceItem?.service?.id,
+          },
+        });
+      }
+    } catch (error: any) {
+      console.log(error, "Your bundle button don't toggle----");
+    }
+  };
 
   // ==================== refreshing ==============
   const onRefreshHandler = useCallback(async () => {
@@ -93,6 +132,12 @@ const ActivePlan = () => {
               <TouchableOpacity
                 activeOpacity={0.6}
                 onPress={() => {
+                  dispatch(
+                    updateBooking({
+                      subscriptionId:
+                        item?.subscription_items?.[0]?.subscription_id,
+                    }),
+                  );
                   router.push({
                     pathname:
                       "/user_role_sections/categoryPlaning/adminServiceDetails",
@@ -102,7 +147,7 @@ const ActivePlan = () => {
                         item?.subscription_items?.[0]?.package?.service?.name ||
                         "Service Details",
                       // category: item?.subscription_items?.[0]?.package?.service?.type,
-                      category: "admin_service",
+                      category: item?.subscription_type || "admin_service",
                     },
                   });
                 }}
@@ -334,35 +379,7 @@ const ActivePlan = () => {
                         return (
                           <TouchableOpacity
                             onPress={() => {
-                              if (
-                                serviceItem?.package?.service?.type ===
-                                "admin_service"
-                              ) {
-                                router.push({
-                                  pathname:
-                                    "/user_role_sections/categoryPlaning/adminServiceDetails",
-                                  params: {
-                                    id: serviceItem?.package_id,
-                                    title:
-                                      serviceItem?.service?.name ||
-                                      "Service Details",
-                                    // category: item?.subscription_items?.[0]?.package?.service?.type,
-                                    category:
-                                      serviceItem?.package?.service?.type,
-                                  },
-                                });
-                              } else if (
-                                serviceItem?.package?.service?.type ===
-                                "thirdparty_service"
-                              ) {
-                                router?.push({
-                                  pathname:
-                                    "/user_role_sections/providers/thirdPartyProviders",
-                                  params: {
-                                    id: serviceItem?.service?.id,
-                                  },
-                                });
-                              }
+                              handleBundlePlanButton(serviceItem);
                             }}
                             activeOpacity={0.5}
                             key={serviceItem?.id}

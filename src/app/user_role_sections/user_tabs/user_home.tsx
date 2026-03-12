@@ -14,6 +14,7 @@ import {
   useGetAllCategoryQuery,
   useGetServiceThirdPartyQuery,
 } from "@/src/redux/Api/userHomeSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
@@ -28,9 +29,12 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const User_home = () => {
   const [isRefreshing, setRefreshing] = React.useState(false);
+  const dispatch = useDispatch();
+
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
@@ -239,6 +243,11 @@ const User_home = () => {
                     {/* Button at bottom */}
                     <PrimaryButton
                       onPress={() => {
+                        dispatch(
+                          updateBooking({
+                            subscriptionId: null,
+                          }),
+                        );
                         router.push({
                           pathname:
                             "/user_role_sections/categoryPlaning/serviceProviderService",

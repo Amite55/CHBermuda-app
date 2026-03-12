@@ -1,7 +1,9 @@
 import { IconRatingStar, IconRightCornerArrowWhite } from "@/assets/icons";
+import { ImgPlaceholderService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useLazyGetServiceWisePackageQuery } from "@/src/redux/Api/userHomeSlices";
+import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { PrimaryColor } from "@/src/utils/util";
@@ -17,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
+import { useDispatch } from "react-redux";
 
 const ServiceProviderService = () => {
   const { title, category, id } = useLocalSearchParams();
@@ -24,6 +27,7 @@ const ServiceProviderService = () => {
   const [hasmore, setHasMore] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [servicePackageData, setServicePackageData] = React.useState([]);
+  const dispatch = useDispatch();
 
   // ================== api end point ==================
   const [
@@ -99,6 +103,7 @@ const ServiceProviderService = () => {
           source={item?.icon}
           style={tw`w-full h-40 rounded-3xl`}
           contentFit="cover"
+          placeholder={ImgPlaceholderService}
         />
         {/* ------------------ plan name and price ---------------- */}
         <Text
@@ -148,11 +153,20 @@ const ServiceProviderService = () => {
         </Text>
         <PrimaryButton
           onPress={() => {
-            router.push({
-              pathname:
-                "/user_role_sections/providers/providerDetailsInfoProviders",
-              params: { id: item?.provider?.id },
-            });
+            try {
+              dispatch(
+                updateBooking({
+                  booking_type: "thirdparty_service",
+                }),
+              );
+              router.push({
+                pathname:
+                  "/user_role_sections/providers/providerDetailsInfoProviders",
+                params: { id: item?.provider?.id },
+              });
+            } catch (error: any) {
+              console.log(error, "Third party can't toggled");
+            }
           }}
           buttonText="See details"
           buttonTextStyle={tw`font-LufgaMedium text-base`}

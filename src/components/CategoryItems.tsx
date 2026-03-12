@@ -2,12 +2,20 @@ import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useDispatch } from "react-redux";
 import tw from "../lib/tailwind";
+import { updateBooking } from "../redux/appStore/bookingSlices";
 
 const CategoryItems = ({ items }: any) => {
+  const dispatch = useDispatch();
   return (
     <TouchableOpacity
       onPress={() => {
+        dispatch(
+          updateBooking({
+            subscriptionId: null,
+          }),
+        );
         if (items.item.type === "respite_care_service") {
           router.push({
             pathname:

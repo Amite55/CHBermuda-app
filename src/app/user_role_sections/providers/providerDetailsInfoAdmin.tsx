@@ -5,6 +5,7 @@ import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useGetAdminProviderDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
 import { updateBooking } from "@/src/redux/appStore/bookingSlices";
+import ProviderDetailsSkeleton from "@/src/Skeletion/ProviderDetailsSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
@@ -35,7 +36,6 @@ const ProviderDetailsInfoAdmin = () => {
     try {
       dispatch(
         updateBooking({
-          booking_type: "admin_booking",
           providerInfo: {
             providerId: adminProviderDetails?.data?.provider?.id,
             providerName: adminProviderDetails?.data?.provider?.name,
@@ -82,6 +82,10 @@ const ProviderDetailsInfoAdmin = () => {
   const oneStarProgress =
     (adminProviderDetails?.data?.rating?.total_one_stars || 0) / maxRatingCount;
 
+  // ==================== loading state ==================
+  if (isAdminProviderDetailsLoading) {
+    return <ProviderDetailsSkeleton />;
+  }
   return (
     <ScrollView
       style={tw`flex-1 bg-bgBaseColor`}

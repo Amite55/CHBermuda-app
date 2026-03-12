@@ -1,4 +1,8 @@
-import { IconGetterThen } from "@/assets/icons";
+import {
+  IconGetterThen,
+  IconSubscriptions,
+  IconTickRoundWhite,
+} from "@/assets/icons";
 import { ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
@@ -72,6 +76,7 @@ const AdminServiceDetails = () => {
               servicePackageImage: adminServiceDetails?.data?.icon,
               title: adminServiceDetails?.data?.title,
             },
+            booking_type: "admin_booking",
           }),
         );
         router.push({
@@ -252,6 +257,11 @@ const AdminServiceDetails = () => {
         }
         loading={isCreatingPaymentIntentLoading || isConfirmSubscriptionLoading}
         buttonTextStyle={tw`font-LufgaMedium text-base`}
+        leftIcon={
+          findPlanId?.package_id === adminServiceDetails?.data?.id
+            ? IconTickRoundWhite
+            : IconSubscriptions
+        }
         buttonContainerStyle={[
           tw`mt-2 h-12`,
           findPlanId?.package_id === adminServiceDetails?.data?.id &&
