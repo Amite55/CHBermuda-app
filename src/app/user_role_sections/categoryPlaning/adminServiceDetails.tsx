@@ -77,6 +77,7 @@ const AdminServiceDetails = () => {
               title: adminServiceDetails?.data?.title,
             },
             booking_type: "admin_booking",
+            adminSubscriptionId: findPlanId?.subscription_id,
           }),
         );
         router.push({

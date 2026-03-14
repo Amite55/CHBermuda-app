@@ -119,7 +119,7 @@ const AdminPlacingOrder = () => {
             >
               <View>
                 <BackTitleButton
-                  title="Placing order "
+                  title="Placing order"
                   onPress={() => router.back()}
                 />
                 {/* ------------- service name ------------ */}

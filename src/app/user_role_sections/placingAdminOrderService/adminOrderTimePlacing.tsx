@@ -37,7 +37,10 @@ const AdminOrderTimePlacing = () => {
       if (!selected) {
         return toast.warning("Please select a date to proceed!");
       }
-      if (booking?.booking_type === "thirdparty_booking") {
+      if (
+        booking?.booking_type === "thirdparty_booking" &&
+        !booking?.subscriptionId
+      ) {
         if (!bookingTime) {
           return toast.warning("Please select a time slot to proceed!");
         }
@@ -64,7 +67,7 @@ const AdminOrderTimePlacing = () => {
     >
       <View>
         <BackTitleButton
-          title="Scheduling time"
+          title="Scheduling time ss"
           onPress={() => router.back()}
         />
 
@@ -105,78 +108,84 @@ const AdminOrderTimePlacing = () => {
         </View>
 
         {/* ====================== time slot section ================ */}
-        {booking?.booking_type === "thirdparty_booking" && (
-          <View>
-            <Text style={tw`font-LufgaMedium text-base text-regularText mt-2`}>
-              Select time
-            </Text>
-            <View style={tw`flex-row flex-wrap justify-between`}>
-              {readTimeData?.isLoading ? (
-                <View>
-                  {[1, 2, 3, 4].map((item) => {
+        {booking?.booking_type === "thirdparty_booking" &&
+          !booking?.subscriptionId && (
+            <View>
+              <Text
+                style={tw`font-LufgaMedium text-base text-regularText mt-2`}
+              >
+                Select time
+              </Text>
+              <View style={tw`flex-row flex-wrap justify-between`}>
+                {readTimeData?.isLoading ? (
+                  <View>
+                    {[1, 2, 3, 4].map((item) => {
+                      return (
+                        <SkeletonBox
+                          key={item}
+                          height={40}
+                          width={150}
+                          radius={12}
+                          style={tw`mb-2`}
+                        />
+                      );
+                    })}
+                  </View>
+                ) : readTimeData?.currentData?.data?.length > 0 ? (
+                  readTimeData?.currentData?.data?.map((item: any) => {
                     return (
-                      <SkeletonBox
-                        key={item}
-                        height={40}
-                        width={150}
-                        radius={12}
-                        style={tw`mb-2`}
-                      />
-                    );
-                  })}
-                </View>
-              ) : readTimeData?.currentData?.data?.length > 0 ? (
-                readTimeData?.currentData?.data?.map((item: any) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setBookingTime(item?.time_from + " - " + item?.time_to);
-                        try {
-                          dispatch(
-                            updateBooking({
-                              package_time_id: item?.id,
-                            }),
+                      <TouchableOpacity
+                        onPress={() => {
+                          setBookingTime(
+                            item?.time_from + " - " + item?.time_to,
                           );
-                        } catch (error) {
-                          console.log(error, "error in setting booking time");
-                        }
-                      }}
-                      key={item?.id}
-                      activeOpacity={0.6}
-                      style={[
-                        tw`w-[48%] items-center justify-center bg-white px-2 py-4 rounded-xl mt-2`,
-                        bookingTime === item?.time_from + " - " + item?.time_to
-                          ? tw`bg-primaryBtn`
-                          : tw`bg-white`,
-                      ]}
-                    >
-                      <Text
+                          try {
+                            dispatch(
+                              updateBooking({
+                                package_time_id: item?.id,
+                              }),
+                            );
+                          } catch (error) {
+                            console.log(error, "error in setting booking time");
+                          }
+                        }}
+                        key={item?.id}
+                        activeOpacity={0.6}
                         style={[
-                          tw`font-LufgaRegular text-xs text-regularText`,
-                          {
-                            color:
-                              bookingTime ===
-                              item?.time_from + " - " + item?.time_to
-                                ? "#FFFFFF"
-                                : "#111827",
-                          },
+                          tw`w-[48%] items-center justify-center bg-white px-2 py-4 rounded-xl mt-2`,
+                          bookingTime ===
+                          item?.time_from + " - " + item?.time_to
+                            ? tw`bg-primaryBtn`
+                            : tw`bg-white`,
                         ]}
                       >
-                        {item?.time_from + " - " + item?.time_to}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })
-              ) : (
-                <Text
-                  style={tw`font-LufgaMedium text-base text-center text-subText mt-4`}
-                >
-                  No time slots available for this provider
-                </Text>
-              )}
+                        <Text
+                          style={[
+                            tw`font-LufgaRegular text-xs text-regularText`,
+                            {
+                              color:
+                                bookingTime ===
+                                item?.time_from + " - " + item?.time_to
+                                  ? "#FFFFFF"
+                                  : "#111827",
+                            },
+                          ]}
+                        >
+                          {item?.time_from + " - " + item?.time_to}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })
+                ) : (
+                  <Text
+                    style={tw`font-LufgaMedium text-base text-center text-subText mt-4`}
+                  >
+                    No time slots available for this provider
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
-        )}
+          )}
       </View>
 
       {/* ==================== submit button ==================== */}

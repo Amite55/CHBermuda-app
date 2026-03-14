@@ -45,12 +45,12 @@ const ActivePlan = () => {
   // ============== bundle plan and addons plan service =================
   const handleBundlePlanButton = (serviceItem: any) => {
     try {
-      dispatch(
-        updateBooking({
-          subscriptionId: serviceItem?.subscription_id,
-        }),
-      );
       if (serviceItem?.package?.service?.type === "admin_service") {
+        dispatch(
+          updateBooking({
+            adminSubscriptionId: serviceItem?.subscription_id,
+          }),
+        );
         router.push({
           pathname: "/user_role_sections/categoryPlaning/adminServiceDetails",
           params: {
@@ -64,6 +64,7 @@ const ActivePlan = () => {
         dispatch(
           updateBooking({
             booking_type: "thirdparty_service",
+            subscriptionId: serviceItem?.subscription_id,
           }),
         );
         router?.push({
@@ -134,7 +135,7 @@ const ActivePlan = () => {
                 onPress={() => {
                   dispatch(
                     updateBooking({
-                      subscriptionId:
+                      adminSubscriptionId:
                         item?.subscription_items?.[0]?.subscription_id,
                     }),
                   );

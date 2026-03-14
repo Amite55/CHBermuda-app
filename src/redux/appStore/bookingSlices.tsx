@@ -53,6 +53,7 @@ interface BookingStateType {
   amount: number | null;
   packageInfo: packageInfoType | null;
   subscriptionId: string | null;
+  adminSubscriptionId: string | null;
   userInfo: userInfoType | null;
   providerInfo: providerInfoType | null;
   respiteCarePackageDetails: respiteCarePackageDetailsType | null;
@@ -65,6 +66,7 @@ const initialState: BookingStateType = {
   date: null,
   time: null,
   subscriptionId: null,
+  adminSubscriptionId: null,
   amount: 0,
   package_time_id: null,
   packageInfo: null,

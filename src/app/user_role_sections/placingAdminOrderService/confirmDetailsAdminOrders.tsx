@@ -3,11 +3,14 @@ import {
   IconEditPen,
   IconOrderPlaceWhite,
   IconRatingStar,
-  IconSuccessIcon,
 } from "@/assets/icons";
 import { ImgPlaceholderProfile, ImgSplashLogo } from "@/assets/image";
+import BookingSuccessModal from "@/src/context/BookingSuccessModal";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useCreatePaymentIntentMutation } from "@/src/redux/Api/paymentSlices";
+import { useBookingSuccessRespiteCareMutation } from "@/src/redux/Api/userRole/orderSlices";
 import {
   resetBooking,
   updateBooking,
@@ -19,12 +22,12 @@ import {
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import { useStripe } from "@stripe/stripe-react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import React, { useCallback, useRef, useState } from "react";
 import {
-  Modal,
   ScrollView,
   Text,
   TextInput,
@@ -44,11 +47,122 @@ interface userInfoType {
 const ConfirmDetailsAdminOrders = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const booking = useSelector((state: any) => state.booking);
   const dispatch = useDispatch();
+  const toast = useToastHelpers();
 
-  console.log(booking, "this is booking -------->");
+  // =================== api end point ==================
+  const [createPaymentIntent, { isLoading: isCreatingPaymentIntentLoading }] =
+    useCreatePaymentIntentMutation();
+  const [
+    bookingSuccessRespiteCare,
+    { isLoading: isBookingSuccessRespiteCareLoading },
+  ] = useBookingSuccessRespiteCareMutation();
 
+  const result = booking?.respiteCarePackageDetails?.addons.reduce(
+    (acc, value, index) => {
+      acc[`add_ons_id[${index + 1}]`] = value;
+      return acc;
+    },
+    {},
+  );
+
+  console.log(booking, "this is array object ad ons");
+
+  // ============== get booking data from store =============
+  const bookingData = {
+    name: booking?.userInfo?.name,
+    email: booking?.userInfo?.email,
+    location: booking?.userInfo?.location,
+    booking_type: booking?.booking_type,
+    date: booking?.date,
+    // when user booking type respite care
+    ...(booking?.booking_type === "respite_care" && {
+      ...(booking?.subscriptionId ? {} : { amount: booking?.amount }),
+      ...(booking?.respiteCarePackageDetails?.addons?.length > 0 && result),
+    }),
+    ...(booking?.booking_type === "respite_care" && {
+      respite_care_id: booking?.respiteCarePackageDetails?.respiteCareId,
+    }),
+    // === when user booking type third party  service ==========
+    ...((booking?.booking_type === "thirdparty_booking" ||
+      booking?.booking_type === "admin_booking") && {
+      provider_id: booking?.providerInfo?.providerId,
+      package_id: booking?.packageInfo?.id,
+      package_time_id: booking?.package_time_id,
+      booking_type: booking?.booking_type,
+      // if booking type plan service ======
+      ...(booking?.booking_type === "thirdparty_booking" &&
+      !booking?.subscription_id
+        ? { amount: booking?.packageInfo?.price }
+        : { subscription_id: booking?.subscriptionId }),
+      subscription_id: booking?.adminSubscriptionId,
+    }),
+
+    // ===== when user booking type admin service plan ======
+    ...(booking?.booking_type === "admin_booking" && {
+      subscription_id: booking?.adminSubscriptionId,
+    }),
+  };
+
+  // ================ booking data handler =================
+  const handleBookingSuccessData = async () => {
+    try {
+      const intentData = {
+        amount: 12,
+        currency: "USD",
+      };
+      const responseIntent = await createPaymentIntent(intentData).unwrap();
+      if (!responseIntent?.data?.client_secret) {
+        toast.warning("Something went wrong please try again", 3000);
+        return;
+      }
+
+      // ==================== call payment modal ===================
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: "Example, Inc.",
+        paymentIntentClientSecret: responseIntent?.data?.client_secret,
+      });
+      if (initError) {
+        // handle error----------
+        toast.showError(
+          initError?.message ||
+            initError ||
+            "Something went wrong please try again",
+        );
+      } else {
+        checkout("admin_package");
+      }
+    } catch (error: any) {
+      console.log(error, "Booking don't success please try again--->");
+    }
+  };
+
+  // ================= when if open the stripe payment sheet to call this this function ================
+  const checkout = async (subscriptionData) => {
+    try {
+      const { error } = await presentPaymentSheet();
+      if (error) {
+        toast.showError(
+          error?.message || error || "Something went wrong please try again",
+        );
+      } else {
+        const response =
+          await bookingSuccessRespiteCare(subscriptionData).unwrap();
+        if (response) {
+          toast.success(
+            response?.message || "Active plans retrieved successfully",
+            3000,
+          );
+        }
+      }
+    } catch (error: any) {
+      console.log(error, "Payment not success in your subscription------>");
+    }
+  };
+
+  // ===================== set redux store for user form data =======================
   const handleStateBookingData = (userInfo: userInfoType) => {
     try {
       dispatch(
@@ -283,55 +397,32 @@ const ConfirmDetailsAdminOrders = () => {
       {/* ==================== submit button ==================== */}
       <PrimaryButton
         onPress={() => {
-          setIsModalVisible(true);
+          // handleBookingSuccessData();
+          console.log(bookingData, "thios is boooki8n sdfkasdjfl;kasjl;kfjsad");
         }}
-        buttonText="Place order"
+        buttonText={
+          booking?.booking_type === "admin_booking" ||
+          (booking?.booking_type === "thirdparty_booking" &&
+            booking?.subscriptionId)
+            ? "Place Order"
+            : "Booking"
+        }
+        loading={isCreatingPaymentIntentLoading}
         buttonContainerStyle={tw`mt-6 `}
         buttonTextStyle={tw`text-lg font-LufgaMedium`}
         leftIcon={IconOrderPlaceWhite}
       />
 
       {/* ============================ logout modal =========================== */}
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setIsModalVisible(!isModalVisible);
+      <BookingSuccessModal
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        onPress={() => {
+          setIsModalVisible(false);
+          dispatch(resetBooking());
+          router.replace("/user_role_sections/user_tabs/user_home");
         }}
-      >
-        <View style={tw`flex-1 justify-center bg-black bg-opacity-50 px-5`}>
-          <View
-            style={[
-              tw`bg-white  justify-center items-center rounded-2xl p-6 h-88 gap-2`,
-            ]}
-          >
-            <SvgXml xml={IconSuccessIcon} />
-            <Text style={tw`font-LufgaBold text-xl text-[#172B4D]`}>
-              Order placed
-            </Text>
-            <Text
-              style={tw`text-center font-LufgaRegular  text-sm text-black my-2`}
-            >
-              Your order has been placed. Please be patient until it’s accepted
-              from provider side.
-            </Text>
-            <View style={tw`w-full`}>
-              <PrimaryButton
-                buttonText="Go to home"
-                buttonTextStyle={tw`text-lg font-LufgaMedium`}
-                onPress={() => {
-                  setIsModalVisible(false);
-                  dispatch(resetBooking());
-                  router.replace("/user_role_sections/user_tabs/user_home");
-                }}
-                buttonContainerStyle={tw`w-full`}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      />
 
       {/* -0---------------------------- order address edit modal --------------------------- */}
       <BottomSheetModalProvider>

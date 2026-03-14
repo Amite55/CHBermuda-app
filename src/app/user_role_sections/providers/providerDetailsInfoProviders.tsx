@@ -33,7 +33,6 @@ const ProviderDetailsInfoProviders = () => {
   const [serviceDetails, setServiceDetails] = React.useState<any>(null);
   const dispatch = useDispatch();
   const booking = useSelector((state: any) => state.booking);
-  console.log(booking, "hare is redux state booking data ???????");
 
   // =================== api end point ===================
   const { data: providerDetailsData, isLoading: isProviderDetailsDataLoading } =
