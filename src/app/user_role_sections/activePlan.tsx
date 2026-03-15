@@ -2,11 +2,14 @@ import { ImgPlaceholderService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
 import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
-import { updateBooking } from "@/src/redux/appStore/bookingSlices";
+import {
+  resetBooking,
+  updateBooking,
+} from "@/src/redux/appStore/bookingSlices";
 import ServicePackageListSkeleton from "@/src/Skeletion/ServicePackageListSkeleton";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -32,6 +35,11 @@ const ActivePlan = () => {
       refetchOnMountOrArgChange: true,
     },
   );
+
+  // ================== this screen render to reset to redux store ================
+  useEffect(() => {
+    dispatch(resetBooking());
+  }, []);
 
   // ================== filter active admin plan ================
   const findActiveAdminPlanArray = activePlans?.data?.filter(

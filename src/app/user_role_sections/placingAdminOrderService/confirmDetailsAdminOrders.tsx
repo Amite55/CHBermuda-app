@@ -10,12 +10,19 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import { useCreatePaymentIntentMutation } from "@/src/redux/Api/paymentSlices";
-import { useBookingSuccessRespiteCareMutation } from "@/src/redux/Api/userRole/orderSlices";
+import {
+  useBookingSubscriptionMutation,
+  useBookingSuccessRespiteCareMutation,
+  useBookingSuccessThirdPartyMutation,
+} from "@/src/redux/Api/userRole/orderSlices";
 import {
   resetBooking,
   updateBooking,
 } from "@/src/redux/appStore/bookingSlices";
+import { UserInfoFormType } from "@/src/redux/CommonTypes/BookingTypes";
+import { buildBookingPayload } from "@/src/utils/buildAddonsPayload";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import { userValidationSchema } from "@/src/validationSchema/userValidationSchema";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -26,7 +33,7 @@ import { useStripe } from "@stripe/stripe-react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Formik } from "formik";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -36,13 +43,7 @@ import {
 } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useDispatch, useSelector } from "react-redux";
-import * as Yup from "yup";
 // ================= user form type =================
-interface userInfoType {
-  fullName: string;
-  email: string;
-  location: string;
-}
 
 const ConfirmDetailsAdminOrders = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -59,111 +60,118 @@ const ConfirmDetailsAdminOrders = () => {
     bookingSuccessRespiteCare,
     { isLoading: isBookingSuccessRespiteCareLoading },
   ] = useBookingSuccessRespiteCareMutation();
+  const [
+    bookingSuccessThirdParty,
+    { isLoading: isBookingSuccessThirdPartyLoading },
+  ] = useBookingSuccessThirdPartyMutation();
+  const [bookingSubscription, { isLoading: isBookingSubscriptionLoading }] =
+    useBookingSubscriptionMutation();
 
-  const result = booking?.respiteCarePackageDetails?.addons.reduce(
-    (acc, value, index) => {
-      acc[`add_ons_id[${index + 1}]`] = value;
-      return acc;
-    },
-    {},
-  );
+  const bookingData = buildBookingPayload(booking);
 
-  console.log(booking, "this is array object ad ons");
+  const handlePlaceOrder = async () => {
+    const type = booking?.booking_type;
+    const hasSubscription = !!booking?.subscriptionId;
 
-  // ============== get booking data from store =============
-  const bookingData = {
-    name: booking?.userInfo?.name,
-    email: booking?.userInfo?.email,
-    location: booking?.userInfo?.location,
-    booking_type: booking?.booking_type,
-    date: booking?.date,
-    // when user booking type respite care
-    ...(booking?.booking_type === "respite_care" && {
-      ...(booking?.subscriptionId ? {} : { amount: booking?.amount }),
-      ...(booking?.respiteCarePackageDetails?.addons?.length > 0 && result),
-    }),
-    ...(booking?.booking_type === "respite_care" && {
-      respite_care_id: booking?.respiteCarePackageDetails?.respiteCareId,
-    }),
-    // === when user booking type third party  service ==========
-    ...((booking?.booking_type === "thirdparty_booking" ||
-      booking?.booking_type === "admin_booking") && {
-      provider_id: booking?.providerInfo?.providerId,
-      package_id: booking?.packageInfo?.id,
-      package_time_id: booking?.package_time_id,
-      booking_type: booking?.booking_type,
-      // if booking type plan service ======
-      ...(booking?.booking_type === "thirdparty_booking" &&
-      !booking?.subscription_id
-        ? { amount: booking?.packageInfo?.price }
-        : { subscription_id: booking?.subscriptionId }),
-      subscription_id: booking?.adminSubscriptionId,
-    }),
-
-    // ===== when user booking type admin service plan ======
-    ...(booking?.booking_type === "admin_booking" && {
-      subscription_id: booking?.adminSubscriptionId,
-    }),
+    if (type === "respite_care") {
+      // -------- this booking always payment --------
+      await handleStripePayment("respite_care");
+    } else if (type === "thirdparty_booking" && !hasSubscription) {
+      // ============ have't subscription to payment ===========
+      await handleStripePayment("thirdparty_booking");
+    } else if (
+      (type === "thirdparty_booking" && hasSubscription) ||
+      type === "admin_booking"
+    ) {
+      // if have subscription to payment =============
+      await handleSubscriptionBooking();
+    }
   };
 
   // ================ booking data handler =================
-  const handleBookingSuccessData = async () => {
+  const handleStripePayment = async (
+    bookingType: "respite_care" | "thirdparty_booking",
+  ) => {
     try {
-      const intentData = {
-        amount: 12,
+      const amount =
+        bookingType === "respite_care"
+          ? Number(booking?.amount)
+          : Number(booking?.packageInfo?.price);
+
+      const responseIntent = await createPaymentIntent({
+        amount,
         currency: "USD",
-      };
-      const responseIntent = await createPaymentIntent(intentData).unwrap();
+      }).unwrap();
       if (!responseIntent?.data?.client_secret) {
         toast.warning("Something went wrong please try again", 3000);
         return;
       }
-
-      // ==================== call payment modal ===================
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: "Example, Inc.",
-        paymentIntentClientSecret: responseIntent?.data?.client_secret,
+        paymentIntentClientSecret: responseIntent.data.client_secret,
       });
       if (initError) {
-        // handle error----------
-        toast.showError(
-          initError?.message ||
-            initError ||
-            "Something went wrong please try again",
-        );
-      } else {
-        checkout("admin_package");
+        toast.showError(initError?.message || "Payment init failed");
+        return;
       }
-    } catch (error: any) {
-      console.log(error, "Booking don't success please try again--->");
+
+      // ==================== call payment modal ===================
+      const { error: paymentError } = await presentPaymentSheet();
+      if (paymentError) {
+        toast.showError(paymentError?.message || "Payment failed");
+        return;
+      }
+      const intentId = responseIntent?.data?.id;
+      // ── Payment success → booking type wise API call ──----------------
+      await handleAfterPaymentSuccess(bookingType, intentId);
+    } catch (error) {
+      console.error("Stripe payment failed:", error);
     }
   };
 
   // ================= when if open the stripe payment sheet to call this this function ================
-  const checkout = async (subscriptionData) => {
+  const handleAfterPaymentSuccess = async (
+    bookingType: "respite_care" | "thirdparty_booking",
+    intentId: string,
+  ) => {
     try {
-      const { error } = await presentPaymentSheet();
-      if (error) {
-        toast.showError(
-          error?.message || error || "Something went wrong please try again",
-        );
+      let response;
+      // ============= call api for respite care and third party ===========
+      if (bookingType === "respite_care") {
+        response = await bookingSuccessRespiteCare({
+          ...bookingData,
+          payment_intent_id: intentId,
+        }).unwrap();
       } else {
-        const response =
-          await bookingSuccessRespiteCare(subscriptionData).unwrap();
-        if (response) {
-          toast.success(
-            response?.message || "Active plans retrieved successfully",
-            3000,
-          );
-        }
+        response = await bookingSuccessThirdParty({
+          ...bookingData,
+          payment_intent_id: intentId,
+        }).unwrap();
+      }
+      // ========= if this booking success then show success message ===========
+      if (response) {
+        setIsModalVisible(true);
       }
     } catch (error: any) {
       console.log(error, "Payment not success in your subscription------>");
     }
   };
+  // =========== subscriptions booking handler ===========
+  const handleSubscriptionBooking = async () => {
+    try {
+      const response = await bookingSubscription(bookingData).unwrap();
+
+      if (response) {
+        // toast.success(response?.message || "Booking successful!", 3000);
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.error("Subscription booking failed:", error);
+    }
+  };
 
   // ===================== set redux store for user form data =======================
-  const handleStateBookingData = (userInfo: userInfoType) => {
+  const handleStateBookingData = (userInfo: UserInfoFormType) => {
     try {
       dispatch(
         updateBooking({
@@ -174,31 +182,12 @@ const ConfirmDetailsAdminOrders = () => {
           },
         }),
       );
-      handleEditModalClose();
+      editBottomSheetModalRef.current?.dismiss();
     } catch (error) {
       console.log(error, "redux not stored------->");
     }
   };
 
-  // ==================== Validation Schema ====================
-  const validationSchema = Yup.object().shape({
-    fullName: Yup.string().required("Full name is required"),
-    email: Yup.string()
-      .matches(
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        "Please enter a valid email address",
-      )
-      .required("Email is required"),
-    location: Yup.string().required("Location is required"),
-  });
-
-  // ====================== modal open and close function =======================
-  const handleEditModalOpen = useCallback(async () => {
-    editBottomSheetModalRef.current?.present();
-  }, []);
-  const handleEditModalClose = useCallback(() => {
-    editBottomSheetModalRef.current?.dismiss();
-  }, []);
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -352,7 +341,7 @@ const ConfirmDetailsAdminOrders = () => {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => handleEditModalOpen()}
+              onPress={() => editBottomSheetModalRef.current?.present()}
               activeOpacity={0.7}
             >
               <SvgXml xml={IconEditPen} />
@@ -397,8 +386,8 @@ const ConfirmDetailsAdminOrders = () => {
       {/* ==================== submit button ==================== */}
       <PrimaryButton
         onPress={() => {
-          // handleBookingSuccessData();
-          console.log(bookingData, "thios is boooki8n sdfkasdjfl;kasjl;kfjsad");
+          handlePlaceOrder();
+          // console.log(bookingData, "thios is boooki8n sdfkasdjfl;kasjl;kfjsad");
         }}
         buttonText={
           booking?.booking_type === "admin_booking" ||
@@ -407,7 +396,12 @@ const ConfirmDetailsAdminOrders = () => {
             ? "Place Order"
             : "Booking"
         }
-        loading={isCreatingPaymentIntentLoading}
+        loading={
+          isCreatingPaymentIntentLoading ||
+          isBookingSuccessRespiteCareLoading ||
+          isBookingSuccessThirdPartyLoading ||
+          isBookingSubscriptionLoading
+        }
         buttonContainerStyle={tw`mt-6 `}
         buttonTextStyle={tw`text-lg font-LufgaMedium`}
         leftIcon={IconOrderPlaceWhite}
@@ -446,7 +440,7 @@ const ConfirmDetailsAdminOrders = () => {
               location: booking?.userInfo?.location || "",
             }}
             onSubmit={(values) => handleStateBookingData(values)}
-            validationSchema={validationSchema}
+            validationSchema={userValidationSchema}
           >
             {({
               handleChange,
@@ -467,7 +461,9 @@ const ConfirmDetailsAdminOrders = () => {
                   <Text style={tw`font-LufgaMedium text-sm text-white`}>
                     Feedback
                   </Text>
-                  <TouchableOpacity onPress={() => handleEditModalClose()}>
+                  <TouchableOpacity
+                    onPress={() => editBottomSheetModalRef.current?.dismiss()}
+                  >
                     <SvgXml xml={IconCrossWhite} />
                   </TouchableOpacity>
                 </View>

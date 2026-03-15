@@ -1,6 +1,6 @@
 import { IconSuccessIcon } from "@/assets/icons";
 import React, { useEffect, useRef } from "react";
-import { Animated, Modal, Text, View } from "react-native";
+import { Animated, BackHandler, Modal, Text, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import tw from "../lib/tailwind";
 import PrimaryButton from "../utils/PrimaryButton";
@@ -18,6 +18,20 @@ const BookingSuccessModal = ({
 }: IModalType) => {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!isModalVisible) return;
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        onPress?.();
+        return true;
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [isModalVisible]);
 
   useEffect(() => {
     if (isModalVisible) {
