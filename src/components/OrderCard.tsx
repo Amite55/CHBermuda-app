@@ -1,3 +1,4 @@
+import { ImgPlaceholderService } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -16,21 +17,37 @@ const OrderCard = ({ onPress, image, title, subTitle, dateAndTime }: Props) => {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
-      style={tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`}
+      style={tw`flex-row items-center gap-4 px-5 py-4 bg-white rounded-xl`}
     >
       <Image
-        style={tw`w-16 h-16 rounded-full`}
+        style={tw`w-16 h-16 rounded-full shrink-0`}
         source={image}
-        contentFit="contain"
+        contentFit="cover"
+        placeholder={ImgPlaceholderService}
       />
-      <View>
-        <Text style={tw`font-LufgaMedium text-base text-regularText`}>
+
+      <View style={tw`flex-1`}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaMedium text-base text-regularText`}
+        >
           {title}
         </Text>
 
-        <Text style={tw`font-LufgaRegular text-sm text-black`}>{subTitle}</Text>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaRegular text-sm text-black`}
+        >
+          {subTitle}
+        </Text>
 
-        <Text style={tw`font-LufgaMedium text-xs text-subText pt-1`}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaMedium text-xs text-subText pt-1`}
+        >
           {dateAndTime}
         </Text>
       </View>

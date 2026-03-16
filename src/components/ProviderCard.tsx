@@ -1,4 +1,5 @@
 import { IconRatingStar } from "@/assets/icons";
+import { ImgPlaceholderProfile } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -8,7 +9,7 @@ import tw from "../lib/tailwind";
 interface Props {
   image: any;
   title: string;
-  subTitle: string;
+  subTitle?: string;
   ratings: number;
   reviews: number;
   onPress?: () => void;
@@ -38,7 +39,12 @@ const ProviderCard = ({
         containerStyle,
       ]}
     >
-      <Image style={tw`w-16 h-16 rounded-full`} source={image} />
+      <Image
+        style={tw`w-16 h-16 rounded-full`}
+        source={image}
+        contentFit="cover"
+        placeholder={ImgPlaceholderProfile}
+      />
       <View>
         <View style={tw`flex-row items-center gap-2`}>
           <Text style={tw`font-LufgaMedium text-base text-regularText`}>

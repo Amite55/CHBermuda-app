@@ -16,7 +16,7 @@ const Notifications = () => {
         ListHeaderComponent={() => {
           return (
             <BackTitleButton
-              title="Notifications"
+              title="Notifications user"
               onPress={() => router.back()}
             />
           );

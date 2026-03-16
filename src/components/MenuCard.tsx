@@ -1,3 +1,4 @@
+import { ImgPlaceholderService } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -43,22 +44,31 @@ const MenuCard = ({
         containerStyle,
       ]}
     >
-      <View style={tw`flex-row items-center gap-3`}>
+      {/* ── Left side ── */}
+      <View style={tw`flex-1 flex-row items-center gap-3`}>
+        {/* icon */}
         {icon && (
           <View
-            style={tw`w-14 h-14 rounded-full bg-stone-100 items-center justify-center`}
+            style={tw`w-14 h-14 shrink-0 rounded-full bg-stone-100 items-center justify-center`}
           >
             <SvgXml xml={icon} />
           </View>
         )}
+
+        {/* image */}
         {image && (
           <Image
             source={image}
-            style={[tw`w-16 h-16 rounded-full`, imageStyle]}
+            style={[tw`w-16 h-16 shrink-0 rounded-full`, imageStyle]}
+            contentFit="cover"
+            placeholder={ImgPlaceholderService}
           />
         )}
-        <View>
+
+        <View style={tw`flex-1`}>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={[
               tw`font-LufgaMedium text-base text-regularText`,
               titleTextStyle,
@@ -66,24 +76,27 @@ const MenuCard = ({
           >
             {titleText}
           </Text>
+
           <Text
             numberOfLines={2}
+            ellipsizeMode="tail"
             style={[
               tw`font-LufgaRegular text-sm text-regularText`,
               subTitleStyle,
             ]}
           >
-            {subTitleText.length > 30
-              ? subTitleText.slice(0, 30) + "..."
-              : subTitleText}
+            {subTitleText}
           </Text>
         </View>
       </View>
+
+      {/* ── End icon ── */}
       {endIcon ? (
         <TouchableOpacity
           activeOpacity={0.6}
           onPress={endIconOnPress}
           disabled={!endIconOnPress}
+          style={tw`pl-2 shrink-0`}
         >
           <SvgXml xml={endIcon} />
         </TouchableOpacity>

@@ -7,7 +7,7 @@ import { SvgXml } from "react-native-svg";
 import tw from "./tailwind";
 
 interface Props {
-  title: string;
+  title: string | undefined;
   icon?: any;
   titleTextStyle?: any;
   continentStyle?: any;
@@ -36,7 +36,9 @@ const BackTitleButton = ({
       >
         <SvgXml xml={icon ? icon : IconHeaderBackArrow} />
       </TouchableOpacity>
-      <Text style={[tw`text-black  font-medium text-lg`, titleTextStyle]}>
+      <Text
+        style={[tw`text-black  font-medium text-lg capitalize`, titleTextStyle]}
+      >
         {title}
       </Text>
       {endText ? (

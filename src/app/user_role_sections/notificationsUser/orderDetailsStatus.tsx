@@ -8,10 +8,12 @@ import {
   IconTellPhone,
 } from "@/assets/icons";
 import { ImgProfileImg, ImgService } from "@/assets/image";
+import BookingDetailsBilingInfo from "@/src/components/BookingDetailsBilingInfo";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useGetBookingDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -36,9 +38,17 @@ import { SvgXml } from "react-native-svg";
 
 const OrderDetailsStatus = () => {
   const [rating, setRating] = useState(0);
-  const { status } = useLocalSearchParams();
-
+  const { status, id } = useLocalSearchParams();
   const ratingBottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // ================== api end point ==================
+  const { data: orderDetails, isLoading: isOrderDetailsLoading } =
+    useGetBookingDetailsQuery(id);
+
+  console.log(
+    orderDetails?.data?.package?.icon,
+    "this is order details -=------------->",
+  );
 
   const handleRatingModalOpen = useCallback(async () => {
     ratingBottomSheetModalRef.current?.present();
@@ -58,7 +68,6 @@ const OrderDetailsStatus = () => {
         <BackTitleButton title={status} onPress={() => router.back()} />
 
         {/* ============== Order Details Status ============== */}
-
         <View>
           <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
             Service
@@ -68,14 +77,14 @@ const OrderDetailsStatus = () => {
               titleText="Crystal Comfort Plan"
               subTitleText="Order Completed"
               subTitleStyle={tw`border px-4 py-1.5 rounded-xl border-green-500 text-green-500`}
-              image={ImgService}
+              image={ImgProfileImg}
               containerStyle={tw` bg-white`}
             />
           ) : (
             <MenuCard
-              titleText="Crystal Comfort Plan"
+              titleText={orderDetails?.data?.package?.title}
               subTitleText="Number of order in this month: 2"
-              image={ImgProfileImg}
+              image={orderDetails?.data?.package?.icon}
               containerStyle={tw` bg-white`}
             />
           )}
@@ -96,11 +105,12 @@ const OrderDetailsStatus = () => {
               </TouchableOpacity>
             )} */}
           </View>
+
           <ProviderCard
             containerStyle={tw`bg-white`}
-            image={ImgProfileImg}
-            title="John Doe"
-            subTitle="Crystal Comfort Plan"
+            image={orderDetails?.data?.provider?.avatar}
+            title={orderDetails?.data?.prover?.name}
+            // subTitle="Crystal Comfort Plan"
             ratings={4.5}
             reviews={10}
             totalOrder={12}
@@ -111,28 +121,11 @@ const OrderDetailsStatus = () => {
           </Text>
 
           {/* ==================== user info details ================== */}
-          <View style={tw` bg-white p-3 rounded-2xl`}>
-            <View>
-              <Text style={tw`font-LufgaMedium text-lg text-black`}>Name</Text>
-              <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                Mr. Lopez
-              </Text>
-            </View>
-            <View>
-              <Text style={tw`font-LufgaMedium text-lg text-black`}>Email</Text>
-              <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                example@gmail.com
-              </Text>
-            </View>
-            <View>
-              <Text style={tw`font-LufgaMedium text-lg text-black`}>
-                Location
-              </Text>
-              <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                Dhaka, Bangladesh
-              </Text>
-            </View>
-          </View>
+          <BookingDetailsBilingInfo
+            email={orderDetails?.data?.user?.email}
+            location=""
+            name={orderDetails?.data?.user?.name}
+          />
 
           <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
             Scheduled time
@@ -140,16 +133,17 @@ const OrderDetailsStatus = () => {
           {/* ==================== Scheduled time ================== */}
           <View style={tw` bg-white p-3 rounded-2xl`}>
             <Text style={tw`font-LufgaMedium text-lg text-black`}>
-              Mon, Aug 27, 2025
+              {orderDetails?.data?.schedule_date}
             </Text>
             <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-              02:00 PM - 11:00 PM
+              {orderDetails?.data?.schedule_time_from} -{" "}
+              {orderDetails?.data?.schedule_time_to}
             </Text>
           </View>
 
           {/* ========================== status ways details ================ */}
 
-          {status === "pending" && (
+          {status === "new_booking" && (
             <View>
               <View style={tw`justify-between items-center py-6`}>
                 <SvgXml xml={IconPendingStatus} />
@@ -300,14 +294,14 @@ const OrderDetailsStatus = () => {
                     {rating === 0.5 || rating === 1
                       ? "Poor"
                       : rating === 1.5 || rating === 2
-                      ? "Good"
-                      : rating === 2.5 || rating === 3
-                      ? "Better"
-                      : rating === 3.5 || rating === 4
-                      ? "Best"
-                      : rating === 4.5 || rating === 5
-                      ? "Excellent"
-                      : null}
+                        ? "Good"
+                        : rating === 2.5 || rating === 3
+                          ? "Better"
+                          : rating === 3.5 || rating === 4
+                            ? "Best"
+                            : rating === 4.5 || rating === 5
+                              ? "Excellent"
+                              : null}
                   </Text>
                 )}
                 {/* ---------------------- input user rating ---------------- */}

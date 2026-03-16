@@ -99,6 +99,7 @@ export const orderSlices = api.injectEndpoints({
 
 export const {
   useGetUserOrderQuery,
+  useLazyGetUserOrderQuery,
   useGetAdminProviderByPackageIdQuery,
   useLazyGetAdminProviderByPackageIdQuery,
   useGetThirdPartyProviderByServiceIdQuery,
