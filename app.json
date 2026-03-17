@@ -28,7 +28,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.madhob.bermuda"
+      "package": "com.madhob.bermuda",
+      "permissions": ["CALL_PHONE"]
     },
     "web": {
       "output": "static",

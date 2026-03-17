@@ -87,7 +87,7 @@ export const orderSlices = api.injectEndpoints({
       }),
       invalidatesTags: ["Booking"],
     }),
-    cancelDeliveryRequest: builder.mutation({
+    cancelBooking: builder.mutation({
       query: (id) => ({
         url: `/cancel-booking/${id}`,
         method: "POST",
@@ -112,5 +112,5 @@ export const {
   useGetDeliveryRequestDetailsQuery,
   useDeclineDeliveryRequestMutation,
   useAcceptDeliveryRequestMutation,
-  useCancelDeliveryRequestMutation,
+  useCancelBookingMutation,
 } = orderSlices;

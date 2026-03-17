@@ -89,9 +89,6 @@ const User_home = () => {
           containerStyle={tw`px-5`}
           userName={profileData?.data?.name}
           userImage={profileData?.data?.avatar}
-          cartOnPress={() => {
-            router.push("/user_role_sections/cart");
-          }}
           notificationOnPress={() => {
             router.push("/user_role_sections/notificationsUser/notifications");
           }}

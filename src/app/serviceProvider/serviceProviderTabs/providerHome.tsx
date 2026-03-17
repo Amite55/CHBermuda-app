@@ -10,6 +10,7 @@ import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
+import { useGetHomePageQuery } from "@/src/redux/Api/providers/home";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -28,8 +29,12 @@ const ProviderHome = () => {
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  const { data: providerHomeData, isLoading: isProviderHomeLoading } =
+    useGetHomePageQuery(undefined, {
+      refetchOnMountOrArgChange: true,
+    });
 
-  console.log(profileData?.data, "this is profile name ");
+  console.log(providerHomeData?.data, "this is profile name ");
 
   return (
     <ScrollView
@@ -68,7 +73,9 @@ const ProviderHome = () => {
               <Text style={tw`font-LufgaRegular text-base text-subText `}>
                 New Order
               </Text>
-              <Text style={tw`font-LufgaMedium text-black text-xl`}>10</Text>
+              <Text style={tw`font-LufgaMedium text-black text-xl`}>
+                {providerHomeData?.data?.new_order || 0}{" "}
+              </Text>
             </View>
             <View style={tw`w-0.5 h-14 bg-slate-300`} />
             <View style={tw`justify-center items-center gap-2`}>
@@ -76,14 +83,18 @@ const ProviderHome = () => {
               <Text style={tw`font-LufgaRegular text-base text-subText `}>
                 Pending Order
               </Text>
-              <Text style={tw`font-LufgaMedium text-black text-xl`}>8</Text>
+              <Text style={tw`font-LufgaMedium text-black text-xl`}>
+                {providerHomeData?.data?.pending_order || 0}
+              </Text>
             </View>
           </View>
           <View style={tw`flex-row items-center gap-1 justify-center pt-3`}>
             <Text className="font-LufgaRegular text-base text-subText">
               Todays total order:
             </Text>
-            <Text style={tw`font-LufgaMedium text-base text-black`}>18</Text>
+            <Text style={tw`font-LufgaMedium text-base text-black`}>
+              {providerHomeData?.data?.todays_total_order || 0}
+            </Text>
           </View>
         </View>
       </View>

@@ -11,9 +11,18 @@ import { ImgProfileImg, ImgService } from "@/assets/image";
 import BookingDetailsBilingInfo from "@/src/components/BookingDetailsBilingInfo";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
+import LogoutModal from "@/src/context/LogoutModal";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import OrderDetailsStatusSkeleton from "@/src/lib/CustomSkeleton/OrderDetailsStatusSkeleton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
-import { useGetBookingDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
+import { useGetThirdPartyProviderDetailsQuery } from "@/src/redux/Api/userHomeSlices";
+import {
+  useCancelBookingMutation,
+  useGetAdminProviderDetailsQuery,
+  useGetBookingDetailsQuery,
+} from "@/src/redux/Api/userRole/orderSlices";
+import { callPadLinkingFunction } from "@/src/utils/callPadLinkingFunction";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -24,7 +33,7 @@ import {
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FlatList,
   ScrollView,
@@ -40,22 +49,57 @@ const OrderDetailsStatus = () => {
   const [rating, setRating] = useState(0);
   const { status, id } = useLocalSearchParams();
   const ratingBottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+  const toast = useToastHelpers();
 
   // ================== api end point ==================
   const { data: orderDetails, isLoading: isOrderDetailsLoading } =
     useGetBookingDetailsQuery(id);
+  const {
+    data: thirdPartyProviderDetails,
+    isLoading: isThirdPartyProviderDetailsLoading,
+  } = useGetThirdPartyProviderDetailsQuery(orderDetails?.data?.provider?.id);
+  const {
+    data: adminProviderDetails,
+    isLoading: isAdminProviderDetailsLoading,
+  } = useGetAdminProviderDetailsQuery(orderDetails?.data?.provider?.id);
+  const [cancelOrder, { isLoading: isCancelOrderLoading }] =
+    useCancelBookingMutation();
 
-  console.log(
-    orderDetails?.data?.package?.icon,
-    "this is order details -=------------->",
-  );
+  // ================== get provider data ================
+  let providerData;
+  switch (orderDetails?.data?.booking_type) {
+    case "thirdparty_booking":
+      providerData = thirdPartyProviderDetails?.data?.provider;
+      break;
+    case "admin_booking":
+      providerData = adminProviderDetails?.data?.provider;
+      break;
+  }
+  // =========== cancel order function ===========
+  const handleCancelOrder = () => {
+    try {
+      cancelOrder(id).unwrap();
+      setIsCancelModalVisible(false);
+      toast.success("Your order cancel successfully", 3000);
+      router.replace("/user_role_sections/user_tabs/user_home");
+    } catch (error: any) {
+      console.log(error, "Your order cancel failed------>");
+      toast.showError(
+        error?.message || error || "Your order cancel failed",
+        3000,
+      );
+    }
+  };
 
-  const handleRatingModalOpen = useCallback(async () => {
-    ratingBottomSheetModalRef.current?.present();
-  }, []);
-  const handleRatingModalClose = useCallback(() => {
-    ratingBottomSheetModalRef.current?.dismiss();
-  }, []);
+  // ==================  loading skeleton ==================
+  if (
+    isAdminProviderDetailsLoading ||
+    isOrderDetailsLoading ||
+    isThirdPartyProviderDetailsLoading
+  ) {
+    return <OrderDetailsStatusSkeleton />;
+  }
 
   return (
     <>
@@ -74,16 +118,16 @@ const OrderDetailsStatus = () => {
           </Text>
           {status === "completed" ? (
             <MenuCard
-              titleText="Crystal Comfort Plan"
+              titleText={orderDetails?.data?.package?.title}
               subTitleText="Order Completed"
-              subTitleStyle={tw`border px-4 py-1.5 rounded-xl border-green-500 text-green-500`}
-              image={ImgProfileImg}
+              subTitleStyle={tw`border px-4 py-1.5 text-center rounded-xl border-green-500 text-green-500`}
+              image={orderDetails?.data?.package?.icon}
               containerStyle={tw` bg-white`}
             />
           ) : (
             <MenuCard
               titleText={orderDetails?.data?.package?.title}
-              subTitleText="Number of order in this month: 2"
+              subTitleText={`Number of order in this month: ${orderDetails?.data?.order_in_this_month || 0}`}
               image={orderDetails?.data?.package?.icon}
               containerStyle={tw` bg-white`}
             />
@@ -93,27 +137,16 @@ const OrderDetailsStatus = () => {
             <Text style={tw`font-LufgaSemiBold text-base text-black`}>
               Provider
             </Text>
-            {/* {status === "approved" && (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() =>
-                  router.push("/user_role_sections/notificationsUser/messaging")
-                }
-                style={tw`w-10 h-10 bg-slate-300 rounded-xl items-center justify-center`}
-              >
-                <SvgXml xml={IconMessage} />
-              </TouchableOpacity>
-            )} */}
           </View>
 
           <ProviderCard
             containerStyle={tw`bg-white`}
-            image={orderDetails?.data?.provider?.avatar}
-            title={orderDetails?.data?.prover?.name}
-            // subTitle="Crystal Comfort Plan"
-            ratings={4.5}
-            reviews={10}
-            totalOrder={12}
+            image={providerData?.avatar}
+            title={providerData?.name}
+            subTitle={orderDetails?.data?.package?.title}
+            ratings={providerData?.avg_rating || 0}
+            reviews={providerData?.total_reviews || 0}
+            totalOrder={providerData?.completed_orders || 0}
           />
 
           <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
@@ -122,9 +155,9 @@ const OrderDetailsStatus = () => {
 
           {/* ==================== user info details ================== */}
           <BookingDetailsBilingInfo
-            email={orderDetails?.data?.user?.email}
-            location=""
-            name={orderDetails?.data?.user?.name}
+            email={orderDetails?.data?.billing?.email}
+            location={orderDetails?.data?.billing?.location}
+            name={orderDetails?.data?.billing?.name}
           />
 
           <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
@@ -156,28 +189,33 @@ const OrderDetailsStatus = () => {
                 buttonTextStyle={tw`text-sm text-red-500`}
                 buttonContainerStyle={tw`bg-transparent border border-red-500`}
                 leftIcon={IconCrossRed}
-                onPress={() => {}}
+                onPress={() => {
+                  setIsCancelModalVisible(true);
+                }}
               />
             </View>
           )}
 
           {/* ====================== ongoing or complete status details ================ */}
-          {status === "approved" ||
-            (status === "completed" && (
+          {orderDetails?.data?.booking_type === "thirdparty_booking" &&
+            (status === "booking_approved" || status === "completed") && (
               <View>
                 <Text style={tw`font-LufgaSemiBold text-base text-black py-3`}>
                   Assigned stuff
                 </Text>
                 <MenuCard
-                  titleText="John Doe"
-                  subTitleText="+12345678965"
+                  titleText={orderDetails?.data?.staff?.name}
+                  subTitleText={orderDetails?.data?.staff?.phone}
                   image={ImgProfileImg}
                   containerStyle={tw` bg-white`}
-                  endIcon={IconTellPhone}
-                  endIconOnPress={() => {}}
+                  endIcon={status === "booking_approved" && IconTellPhone}
+                  endIconOnPress={() => {
+                    callPadLinkingFunction(orderDetails?.data?.staff?.phone);
+                  }}
                 />
               </View>
-            ))}
+            )}
+
           {/* ================= cancel status details ================ */}
           {status === "canceled" && (
             <PrimaryButton
@@ -233,7 +271,7 @@ const OrderDetailsStatus = () => {
                   buttonTextStyle={tw`text-sm`}
                   buttonContainerStyle={tw`h-10 bg-green-700 flex-1`}
                   onPress={() => {
-                    handleRatingModalOpen();
+                    ratingBottomSheetModalRef.current?.present();
                   }}
                 />
               </View>
@@ -265,7 +303,9 @@ const OrderDetailsStatus = () => {
               <Text style={tw`font-LufgaMedium text-sm text-white`}>
                 Feedback
               </Text>
-              <TouchableOpacity onPress={() => handleRatingModalClose()}>
+              <TouchableOpacity
+                onPress={() => ratingBottomSheetModalRef.current?.dismiss()}
+              >
                 <SvgXml xml={IconCrossWhite} />
               </TouchableOpacity>
             </View>
@@ -327,7 +367,7 @@ const OrderDetailsStatus = () => {
               {/* = ----------------- button content ---------------- */}
               <PrimaryButton
                 onPress={() => {
-                  handleRatingModalClose();
+                  ratingBottomSheetModalRef.current?.dismiss();
                   router.push({
                     pathname:
                       "/user_role_sections/notificationsUser/orderDetailsStatus",
@@ -341,6 +381,19 @@ const OrderDetailsStatus = () => {
           </BottomSheetScrollView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
+
+      {/* ================== order cancel modal ================ */}
+      <LogoutModal
+        modalVisible={isCancelModalVisible}
+        setModalVisible={setIsCancelModalVisible}
+        buttonTitle="Delete"
+        modalTitle="Are You Sure? Cancel your order?"
+        loading={isCancelOrderLoading}
+        disabled={isCancelOrderLoading}
+        onPress={() => {
+          handleCancelOrder();
+        }}
+      />
     </>
   );
 };

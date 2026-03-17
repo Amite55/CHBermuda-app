@@ -1,4 +1,4 @@
-import { IconNotification, IconShoppingCart } from "@/assets/icons";
+import { IconNotification } from "@/assets/icons";
 import { ImgPlaceholderProfile } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
@@ -75,23 +75,6 @@ const UserInfoHeader = ({
         </View>
       </TouchableOpacity>
       <View style={tw`flex-row items-center gap-2`}>
-        {cartOnPress && (
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={cartOnPress}
-            style={tw`h-12 w-12 rounded-full bg-white items-center justify-center`}
-          >
-            <SvgXml xml={IconShoppingCart} />
-            {isCartCount > 0 && (
-              <Text
-                style={tw`absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center`}
-              >
-                {isCartCount > 99 ? "99+" : isCartCount}
-              </Text>
-            )}
-          </TouchableOpacity>
-        )}
-
         <TouchableOpacity
           onPress={notificationOnPress}
           activeOpacity={0.7}

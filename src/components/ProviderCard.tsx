@@ -35,31 +35,44 @@ const ProviderCard = ({
       disabled={!onPress}
       activeOpacity={0.7}
       style={[
-        tw`flex-row items-center gap-4 px-5 py-4 bg-white  rounded-xl`,
+        tw`flex-row items-center gap-4 px-5 py-4 bg-white rounded-xl`,
         containerStyle,
       ]}
     >
       <Image
-        style={tw`w-16 h-16 rounded-full`}
+        style={tw`w-16 h-16 shrink-0 rounded-full`}
         source={image}
         contentFit="cover"
         placeholder={ImgPlaceholderProfile}
       />
-      <View>
+
+      <View style={tw`flex-1`}>
+        {/* title + order badge */}
         <View style={tw`flex-row items-center gap-2`}>
-          <Text style={tw`font-LufgaMedium text-base text-regularText`}>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={tw`flex-1 font-LufgaMedium text-base text-regularText`}
+          >
             {title}
           </Text>
           <Text
-            style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 `}
+            style={tw`font-LufgaRegular text-xs text-subText bg-slate-300 rounded-3xl px-1 py-0.5 shrink-0`}
           >
             {totalOrder} order
           </Text>
         </View>
 
-        <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+        {/* subtitle */}
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={tw`font-LufgaRegular text-sm text-subText`}
+        >
           {subTitle}
         </Text>
+
+        {/* ratings */}
         <View style={tw`flex-row items-center gap-1`}>
           <SvgXml xml={IconRatingStar} />
           <Text style={tw`font-LufgaRegular text-sm text-regularText`}>

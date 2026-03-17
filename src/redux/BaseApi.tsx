@@ -80,6 +80,7 @@ export const api = createApi({
     "Pages",
     "Balance",
     "Account",
+    "Staff",
   ],
 });
 // export const imageUrl = process.env.EXPO_PUBLIC_IMG_URL;
