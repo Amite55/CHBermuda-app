@@ -2,9 +2,9 @@ import { api } from "@/src/redux/BaseApi";
 
 export const userHomeSlices = api.injectEndpoints({
   endpoints: (builder) => ({
-    myStaffs: builder.query({
-      query: () => ({
-        url: `/staffs`,
+    getMyStaffs: builder.query({
+      query: ({ page, per_page }) => ({
+        url: `/staffs/?page=${page}&per_page=${per_page}`,
         method: "GET",
       }),
       providesTags: ["Staff", "Account", "Provider"],
@@ -51,7 +51,8 @@ export const userHomeSlices = api.injectEndpoints({
 });
 
 export const {
-  useMyStaffsQuery,
+  useGetMyStaffsQuery,
+  useLazyGetMyStaffsQuery,
   useAddStaffMutation,
   useUpdateStaffMutation,
   useDeleteStaffMutation,

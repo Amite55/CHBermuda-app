@@ -58,7 +58,6 @@ const baseQueryWithPath: BaseQueryFn<BaseQueryArgs, unknown, unknown> = async (
   }
 };
 
-// Define the `createApi` with appropriate types
 export const api = createApi({
   keepUnusedDataFor: 0,
   reducerPath: "api",

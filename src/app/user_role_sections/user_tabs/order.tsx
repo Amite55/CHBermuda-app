@@ -5,6 +5,7 @@ import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useLazyGetUserOrderQuery } from "@/src/redux/Api/userRole/orderSlices";
+import { LIMIT } from "@/src/utils/PaginationLimit";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useRef } from "react";
@@ -20,8 +21,6 @@ import {
 } from "react-native";
 
 type OrderStatus = "new" | "pending" | "completed";
-
-const LIMIT = 7;
 
 const Order = () => {
   const [orderStatus, setOrderStatus] = React.useState<OrderStatus>("new");
@@ -44,15 +43,12 @@ const Order = () => {
     async (targetPage: number, reset = false) => {
       if (isFetchingRef.current) return;
       if (!hasMoreRef.current && !reset) return;
-
       isFetchingRef.current = true;
-
       if (reset) {
         setIsFirstPageLoading(true);
       } else {
         setIsFetchingMore(true);
       }
-
       try {
         const result = await getUserOrder({
           status: orderStatusRef.current,
@@ -143,7 +139,6 @@ const Order = () => {
           containerStyle={tw`px-5`}
           userName={profileData?.data?.name}
           userImage={profileData?.data?.avatar}
-          cartOnPress={() => router.push("/user_role_sections/cart")}
           notificationOnPress={() =>
             router.push("/user_role_sections/notificationsUser/notifications")
           }

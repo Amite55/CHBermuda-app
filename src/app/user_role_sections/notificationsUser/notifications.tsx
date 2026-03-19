@@ -88,13 +88,20 @@ const Notifications = () => {
 
   // =================== render notification card/items ===============
   const RenderNotificationItems = (item: INotification) => {
+    console.log(
+      item?.data?.data?.type,
+      "this is notification types ===========>",
+    );
     return (
       <NotificationCard
         onPress={() => {
           router.push({
             pathname:
               "/user_role_sections/notificationsUser/orderDetailsStatus",
-            params: { status: item?.data?.data?.type },
+            params: {
+              status: item?.data?.data?.type,
+              id: item?.data?.data?.booking_id,
+            },
           });
         }}
         title={item?.data?.title}
@@ -114,6 +121,8 @@ const Notifications = () => {
         contentContainerStyle={tw`bg-bgBaseColor px-5 gap-3 pb-3 flex-grow `}
         refreshing={refreshing}
         onEndReached={handleLoadMore}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

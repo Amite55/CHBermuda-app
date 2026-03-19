@@ -76,7 +76,6 @@ const Explore = () => {
             containerStyle={tw`px-5`}
             userName={profileData?.data?.name}
             userImage={profileData?.data?.avatar}
-            cartOnPress={() => router.push("/user_role_sections/cart")}
             notificationOnPress={() =>
               router.push("/user_role_sections/notificationsUser/notifications")
             }
@@ -207,8 +206,7 @@ const Explore = () => {
 
             {/* Button */}
             <PrimaryButton
-              onPress={() => router.push("/user_role_sections/cart")}
-              buttonTextStyle={tw`text-lg font-LufgaMedium`}
+              buttonTextStyle={tw`text-base font-LufgaMedium`}
               buttonContainerStyle={tw`mt-4 h-10`}
               buttonText="Subscribe Now"
             />
@@ -242,7 +240,7 @@ const Explore = () => {
       keyExtractor={(_, index) => index.toString()}
       renderItem={renderAddonItem}
       ListHeaderComponent={RenderHeader}
-      contentContainerStyle={tw`pb-16 bg-bgBaseColor`}
+      contentContainerStyle={tw`pb-20 bg-bgBaseColor`}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />

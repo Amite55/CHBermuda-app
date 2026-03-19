@@ -5,16 +5,22 @@ import {
   IconProviderRecentOrders,
   IconProviderStaffs,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgProviderBG, ImgServiceImage } from "@/assets/image";
+import {
+  ImgPlaceholderProfile,
+  ImgProviderBG,
+  ImgServiceImage,
+} from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
+import { usePagination } from "@/src/hooks/usePagination";
 import tw from "@/src/lib/tailwind";
+import { useLazyGetMyStaffsQuery } from "@/src/redux/Api/providers/accounts/staffs";
 import { useGetHomePageQuery } from "@/src/redux/Api/providers/home";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FlatList,
   ScrollView,
@@ -25,17 +31,29 @@ import {
 import { SvgXml } from "react-native-svg";
 
 const ProviderHome = () => {
-  // profile query get --------------->
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  // ============== api end point ================
   const { data: providerHomeData, isLoading: isProviderHomeLoading } =
     useGetHomePageQuery(undefined, {
       refetchOnMountOrArgChange: true,
     });
-
-  console.log(providerHomeData?.data, "this is profile name ");
-
+  const [getMyStaffs] = useLazyGetMyStaffsQuery();
+  // ================= FETCH FUNCTION =================
+  const {
+    data: staffsData,
+    isLoading,
+    isFetchingMore,
+    refreshing,
+    fetchData,
+    loadMore,
+    refresh,
+  } = usePagination(getMyStaffs);
+  //  ============ call pagination function ===========
+  useEffect(() => {
+    fetchData(1, true);
+  }, []);
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -108,33 +126,41 @@ const ProviderHome = () => {
         </View>
         <TouchableOpacity
           activeOpacity={0.6}
+          onPress={() => {
+            router.push("/serviceProvider/providerStaffs/staffs");
+          }}
           style={tw`border border-subText px-2 py-1 rounded-lg`}
         >
           <Text style={tw`font-LufgaRegular text-sm text-black`}>See all</Text>
         </TouchableOpacity>
       </View>
       <FlatList
-        data={[1, 2, 3, 4, 5]}
+        data={staffsData}
         keyExtractor={(item, index) => index.toString()}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         horizontal
-        style={tw``}
         contentContainerStyle={tw`px-5 gap-4 mt-4`}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
         renderItem={({ item }) => {
           return (
-            <View>
-              <View style={tw`relative `}>
+            <View style={tw`justify-center items-center`}>
+              <View style={tw` `}>
                 <Image
-                  source={ImgProfileImg}
-                  style={tw`w-20 h-20 rounded-full `}
+                  source={item?.image}
+                  style={tw`w-16 h-16 rounded-full `}
+                  contentFit="cover"
+                  placeholder={ImgPlaceholderProfile}
                 />
                 <View
                   style={tw`absolute top-1 right-1 w-3 h-3 bg-green-600 rounded-full`}
                 />
               </View>
               <Text style={tw`font-LufgaMedium text-sm text-black pt-2`}>
-                Staff Name
+                {item?.name?.length > 10
+                  ? item?.name?.slice(0, 10) + "..."
+                  : item?.name}
               </Text>
             </View>
           );
