@@ -1,12 +1,8 @@
 import { IconNotificationWhite } from "@/assets/icons";
-import {
-  ImgNoOrder,
-  ImgProfileImg,
-  ImgProviderBG,
-  ImgServiceImage,
-} from "@/assets/image";
+import { ImgNoOrder, ImgProviderBG, ImgServiceImage } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -16,7 +12,8 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 const ProviderOrder = () => {
   const [orderData, setOrderData] = React.useState<any>(true);
   const [orderStatus, setOrderStatus] = React.useState<any>("New");
-
+  // ============ hooks ==================
+  const { profileData } = useProfile();
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -29,15 +26,17 @@ const ProviderOrder = () => {
         <UserInfoHeader
           containerStyle={tw`px-5 items-center`}
           notificationContentStyle={tw`bg-[#FFFFFF33] `}
-          userName="Provider"
-          userImage={ImgProfileImg}
+          userName={profileData?.data?.name}
+          userImage={profileData?.data?.avatar}
           notificationIcon={IconNotificationWhite}
           greetingStyle={tw`text-white `}
           userNameStyle={tw`text-white `}
           notificationOnPress={() => {
             router.push("/serviceProvider/notificationProvider/notifications");
           }}
-          profileOnPress={() => {}}
+          profileOnPress={() => {
+            router.push("/auth/editProfile");
+          }}
         />
       </ImageBackground>
       <Text
@@ -65,13 +64,13 @@ const ProviderOrder = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "New"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "New" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "New" ? "text-white" : "text-primaryBtn",
                 )}
               >
                 New
@@ -94,13 +93,13 @@ const ProviderOrder = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Ongoing"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Ongoing" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "Ongoing" ? "text-white" : "text-primaryBtn",
                 )}
               >
                 Ongoing
@@ -123,13 +122,15 @@ const ProviderOrder = () => {
                 "flex-1 h-8 rounded-lg justify-center items-center",
                 orderStatus === "Completed"
                   ? "bg-primaryBtn"
-                  : "border border-primaryBtn bg-white"
+                  : "border border-primaryBtn bg-white",
               )}
             >
               <Text
                 style={tw.style(
                   "font-LufgaMedium text-base",
-                  orderStatus === "Completed" ? "text-white" : "text-primaryBtn"
+                  orderStatus === "Completed"
+                    ? "text-white"
+                    : "text-primaryBtn",
                 )}
               >
                 Completed

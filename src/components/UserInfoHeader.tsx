@@ -43,7 +43,7 @@ const UserInfoHeader = ({
       <TouchableOpacity
         onPress={profileOnPress}
         activeOpacity={0.8}
-        style={tw`flex-row items-center gap-2`}
+        style={tw`flex-row flex-1 items-center gap-2`}
       >
         <TouchableOpacity
           onPress={profileOnPress}
@@ -57,21 +57,23 @@ const UserInfoHeader = ({
             style={tw`w-12 h-12 rounded-full`}
           />
         </TouchableOpacity>
-        <View>
+        <View style={tw`flex-1`}>
           <Text
             style={[tw`font-LufgaRegular text-base text-black`, greetingStyle]}
           >
             {getDynamicGreeting()}
           </Text>
-          <View style={tw`max-w-44`}>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[tw`font-LufgaMedium text-xl text-black`, userNameStyle]}
-            >
-              {userName}
-            </Text>
-          </View>
+
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={[
+              tw`font-LufgaMedium  flex-shrink text-xl text-black`,
+              userNameStyle,
+            ]}
+          >
+            {userName}
+          </Text>
         </View>
       </TouchableOpacity>
       <View style={tw`flex-row items-center gap-2`}>

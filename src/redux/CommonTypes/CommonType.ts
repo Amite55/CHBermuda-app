@@ -23,3 +23,11 @@ export interface INotification {
   created_at: string;
   updated_at: string;
 }
+
+// ================= staffs type =========
+export interface IStaffs {
+  email: string;
+  location: string;
+  name: string;
+  phone: string;
+}

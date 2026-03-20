@@ -4,10 +4,12 @@ import {
   IconProviderPendingOrder,
   IconProviderRecentOrders,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgProviderBG, ImgServiceImage } from "@/assets/image";
+import { ImgProviderBG, ImgServiceImage } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
+import { useGetHomePageQuery } from "@/src/redux/Api/providers/home";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -16,6 +18,18 @@ import { ScrollView, Text, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 
 const AdminHome = () => {
+  // ============ hooks ==================
+  const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
+    useProfile();
+
+  // ============== api end point ================
+  const { data: providerHomeData, isLoading: isProviderHomeLoading } =
+    useGetHomePageQuery(undefined, {
+      refetchOnMountOrArgChange: true,
+    });
+
+  console.log(providerHomeData, "there is home data");
+
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
@@ -30,14 +44,14 @@ const AdminHome = () => {
           <UserInfoHeader
             containerStyle={tw`px-5`}
             notificationContentStyle={tw`bg-[#FFFFFF33] `}
-            userName="Admin Provider"
-            userImage={ImgProfileImg}
+            userName={profileData?.data?.name}
+            userImage={profileData?.data?.avatar}
             notificationIcon={IconNotificationWhite}
             greetingStyle={tw`text-white `}
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/admin_provider/adminNotification/notificationsAdmin"
+                "/admin_provider/adminNotification/notificationsAdmin",
               );
             }}
             profileOnPress={() => {}}

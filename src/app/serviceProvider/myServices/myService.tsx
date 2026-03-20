@@ -7,6 +7,11 @@ import {
 import { ImgServiceImage } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import {
+  useCreateAccountMutation,
+  useCreateOnboardingLinkMutation,
+  useOnboardingVerificationMutation,
+} from "@/src/redux/Api/stripeSlices";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -16,10 +21,22 @@ import { SvgXml } from "react-native-svg";
 
 const MyService = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [onboardingUrl, setOnboardingUrl] = useState<string | null>(null);
+
+  // ================ api end point =================
+  const [createConnectAccount, { isLoading: isCreatingConnectAccountLoading }] =
+    useCreateAccountMutation();
+  const [createOnboardingLink, { isLoading: isCreatingOnboardingLinkLoading }] =
+    useCreateOnboardingLinkMutation();
+  const [
+    onboardingVerification,
+    { isLoading: isOnboardingVerificationLoading },
+  ] = useOnboardingVerificationMutation();
+
   return (
     <>
       <FlatList
-        data={[1, 2, 3, 4, 5]}
+        data={[1, 2]}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={tw`bg-bgBaseColor px-5 gap-3 pb-3 `}
         style={tw`flex-1 bg-bgBaseColor`}

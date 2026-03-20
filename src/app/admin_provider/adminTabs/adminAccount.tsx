@@ -10,7 +10,7 @@ import {
   IconPrivacyPolicy,
   IconRightTopConnerArrow,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgProviderBG } from "@/assets/image";
+import { ImgProviderBG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import LogoutModal from "@/src/context/LogoutModal";
@@ -66,8 +66,8 @@ const AdminAccount = () => {
           <UserInfoHeader
             containerStyle={tw`px-5 items-center`}
             notificationContentStyle={tw`bg-[#FFFFFF33] `}
-            userName="Provider"
-            userImage={ImgProfileImg}
+            userName={profileData?.data?.name}
+            userImage={profileData?.data?.avatar}
             notificationIcon={IconNotificationWhite}
             greetingStyle={tw`text-white `}
             userNameStyle={tw`text-white `}
@@ -76,7 +76,9 @@ const AdminAccount = () => {
                 "/admin_provider/adminNotification/notificationsAdmin",
               );
             }}
-            profileOnPress={() => {}}
+            profileOnPress={() => {
+              router.push("/auth/editProfile");
+            }}
           />
         </ImageBackground>
         <Text
@@ -91,10 +93,10 @@ const AdminAccount = () => {
             endIconOnPress={() => {
               // router.push("/auth/editProfile");
             }}
-            titleText="Mr. Lopez"
-            subTitleText="example@gmail.com"
-            image={ImgProfileImg}
-            imageStyle={tw`w-20 h-20 rounded-full `}
+            titleText={profileData?.data?.name}
+            subTitleText={profileData?.data?.email}
+            image={profileData?.data?.avatar}
+            imageStyle={tw`w-20 h-20 rounded-full`}
             endIcon={IconEditPen}
             containerStyle={tw`py-2`}
           />

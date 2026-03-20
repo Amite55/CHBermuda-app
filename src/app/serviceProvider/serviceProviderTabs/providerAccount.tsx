@@ -13,7 +13,7 @@ import {
   IconProviderStaffs,
   IconRightTopConnerArrow,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgProviderBG } from "@/assets/image";
+import { ImgProviderBG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import LogoutModal from "@/src/context/LogoutModal";
@@ -21,7 +21,6 @@ import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import { useLogoutMutation } from "@/src/redux/Api/authSlices";
-import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -35,8 +34,7 @@ const ProviderAccount = () => {
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
-  const { data: activePlans, isLoading: isActivePlansLoading } =
-    useGetActivePlansQuery({});
+
   const [singOut, { isLoading: isLogoutLoading }] = useLogoutMutation();
 
   // =============== account logout function ===============
@@ -72,8 +70,8 @@ const ProviderAccount = () => {
           <UserInfoHeader
             containerStyle={tw`px-5 items-center`}
             notificationContentStyle={tw`bg-[#FFFFFF33] `}
-            userName="Provider"
-            userImage={ImgProfileImg}
+            userName={profileData?.data?.name}
+            userImage={profileData?.data?.avatar}
             notificationIcon={IconNotificationWhite}
             greetingStyle={tw`text-white `}
             userNameStyle={tw`text-white `}
@@ -82,7 +80,9 @@ const ProviderAccount = () => {
                 "/serviceProvider/notificationProvider/notifications",
               );
             }}
-            profileOnPress={() => {}}
+            profileOnPress={() => {
+              router.push("/auth/editProfile");
+            }}
           />
         </ImageBackground>
         <Text
@@ -97,9 +97,9 @@ const ProviderAccount = () => {
             endIconOnPress={() => {
               router.push("/auth/editProfile");
             }}
-            titleText="Mr. Lopez"
-            subTitleText="example@gmail.com"
-            image={ImgProfileImg}
+            titleText={profileData?.data?.name}
+            subTitleText={profileData?.data?.email}
+            image={profileData?.data?.avatar}
             imageStyle={tw`w-20 h-20 rounded-full `}
             endIcon={IconEditPen}
             containerStyle={tw`py-2`}

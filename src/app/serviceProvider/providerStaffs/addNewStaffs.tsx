@@ -1,10 +1,15 @@
 import { IconCameraWhite, IconPlus } from "@/assets/icons";
-import { ImgProfileImg } from "@/assets/image";
+import { ImgPlaceholderProfile } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useAddStaffMutation } from "@/src/redux/Api/providers/accounts/staffs";
+import { IStaffs } from "@/src/redux/CommonTypes/CommonType";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { addStaffsSchema } from "@/src/validationSchema/userValidationSchema";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -23,7 +28,85 @@ import { SvgXml } from "react-native-svg";
 
 const AddNewStaffs = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [image, setImage] = useState<any>(null);
+  const toast = useToastHelpers();
 
+  // =============== api end point ===================
+  const [addNewStaffs, { isLoading }] = useAddStaffMutation();
+  // ================ profile fil image update =================
+  const handleProfileImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        // aspect: [4, 4],
+        quality: 1,
+      });
+      if (!result.canceled && result.assets.length > 0) {
+        setImage(result.assets[0].uri);
+        const selectedImage = result.assets[0];
+
+        const filename =
+          selectedImage.fileName ??
+          selectedImage.uri.split("/").pop() ??
+          `image_${Date.now()}.jpg`;
+
+        const extMatch = /\.(\w+)$/.exec(filename);
+        const mime = extMatch ? `image/${extMatch[1]}` : "image/jpeg";
+
+        const imageObj = {
+          uri: selectedImage.uri,
+          name: filename,
+          type: mime,
+        };
+        setImage(imageObj);
+      } else {
+        toast.showError("Uploaded cancelled ", 3000);
+      }
+    } catch (error: any) {
+      console.log(error, "Profile Image not updated ------------>");
+      toast.showError(
+        error.message ||
+          error?.data?.message ||
+          error ||
+          error?.data ||
+          "Profile Image not updated please try again",
+        3000,
+      );
+    }
+  };
+
+  // ======================== submit your new staff =======================
+  const handleAddNewStaffs = async (info: IStaffs) => {
+    if (!image) return toast.showError("Please select image", 3000);
+    const formData = new FormData();
+    formData.append("image", {
+      uri: image.uri,
+      name: image.name,
+      type: image.type,
+    } as any);
+    console.log(formData, "this is form data ");
+    try {
+      const payload = {
+        ...info,
+        formData,
+      };
+      const res = await addNewStaffs(payload).unwrap();
+      console.log(res, "image uploaded success------->");
+      if (res) {
+        router.back();
+        toast.success(
+          res?.message || "Profile Image updated successfully",
+          3000,
+        );
+      }
+    } catch (error: any) {
+      console.log(error, "Your New Staff Not Added");
+      toast.showError(error.message || "Your New Staff Not Added", 3000);
+    }
+  };
+
+  // ==================== keyboard hide ====================
   useEffect(() => {
     const show = Keyboard.addListener("keyboardDidShow", () =>
       setKeyboardVisible(true),
@@ -45,7 +128,7 @@ const AddNewStaffs = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <Formik
           initialValues={{ name: "", email: "", phone: "", location: "" }}
-          onSubmit={(values) => console.log(values)}
+          onSubmit={(values) => handleAddNewStaffs(values)}
           validationSchema={addStaffsSchema}
           enableReinitialize={true}
         >
@@ -68,23 +151,48 @@ const AddNewStaffs = () => {
             >
               <View>
                 <BackTitleButton
-                  title="Add Staff"
+                  title="Add Staff pro"
                   onPress={() => router.back()}
                 />
 
                 {/* ======================= user profile image ======================= */}
-                <View style={tw`relative items-center`}>
-                  <Image
-                    style={tw`  w-24 h-24 rounded-full`}
-                    source={ImgProfileImg}
-                  />
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={tw`absolute right-4/12 -bottom-1 w-10 h-10 items-center justify-center rounded-full bg-primaryBtn`}
-                  >
-                    <SvgXml xml={IconCameraWhite} />
-                  </TouchableOpacity>
-                </View>
+                {image ? (
+                  <View style={tw`relative items-center`}>
+                    <Image
+                      style={tw`w-24 h-24 rounded-full`}
+                      source={{ uri: image?.uri }}
+                      placeholder={ImgPlaceholderProfile}
+                      contentFit="cover"
+                    />
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        handleProfileImage();
+                      }}
+                      style={tw`absolute right-4/12 -bottom-1 w-10 h-10 items-center justify-center rounded-full bg-primaryBtn`}
+                    >
+                      <SvgXml xml={IconCameraWhite} />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View style={tw`relative items-center`}>
+                    <Ionicons
+                      name="image-outline"
+                      style={tw`border border-gray-400 rounded-full p-3`}
+                      size={40}
+                      color="#9CA3AF"
+                    />
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        handleProfileImage();
+                      }}
+                      style={tw`absolute right-5/13 -bottom-1 w-10 h-10 items-center justify-center rounded-full bg-primaryBtn`}
+                    >
+                      <SvgXml xml={IconCameraWhite} />
+                    </TouchableOpacity>
+                  </View>
+                )}
 
                 {/* ---------- input form ---------- */}
                 <View style={tw` mt-4`}>
@@ -187,9 +295,11 @@ const AddNewStaffs = () => {
                 onPress={() => {
                   handleSubmit();
                 }}
+                disabled={isLoading}
+                loading={isLoading}
                 buttonText="Add"
                 leftIcon={IconPlus}
-                buttonContainerStyle={tw`mt-4`}
+                buttonContainerStyle={tw`mt-4b h-10`}
               />
             </ScrollView>
           )}
