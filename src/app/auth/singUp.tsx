@@ -206,14 +206,14 @@ const SingUp = () => {
                     <View style={tw`flex-1 flex-row items-center gap-3`}>
                       <SvgXml xml={IconPassword} />
                       <TextInput
-                        key={showPassword ? "text" : "password"}
+                        key={showConfirmPassword ? "text" : "password"}
                         onChangeText={handleChange("password_confirmation")}
                         onBlur={handleBlur("password_confirmation")}
                         value={values.password_confirmation}
                         placeholder="Confirm Password"
                         placeholderTextColor="#111111"
                         style={tw`flex-1 text-regularText `}
-                        secureTextEntry={!showPassword}
+                        secureTextEntry={!showConfirmPassword}
                       />
                     </View>
                     <TouchableOpacity

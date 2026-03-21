@@ -13,11 +13,15 @@ import {
 import { ImgProviderBG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import DeleteAccountModal from "@/src/context/DeleteAccountModal";
 import LogoutModal from "@/src/context/LogoutModal";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
-import { useLogoutMutation } from "@/src/redux/Api/authSlices";
+import {
+  useDeleteProfileMutation,
+  useLogoutMutation,
+} from "@/src/redux/Api/authSlices";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -26,13 +30,16 @@ import { ScrollView, Text, View } from "react-native";
 
 const AdminAccount = () => {
   const [logoutModal, setLogoutModal] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const toast = useToastHelpers();
 
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
-
+  // =============== api end point ==============================
   const [singOut, { isLoading: isLogoutLoading }] = useLogoutMutation();
+  const [deleteProfile, { isLoading: isDeleteProfileLoading }] =
+    useDeleteProfileMutation();
 
   // =============== account logout function ===============
   const handleLogoutUser = async () => {
@@ -51,6 +58,24 @@ const AdminAccount = () => {
       );
     } finally {
       setLogoutModal(false);
+    }
+  };
+
+  // ============== delete account function ================
+  const handleDeleteConfirm = async (password: string) => {
+    try {
+      const res = await deleteProfile({ password }).unwrap();
+      if (res) {
+        setIsModalVisible(false);
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("role");
+        await AsyncStorage.removeItem("loginInfo");
+        router.replace("/chooseRole");
+      }
+    } catch (error: any) {
+      setIsModalVisible(false);
+      console.log(error, "Your account not deleted ->");
+      toast.showError(error.message || "Your account not deleted", 3000);
     }
   };
   return (
@@ -145,9 +170,9 @@ const AdminAccount = () => {
             endIcon={IconRightTopConnerArrow}
           />
           <MenuCard
-            // onPress={() => {
-
-            // }}
+            onPress={() => {
+              setIsModalVisible(true);
+            }}
             titleText="Delete account"
             subTitleText="Your account will be permanently deleted from this application. "
             subTitleStyle={tw`text-xs`}
@@ -179,6 +204,15 @@ const AdminAccount = () => {
         onPress={() => {
           handleLogoutUser();
         }}
+      />
+
+      {/* ============================ delete  account  modal =========================== */}
+      <DeleteAccountModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={handleDeleteConfirm}
+        loading={isDeleteProfileLoading}
+        disabled={isDeleteProfileLoading}
       />
     </View>
   );

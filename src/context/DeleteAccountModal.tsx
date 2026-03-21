@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Keyboard,
   KeyboardAvoidingView,
@@ -17,12 +18,16 @@ interface Props {
   isVisible: boolean;
   onClose: () => void;
   onConfirm: (password: string) => void;
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 export default function DeleteAccountModal({
   isVisible,
   onClose,
   onConfirm,
+  loading,
+  disabled,
 }: Props) {
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -141,9 +146,13 @@ export default function DeleteAccountModal({
                       !password.trim() && styles.deleteBtnDisabled,
                     ]}
                     activeOpacity={0.8}
-                    disabled={!password.trim()}
+                    disabled={!password.trim() || disabled || loading}
                   >
-                    <Text style={styles.deleteBtnText}>Delete</Text>
+                    {loading ? (
+                      <ActivityIndicator size={"small"} color="#fff" />
+                    ) : (
+                      <Text style={styles.deleteBtnText}>Delete</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </Animated.View>

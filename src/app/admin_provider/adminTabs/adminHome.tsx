@@ -43,7 +43,7 @@ const AdminHome = () => {
           {/* ------------------- user header part ---------------- */}
           <UserInfoHeader
             containerStyle={tw`px-5`}
-            notificationContentStyle={tw`bg-[#FFFFFF33] `}
+            notificationContentStyle={tw`bg-[#FFFFFF33]`}
             userName={profileData?.data?.name}
             userImage={profileData?.data?.avatar}
             notificationIcon={IconNotificationWhite}

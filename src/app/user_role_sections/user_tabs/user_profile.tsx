@@ -21,7 +21,10 @@ import LogoutModal from "@/src/context/LogoutModal";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
-import { useLogoutMutation } from "@/src/redux/Api/authSlices";
+import {
+  useDeleteProfileMutation,
+  useLogoutMutation,
+} from "@/src/redux/Api/authSlices";
 import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ImageBackground } from "expo-image";
@@ -37,15 +40,29 @@ const User_Profile = () => {
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  // ============== api end point ============================
   const { data: activePlans, isLoading: isActivePlansLoading } =
     useGetActivePlansQuery({});
   const [singOut, { isLoading: isLogoutLoading }] = useLogoutMutation();
+  const [deleteProfile, { isLoading: isDeleteProfileLoading }] =
+    useDeleteProfileMutation();
 
-  // =============== account delete function ===============
-
-  const handleDeleteConfirm = (password: string) => {
-    console.log("Delete with password:", password);
-    setIsModalVisible(false);
+  // ============== delete account function ================
+  const handleDeleteConfirm = async (password: string) => {
+    try {
+      const res = await deleteProfile({ password }).unwrap();
+      if (res) {
+        setIsModalVisible(false);
+        await AsyncStorage.removeItem("token");
+        await AsyncStorage.removeItem("role");
+        await AsyncStorage.removeItem("loginInfo");
+        router.replace("/chooseRole");
+      }
+    } catch (error: any) {
+      setIsModalVisible(false);
+      console.log(error, "Your account not deleted ->");
+      toast.showError(error.message || "Your account not deleted", 3000);
+    }
   };
 
   // =============== account logout function ===============
@@ -82,9 +99,6 @@ const User_Profile = () => {
             containerStyle={tw`px-5`}
             userName={profileData?.data?.name}
             userImage={profileData?.data?.avatar}
-            cartOnPress={() => {
-              router.push("/user_role_sections/cart");
-            }}
             notificationOnPress={() => {
               router.push(
                 "/user_role_sections/notificationsUser/notifications",
@@ -237,6 +251,8 @@ const User_Profile = () => {
         isVisible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onConfirm={handleDeleteConfirm}
+        disabled={isDeleteProfileLoading}
+        loading={isDeleteProfileLoading}
       />
     </>
   );
