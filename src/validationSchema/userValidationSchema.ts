@@ -17,3 +17,11 @@ export const addStaffsSchema = Yup.object().shape({
   phone: Yup.string().required("Phone number is required"),
   location: Yup.string().required("Location is required"),
 });
+
+// ==================== Validation Schema ====================
+export const addPackageSchema = Yup.object().shape({
+  title: Yup.string().required("Package title is required"),
+  description: Yup.string().required("Package about is required"),
+  price: Yup.string().required("Price is required"),
+  included_services: Yup.string().required("Included services is required"),
+});

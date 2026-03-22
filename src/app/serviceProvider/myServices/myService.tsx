@@ -5,13 +5,9 @@ import {
   IconPlus,
 } from "@/assets/icons";
 import { ImgServiceImage } from "@/assets/image";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
-import {
-  useCreateAccountMutation,
-  useCreateOnboardingLinkMutation,
-  useOnboardingVerificationMutation,
-} from "@/src/redux/Api/stripeSlices";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -21,17 +17,9 @@ import { SvgXml } from "react-native-svg";
 
 const MyService = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [onboardingUrl, setOnboardingUrl] = useState<string | null>(null);
 
-  // ================ api end point =================
-  const [createConnectAccount, { isLoading: isCreatingConnectAccountLoading }] =
-    useCreateAccountMutation();
-  const [createOnboardingLink, { isLoading: isCreatingOnboardingLinkLoading }] =
-    useCreateOnboardingLinkMutation();
-  const [
-    onboardingVerification,
-    { isLoading: isOnboardingVerificationLoading },
-  ] = useOnboardingVerificationMutation();
+  // ============ hooks  ===========
+  const { profileData, isProfileLoading } = useProfile();
 
   return (
     <>
@@ -45,25 +33,41 @@ const MyService = () => {
         ListHeaderComponent={() => (
           <View>
             <BackTitleButton
-              title="My services"
+              title="My services pro"
               onPress={() => router.back()}
             />
             <View style={tw`flex-row items-center justify-between mt-3`}>
               <Text style={tw`font-LufgaMedium text-lg text-black`}>
                 5 packages
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  router.push("/serviceProvider/myServices/addNewService");
-                }}
-                activeOpacity={0.7}
-                style={tw` bg-primaryBtn flex-row items-center justify-center gap-1 rounded-lg py-2 px-3`}
-              >
-                <Text style={tw`font-LufgaMedium text-base text-white`}>
-                  Add
-                </Text>
-                <SvgXml xml={IconPlus} />
-              </TouchableOpacity>
+              {profileData?.data?.stripe_account_id === null ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push(
+                      "/serviceProvider/myServices/createAccountWebview",
+                    );
+                  }}
+                  activeOpacity={0.7}
+                  style={tw` bg-primaryBtn  items-center justify-center rounded-lg py-2 px-3`}
+                >
+                  <Text style={tw`font-LufgaMedium text-base text-white`}>
+                    Create Account
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/serviceProvider/myServices/addNewService");
+                  }}
+                  activeOpacity={0.7}
+                  style={tw` bg-primaryBtn flex-row items-center justify-center gap-1 rounded-lg py-2 px-3`}
+                >
+                  <Text style={tw`font-LufgaMedium text-base text-white`}>
+                    Add
+                  </Text>
+                  <SvgXml xml={IconPlus} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}

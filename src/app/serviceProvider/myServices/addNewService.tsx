@@ -6,7 +6,9 @@ import {
 } from "@/assets/icons";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useAddPackageMutation } from "@/src/redux/Api/providers/accounts/myServices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import { addPackageSchema } from "@/src/validationSchema/userValidationSchema";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { router } from "expo-router";
 import { Formik } from "formik";
@@ -23,85 +25,86 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SvgXml } from "react-native-svg";
-import * as Yup from "yup";
 
 const AddNewService = () => {
-  const [servicesText, setServicesText] = React.useState();
-  const [serviceIncludeArry, setServiceIncludeArry] = React.useState([]);
-
+  const [servicesText, setServicesText] = React.useState("");
+  const [serviceIncludeArry, setServiceIncludeArry] = React.useState<string[]>(
+    [],
+  );
   const [date, setDate] = React.useState(new Date(1598051730000));
-  const [mode, setMode] = React.useState("date");
+  const [mode, setMode] = React.useState<"date" | "time">("date");
   const [show, setShow] = React.useState(false);
-  console.log(date, "");
 
-  const onChange = (event, selectedDate) => {
-    const selelctedEdnTime = selectedDate;
+  // ================= api end point ==================
+  const [addPackage, { isLoading: isAddPackageLoading }] =
+    useAddPackageMutation();
+
+  const onChange = (event: any, selectedDate?: Date) => {
     setShow(false);
-    setDate(selelctedEdnTime);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
   };
 
-  const showMode = (currentMode) => {
+  const showMode = (currentMode: any) => {
     setShow(true);
     setMode(currentMode);
   };
-
-  // ==================== Validation Schema ====================
-  const LoginSchema = Yup.object().shape({
-    title: Yup.string().required("Package title is required"),
-    about: Yup.string().required("Package about is required"),
-    price: Yup.string().required("Price is required"),
-  });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS/Android alada behavior
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        // behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ScrollView
-          style={tw`flex-1 bg-bgBaseColor`}
-          contentContainerStyle={tw`px-5 pb-10`}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
+        {/* -0----------------- input from here ----------------- */}
+        <Formik
+          initialValues={{
+            title: "",
+            description: "",
+            included_services: "",
+            price: "",
+          }}
+          onSubmit={(values) => console.log(values)}
+          validationSchema={addPackageSchema}
         >
-          <BackTitleButton
-            title="Add new package"
-            onPress={() => router.back()}
-          />
-          <View
-            style={tw`justify-center items-center gap-2 bg-white p-4 rounded-2xl mt-3`}
-          >
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={tw`flex-row items-center gap-2 p-3 bg-white rounded-xl shadow`}
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            errors,
+            touched,
+            values,
+          }) => (
+            <ScrollView
+              style={tw`flex-1 bg-bgBaseColor`}
+              contentContainerStyle={tw`px-5 pb-0 flex-grow justify-between`}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
             >
-              <SvgXml xml={IconImageUpload} />
-              <Text style={tw`font-LufgaMedium text-lg text-black`}>
-                Upload file
-              </Text>
-            </TouchableOpacity>
-            <Text style={tw`font-LufgaRegular text-subText text-sm`}>
-              Upload coder photo for this package
-            </Text>
-          </View>
+              <View>
+                <BackTitleButton
+                  title="Add new package"
+                  onPress={() => router.back()}
+                />
+                <View
+                  style={tw`justify-center items-center gap-2 bg-white p-4 rounded-2xl mt-3`}
+                >
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={tw`flex-row items-center gap-2 p-3 bg-white rounded-xl shadow`}
+                  >
+                    <SvgXml xml={IconImageUpload} />
+                    <Text style={tw`font-LufgaMedium text-lg text-black`}>
+                      Upload file
+                    </Text>
+                  </TouchableOpacity>
+                  <Text style={tw`font-LufgaRegular text-subText text-sm`}>
+                    Upload coder photo for this package
+                  </Text>
+                </View>
 
-          {/* -0----------------- input from here ----------------- */}
-          <Formik
-            initialValues={{ title: "", about: "", price: "" }}
-            onSubmit={(values) => console.log(values)}
-            validationSchema={LoginSchema}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              errors,
-              touched,
-              values,
-            }) => (
-              <View style={tw`w-full  mt-5`}>
                 {/* ------------------ package title ---------------- */}
                 <Text style={tw`font-LufgaMedium text-base text-black`}>
                   Package title
@@ -131,17 +134,17 @@ const AddNewService = () => {
                   style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3`}
                 >
                   <TextInput
-                    onChangeText={handleChange("about")}
-                    onBlur={handleBlur("about")}
-                    value={values.about}
+                    onChangeText={handleChange("description")}
+                    onBlur={handleBlur("description")}
+                    value={values.description}
                     placeholder="Write something about this package"
                     placeholderTextColor="#535353"
                     style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
                   />
                 </View>
-                {errors.about && touched.about && (
+                {errors.description && touched.description && (
                   <Text style={tw`text-red-500 text-xs mt-1`}>
-                    {errors.about}
+                    {errors.description}
                   </Text>
                 )}
                 {/* ------------------ included Service  ---------------- */}
@@ -153,6 +156,9 @@ const AddNewService = () => {
                 >
                   <TextInput
                     multiline
+                    onChangeText={handleChange("included_services")}
+                    onBlur={handleBlur("included_services")}
+                    value={values.included_services}
                     onChange={(text) => setServicesText(text.nativeEvent.text)}
                     placeholder="Type here..."
                     placeholderTextColor="#535353"
@@ -172,6 +178,11 @@ const AddNewService = () => {
                     <SvgXml xml={IconPlushPrimaryColor} />
                   </TouchableOpacity>
                 </View>
+                {errors.included_services && touched.included_services && (
+                  <Text style={tw`text-red-500 text-xs mt-1`}>
+                    {errors.included_services}
+                  </Text>
+                )}
 
                 {serviceIncludeArry.length > 0 && (
                   <View
@@ -195,7 +206,7 @@ const AddNewService = () => {
                     ))}
                   </View>
                 )}
-                {/*     ------------------ included Service end hare  ---------------- */}
+                {/* ------------------ included Service end hare  ---------------- */}
 
                 {/* ------------------ price ---------------- */}
                 <Text style={tw`font-LufgaMedium text-base text-black pt-3`}>
@@ -274,20 +285,19 @@ const AddNewService = () => {
                     onChange={onChange}
                   />
                 )}
-
-                {/* --------------------- bottom button ---------------- */}
-
-                <PrimaryButton
-                  // onPress={handleSubmit}
-                  buttonText="Add"
-                  buttonTextStyle={tw`font-LufgaMedium text-base`}
-                  leftIcon={IconPlus}
-                  buttonContainerStyle={tw`mt-8`}
-                />
               </View>
-            )}
-          </Formik>
-        </ScrollView>
+              {/* --------------------- bottom button ---------------- */}
+
+              <PrimaryButton
+                onPress={handleSubmit}
+                buttonText="Add"
+                buttonTextStyle={tw`font-LufgaMedium text-base`}
+                leftIcon={IconPlus}
+                buttonContainerStyle={tw`mt-8`}
+              />
+            </ScrollView>
+          )}
+        </Formik>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

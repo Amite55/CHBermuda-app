@@ -11,6 +11,7 @@ const _layout = () => {
       <Stack.Screen name="myService" />
       <Stack.Screen name="addNewService" />
       <Stack.Screen name="editMyService" />
+      <Stack.Screen name="createAccountWebview" />
     </Stack>
   );
 };

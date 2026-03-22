@@ -4,18 +4,31 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import { useAuth } from "../context/AuthContext";
 import tw from "../lib/tailwind";
 import { BaseColor, PrimaryColor } from "../utils/util";
 
 export default function Index() {
-  const decideNavigation = async () => {
-    try {
-      setTimeout(() => {
-        router.replace("/chooseRole");
-        // router.replace("/taskCreator/creatorHomTabs/dashboard");
-      }, 3000);
-    } catch (error) {
-      console.log("Error in main layout:", error);
+  const { userInfo, isLoading } = useAuth();
+  const decideNavigation = () => {
+    if (isLoading) return;
+    // user wise navigation ======================
+    if (userInfo) {
+      switch (userInfo.role) {
+        case "USER":
+          router.replace("/user_role_sections/user_tabs/user_home");
+          break;
+        case "PROVIDER":
+          router.replace("/serviceProvider/serviceProviderTabs/providerHome");
+          break;
+        case "ADMIN":
+          router.replace("/admin_provider/adminTabs/adminHome");
+          break;
+        default:
+          router.replace("/chooseRole");
+      }
+    } else {
+      router.replace("/chooseRole");
     }
   };
 
@@ -30,8 +43,16 @@ export default function Index() {
       });
     };
     loadFont();
-    decideNavigation();
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        decideNavigation();
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, userInfo]);
 
   return (
     <View

@@ -8,6 +8,7 @@ import {
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
+import { useAuth } from "@/src/context/AuthContext";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
@@ -39,6 +40,7 @@ const SingIn = () => {
   const [savedPassword, setSavedPassword] = React.useState("");
   const toast = useToastHelpers();
   const role = useRoleHooks();
+  const { saveUser } = useAuth();
 
   // =============== api end point =================
   const [singInInfo, { isLoading: isLoginLoading }] = useLoginMutation();
@@ -77,6 +79,17 @@ const SingIn = () => {
           role: role,
         };
         const res = await singInInfo(payload).unwrap();
+        await saveUser({
+          email: res?.data?.user?.email,
+          id: res?.data?.user?.id,
+          name: res?.data?.user?.name,
+          otp: res?.data?.user?.otp,
+          phone: res?.data?.user?.phone,
+          provider_type: res?.data?.user?.provider_type,
+          role: res?.data?.user?.role,
+          status: res?.data?.user?.status,
+          token: res?.data?.access_token,
+        });
         // ------------- login info save async storage -------------
         if (isChecked) {
           await AsyncStorage.setItem(
