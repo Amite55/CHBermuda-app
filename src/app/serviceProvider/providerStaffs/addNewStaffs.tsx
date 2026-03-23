@@ -1,5 +1,6 @@
 import { IconCameraWhite, IconPlus } from "@/assets/icons";
 import { ImgPlaceholderProfile } from "@/assets/image";
+import { useImagePicker } from "@/src/hooks/useImagePicker";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
@@ -9,7 +10,6 @@ import PrimaryButton from "@/src/utils/PrimaryButton";
 import { addStaffsSchema } from "@/src/validationSchema/userValidationSchema";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -28,51 +28,20 @@ import { SvgXml } from "react-native-svg";
 
 const AddNewStaffs = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [image, setImage] = useState<any>(null);
+  // const [image, setImage] = useState<any>(null);
+
+  // =============== hooks ===================
+  const { image, previewUri, loading, error, pickImage } = useImagePicker();
   const toast = useToastHelpers();
 
   // =============== api end point ===================
   const [addNewStaffs, { isLoading }] = useAddStaffMutation();
   // ================ profile fil image update =================
   const handleProfileImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        // aspect: [4, 4],
-        quality: 1,
-      });
-      if (!result.canceled && result.assets.length > 0) {
-        setImage(result.assets[0].uri);
-        const selectedImage = result.assets[0];
-
-        const filename =
-          selectedImage.fileName ??
-          selectedImage.uri.split("/").pop() ??
-          `image_${Date.now()}.jpg`;
-
-        const extMatch = /\.(\w+)$/.exec(filename);
-        const mime = extMatch ? `image/${extMatch[1]}` : "image/jpeg";
-
-        const imageObj = {
-          uri: selectedImage.uri,
-          name: filename,
-          type: mime,
-        };
-        setImage(imageObj);
-      } else {
-        toast.showError("Uploaded cancelled ", 3000);
-      }
-    } catch (error: any) {
-      console.log(error, "Profile Image not updated ------------>");
-      toast.showError(
-        error.message ||
-          error?.data?.message ||
-          error ||
-          error?.data ||
-          "Profile Image not updated please try again",
-        3000,
-      );
+    const picked = await pickImage();
+    if (!picked) {
+      toast.showError("Upload cancelled", 3000);
+      return;
     }
   };
 
@@ -151,7 +120,7 @@ const AddNewStaffs = () => {
             >
               <View>
                 <BackTitleButton
-                  title="Add Staff pro"
+                  title="Add Staff"
                   onPress={() => router.back()}
                 />
 

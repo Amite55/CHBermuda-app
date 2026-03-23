@@ -3,8 +3,8 @@ import { api } from "@/src/redux/BaseApi";
 export const userHomeSlices = api.injectEndpoints({
   endpoints: (builder) => ({
     getMyPackage: builder.query({
-      query: () => ({
-        url: `/my-services`,
+      query: ({ page, per_page }) => ({
+        url: `/my-services?per_page=${per_page}&page=${page}`,
         method: "GET",
       }),
       providesTags: ["Package", "Service", "Category", "Account"],
@@ -14,6 +14,9 @@ export const userHomeSlices = api.injectEndpoints({
         url: "/packages",
         method: "POST",
         body: data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
       invalidatesTags: ["Package", "Service", "Account"],
     }),
@@ -68,6 +71,7 @@ export const userHomeSlices = api.injectEndpoints({
 export const {
   useAddPackageMutation,
   useGetMyPackageQuery,
+  useLazyGetMyPackageQuery,
   useGetPackageDetailsQuery,
   useUpdatePackageMutation,
   useDeletePackageMutation,

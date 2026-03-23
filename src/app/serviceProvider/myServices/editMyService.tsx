@@ -4,13 +4,17 @@ import {
   IconPlushPrimaryColor,
   IconReUpload,
 } from "@/assets/icons";
-import { ImgServiceImage } from "@/assets/image";
+import { ImgPlaceholderService } from "@/assets/image";
+import { useImagePicker } from "@/src/hooks/useImagePicker";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useGetPackageDetailsQuery } from "@/src/redux/Api/providers/accounts/myServices";
+import MyServiceSkeleton from "@/src/Skeletion/MyServiceSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { editPackageSchema } from "@/src/validationSchema/userValidationSchema";
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Formik } from "formik";
 import React from "react";
 import {
@@ -25,88 +29,112 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { SvgXml } from "react-native-svg";
-import * as Yup from "yup";
 
 const EditMyService = () => {
-  const [servicesText, setServicesText] = React.useState();
-  const [serviceIncludeArry, setServiceIncludeArry] = React.useState([]);
+  const [servicesText, setServicesText] = React.useState("");
+  const [serviceIncludeArry, setServiceIncludeArry] = React.useState<any[]>([]);
+  const { id } = useLocalSearchParams();
 
-  const [date, setDate] = React.useState(new Date(1598051730000));
-  const [mode, setMode] = React.useState("date");
-  const [show, setShow] = React.useState(false);
-  console.log(date, "");
-
-  const onChange = (event, selectedDate) => {
-    const selelctedEdnTime = selectedDate;
-    setShow(false);
-    setDate(selelctedEdnTime);
-  };
-
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-
-  // ==================== Validation Schema ====================
-  const LoginSchema = Yup.object().shape({
-    title: Yup.string().required("Package title is required"),
-    about: Yup.string().required("Package about is required"),
-    price: Yup.string().required("Price is required"),
+  // hooks                ====
+  const toast = useToastHelpers();
+  const { image, loading, pickImage, previewUri } = useImagePicker({
+    aspect: [16, 9],
   });
 
+  // =============== api end point ===============
+  const { data: packageDetails, isLoading: isPackageDetailsLoading } =
+    useGetPackageDetailsQuery(id);
+
+  // =============== get image from camera ================
+  const handleProfileImage = async () => {
+    const picked = await pickImage();
+    if (!picked) {
+      toast.showError("Upload cancelled", 3000);
+      return;
+    }
+  };
+
+  const handleUpdateService = (value: any) => {
+    try {
+      console.log(value, "this is edit value-------->");
+    } catch (error: any) {
+      console.log(error, "Your service not updated.");
+    }
+  };
+
+  // ============== here is included services ===============
+  React.useEffect(() => {
+    if (packageDetails?.data?.included_services) {
+      setServiceIncludeArry(packageDetails.data.included_services);
+    }
+  }, [packageDetails]);
+
+  // -=============== here is loading state ===============-
+  if (isPackageDetailsLoading) {
+    return <MyServiceSkeleton />;
+  }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"} // iOS/Android alada behavior
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-        // behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ScrollView
-          style={tw`flex-1 bg-bgBaseColor`}
-          contentContainerStyle={tw`px-5 pb-10`}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
+        <Formik
+          initialValues={{
+            title: packageDetails?.data?.title || "",
+            description: packageDetails?.data?.description || "",
+            price: packageDetails?.data?.price || "",
+            duration: packageDetails?.data?.duration || "",
+            included_services: "",
+          }}
+          onSubmit={(values) => console.log(values)}
+          validationSchema={editPackageSchema}
         >
-          <BackTitleButton title="Edit package" onPress={() => router.back()} />
-          {/* --------------- service image  --------------- */}
-          <View style={tw`relative`}>
-            <Image
-              style={tw`w-full h-40 rounded-3xl mt-2`}
-              contentFit="cover"
-              source={ImgServiceImage}
-            />
-
-            <View
-              style={tw`absolute top-4 right-3 flex-row items-center gap-2`}
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            errors,
+            touched,
+            values,
+          }) => (
+            <ScrollView
+              style={tw`flex-1 bg-bgBaseColor`}
+              contentContainerStyle={tw`px-5 justify-between flex-grow`}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
             >
-              <TouchableOpacity
-                onPress={() => {}}
-                activeOpacity={0.6}
-                style={tw`w-10 h-10 rounded-lg bg-gray-400 border border-white justify-center items-center shadow`}
-              >
-                <SvgXml xml={IconReUpload} />
-              </TouchableOpacity>
-            </View>
-          </View>
+              <View style={tw`w-full `}>
+                <BackTitleButton
+                  title="Edit package"
+                  onPress={() => router.back()}
+                />
+                {/* --------------- service image  --------------- */}
+                <View style={tw`relative`}>
+                  <Image
+                    style={tw`w-full h-40 rounded-3xl mt-2`}
+                    contentFit="cover"
+                    source={image ? previewUri : packageDetails?.data?.icon}
+                    placeholder={ImgPlaceholderService}
+                  />
 
-          {/* -0----------------- input from here ----------------- */}
-          <Formik
-            initialValues={{ title: "", about: "", price: "" }}
-            onSubmit={(values) => console.log(values)}
-            validationSchema={LoginSchema}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              errors,
-              touched,
-              values,
-            }) => (
-              <View style={tw`w-full  mt-5`}>
+                  <View
+                    style={tw`absolute top-4 right-3 flex-row items-center gap-2`}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleProfileImage();
+                      }}
+                      activeOpacity={0.6}
+                      style={tw`w-10 h-10 rounded-lg bg-gray-400 border border-white justify-center items-center shadow`}
+                    >
+                      <SvgXml xml={IconReUpload} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
                 {/* ------------------ package title ---------------- */}
-                <Text style={tw`font-LufgaMedium text-base text-black`}>
+                <Text style={tw`font-LufgaMedium text-base text-black mt-2`}>
                   Package title
                 </Text>
                 <View
@@ -123,28 +151,30 @@ const EditMyService = () => {
                 </View>
                 {errors.title && touched.title && (
                   <Text style={tw`text-red-500 text-xs mt-1`}>
-                    {errors.title}
+                    {errors.title as any}
                   </Text>
                 )}
                 {/* ------------------ about ---------------- */}
                 <Text style={tw`font-LufgaMedium text-base text-black pt-3`}>
-                  About
+                  Description
                 </Text>
                 <View
-                  style={tw`w-full h-12  px-4 rounded-full border border-borderColor gap-3`}
+                  style={tw`w-full h-24  px-4 rounded-xl border border-borderColor gap-3`}
                 >
                   <TextInput
-                    onChangeText={handleChange("about")}
-                    onBlur={handleBlur("about")}
-                    value={values.about}
+                    onChangeText={handleChange("description")}
+                    onBlur={handleBlur("description")}
+                    value={values.description}
                     placeholder="Write something about this package"
                     placeholderTextColor="#535353"
                     style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
+                    multiline
+                    numberOfLines={10}
                   />
                 </View>
-                {errors.about && touched.about && (
+                {errors.description && touched.description && (
                   <Text style={tw`text-red-500 text-xs mt-1`}>
-                    {errors.about}
+                    {errors.description as any}
                   </Text>
                 )}
                 {/* ------------------ included Service  ---------------- */}
@@ -155,8 +185,12 @@ const EditMyService = () => {
                   style={tw`w-full h-12 flex-row justify-center   rounded-full  gap-3`}
                 >
                   <TextInput
-                    multiline
-                    onChange={(text) => setServicesText(text.nativeEvent.text)}
+                    onChangeText={(text) => {
+                      setServicesText(text);
+                      handleChange("included_services")(text);
+                    }}
+                    onBlur={handleBlur("included_services")}
+                    value={servicesText}
                     placeholder="Type here..."
                     placeholderTextColor="#535353"
                     style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
@@ -165,39 +199,55 @@ const EditMyService = () => {
                     activeOpacity={0.7}
                     disabled={!servicesText}
                     onPress={() => {
+                      if (!servicesText.trim()) return;
                       setServiceIncludeArry([
                         ...serviceIncludeArry,
-                        servicesText,
+                        servicesText.trim(),
                       ]);
+                      setServicesText("");
+                      handleChange("included_services")("");
                     }}
-                    style={tw`border border-subText bg-white bg-opacity-35 w-12 h-12 items-center justify-center rounded-full`}
+                    style={tw`border border-subText bg-white bg-opacity-35 w-10 h-10l items-center justify-center rounded-full`}
                   >
                     <SvgXml xml={IconPlushPrimaryColor} />
                   </TouchableOpacity>
                 </View>
-
                 {serviceIncludeArry.length > 0 && (
                   <View
                     style={tw`gap-4 my-4 border border-subText rounded-2xl p-3`}
                   >
                     {serviceIncludeArry.map((item, index) => (
-                      <View key={index} style={tw`flex-row justify-between`}>
-                        <View style={tw`flex-row items-center gap-1`}>
-                          <View style={tw`w-1 h-1 bg-black rounded-full`} />
+                      <View
+                        key={index}
+                        style={tw`flex-row justify-between items-start gap-2`}
+                      >
+                        <View style={tw`flex-row items-start gap-2 flex-1`}>
+                          <View
+                            style={tw`w-1.5 h-1.5 bg-black rounded-full mt-2`}
+                          />
                           <Text
-                            numberOfLines={2}
-                            style={tw`flex-shrink  font-LufgaRegular text-base text-subText`}
+                            style={tw`flex-1 font-LufgaRegular text-base text-subText`}
                           >
                             {item}
                           </Text>
                         </View>
-                        <TouchableOpacity>
+
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          style={tw`mt-1`}
+                          onPress={() => {
+                            setServiceIncludeArry(
+                              serviceIncludeArry.filter((_, i) => i !== index),
+                            );
+                          }}
+                        >
                           <SvgXml xml={IconDeleteRed} />
                         </TouchableOpacity>
                       </View>
                     ))}
                   </View>
                 )}
+
                 {/*     ------------------ included Service end hare  ---------------- */}
 
                 {/* ------------------ price ---------------- */}
@@ -223,74 +273,47 @@ const EditMyService = () => {
                 </View>
                 {errors.price && touched.price && (
                   <Text style={tw`text-red-500 text-xs mt-1`}>
-                    {errors.price}
+                    {errors.price as any}
                   </Text>
                 )}
-
-                {/* --------------- Time Slot start hare --------------- */}
-                {/* start time */}
-                <Text style={tw`font-LufgaMedium text-base text-black pt-10`}>
-                  Start Time
+                {/* ------------------ Duration ---------------- */}
+                <Text style={tw`font-LufgaMedium text-base text-black pt-3`}>
+                  Duration
                 </Text>
-                <View style={tw`flex-row items-center justify-between   px-3`}>
-                  <Text style={tw`font-LufgaMedium text-regularText text-base`}>
-                    {date
-                      ? date.toLocaleTimeString([], { hour12: true })
-                      : "12:00 PM"}
-                  </Text>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      showMode("time");
-                    }}
-                    style={tw`border border-subText bg-white bg-opacity-35 w-12 h-12 items-center justify-center rounded-full`}
-                  >
-                    <SvgXml xml={IconPlushPrimaryColor} />
-                  </TouchableOpacity>
-                </View>
-                {/* end time */}
-                <Text style={tw`font-LufgaMedium text-base text-black pt-2`}>
-                  End Time
-                </Text>
-                <View style={tw`flex-row items-center justify-between   px-3`}>
-                  <Text style={tw`font-LufgaMedium text-regularText text-base`}>
-                    {date
-                      ? date.toLocaleTimeString([], { hour12: true })
-                      : "12:00 AM"}
-                  </Text>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      showMode("time");
-                    }}
-                    style={tw`border border-subText bg-white bg-opacity-35 w-12 h-12 items-center justify-center rounded-full`}
-                  >
-                    <SvgXml xml={IconPlushPrimaryColor} />
-                  </TouchableOpacity>
-                </View>
-
-                {show && (
-                  <DateTimePicker
-                    testID="dateTimePicker"
-                    value={date}
-                    mode={mode}
-                    onChange={onChange}
+                <View
+                  style={tw`w-full h-12 flex-row items-center px-4 rounded-full border border-borderColor gap-3`}
+                >
+                  <TextInput
+                    onChangeText={handleChange("duration")}
+                    onBlur={handleBlur("duration")}
+                    value={values.duration}
+                    placeholder="00"
+                    placeholderTextColor="#535353"
+                    style={tw`flex-1 text-regularText font-LufgaRegular text-base`}
                   />
+                  <Text
+                    style={tw`text-regularText font-LufgaRegular text-base`}
+                  >
+                    / hour
+                  </Text>
+                </View>
+                {errors.duration && touched.duration && (
+                  <Text style={tw`text-red-500 text-xs mt-1`}>
+                    {errors.duration as any}
+                  </Text>
                 )}
-
-                {/* --------------------- bottom button ---------------- */}
-
-                <PrimaryButton
-                  // onPress={handleSubmit}
-                  buttonText="Add"
-                  buttonTextStyle={tw`font-LufgaMedium text-base`}
-                  leftIcon={IconPlus}
-                  buttonContainerStyle={tw`mt-8`}
-                />
               </View>
-            )}
-          </Formik>
-        </ScrollView>
+              {/* --------------------- bottom button ---------------- */}
+              <PrimaryButton
+                onPress={handleSubmit}
+                buttonText="Update"
+                buttonTextStyle={tw`font-LufgaMedium text-base`}
+                leftIcon={IconPlus}
+                buttonContainerStyle={tw`mt-8`}
+              />
+            </ScrollView>
+          )}
+        </Formik>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
