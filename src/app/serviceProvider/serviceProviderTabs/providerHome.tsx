@@ -145,16 +145,22 @@ const ProviderHome = () => {
         onEndReachedThreshold={0.5}
         renderItem={({ item }) => {
           return (
-            <View style={tw`justify-center items-center`}>
-              <View style={tw` `}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/serviceProvider/providerStaffs/editStaffProfile",
+                  params: { id: item?.id },
+                })
+              }
+              activeOpacity={0.6}
+              style={tw`justify-center items-center`}
+            >
+              <View style={tw``}>
                 <Image
                   source={item?.image}
                   style={tw`w-16 h-16 rounded-full `}
                   contentFit="cover"
                   placeholder={ImgPlaceholderProfile}
-                />
-                <View
-                  style={tw`absolute top-1 right-1 w-3 h-3 bg-green-600 rounded-full`}
                 />
               </View>
               <Text style={tw`font-LufgaMedium text-sm text-black pt-2`}>
@@ -162,7 +168,7 @@ const ProviderHome = () => {
                   ? item?.name?.slice(0, 10) + "..."
                   : item?.name}
               </Text>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

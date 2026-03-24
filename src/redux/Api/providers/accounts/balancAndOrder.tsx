@@ -19,5 +19,8 @@ export const userHomeSlices = api.injectEndpoints({
   }),
 });
 
-export const { useGetOrderProvidedQuery, useGetRecentTransactionsQuery } =
-  userHomeSlices;
+export const {
+  useGetOrderProvidedQuery,
+  useLazyGetOrderProvidedQuery,
+  useGetRecentTransactionsQuery,
+} = userHomeSlices;

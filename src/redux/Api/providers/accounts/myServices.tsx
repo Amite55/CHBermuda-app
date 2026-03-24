@@ -21,11 +21,16 @@ export const userHomeSlices = api.injectEndpoints({
       invalidatesTags: ["Package", "Service", "Account"],
     }),
     updatePackage: builder.mutation({
-      query: (data) => ({
-        url: `/packages/${data.id}`,
-        method: "PUT",
-        body: data,
-      }),
+      query: ({ id, data }) => {
+        return {
+          url: `/packages/${id}`,
+          method: "POST",
+          body: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+      },
       invalidatesTags: ["Package", "Service", "Account"],
     }),
     getPackageDetails: builder.query({

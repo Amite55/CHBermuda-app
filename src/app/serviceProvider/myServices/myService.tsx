@@ -28,7 +28,7 @@ const MyService = () => {
   const [selectedId, setSelectedId] = useState(null);
 
   // ============ hooks  ===========
-  const { profileData, isProfileLoading } = useProfile();
+  const { profileData, isProfileLoading, profileRefetch } = useProfile();
 
   // ========== api end point ===========
   const [getMyPackageQuery, { isLoading: isGetMyPackageLoading }] =
@@ -66,6 +66,16 @@ const MyService = () => {
     fetchData(1, true);
   }, []);
 
+  // ==================== refreshing ==============
+  const onRefreshHandler = useCallback(async () => {
+    try {
+      await profileRefetch();
+      fetchData(1, true);
+    } catch (error: any) {
+      console.log(error, "Active plan refreshing not working ============>");
+    }
+  }, [profileRefetch]);
+
   // ─── Empty state ───────────────────────────────────────────────────────────
   const ListEmpty = useCallback(
     () =>
@@ -92,10 +102,7 @@ const MyService = () => {
   const renderHeaderItem = ({ item }: any) => {
     return (
       <View>
-        <BackTitleButton
-          title="My services pro"
-          onPress={() => router.back()}
-        />
+        <BackTitleButton title="My services " onPress={() => router.back()} />
         <View style={tw`flex-row   self-end mt-3`}>
           {profileData?.data?.stripe_account_id === null ? (
             <TouchableOpacity
@@ -166,9 +173,11 @@ const MyService = () => {
         </View>
 
         {/* --------------- service details  --------------- */}
-        <View style={tw`flex-1 flex-row items-center justify-between py-3`}>
+        <View
+          style={tw`flex-1 flex-row items-center justify-between gap-2 py-3`}
+        >
           <Text
-            numberOfLines={1}
+            numberOfLines={2}
             ellipsizeMode="tail"
             style={tw`flex-1 flex-shrink font-LufgaMedium gap-1 text-regularText text-base`}
           >
@@ -237,7 +246,9 @@ const MyService = () => {
         onEndReachedThreshold={0.1}
         // ─── pull to refresh ──────────────────────────────────────────────
         refreshing={refreshing}
-        onRefresh={refresh}
+        onRefresh={() => {
+          onRefreshHandler();
+        }}
         // ─── footer / empty ───────────────────────────────────────────────
         ListFooterComponent={
           isFetchingMore ? <ActivityIndicator size="small" /> : ListFooter

@@ -1,5 +1,5 @@
 import { IconCrossWhite, IconLocation, IconRatingStar } from "@/assets/icons";
-import { ImgPlaceholderProfile, ImgServiceImage } from "@/assets/image";
+import { ImgPlaceholderProfile, ImgPlaceholderService } from "@/assets/image";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
@@ -440,7 +440,7 @@ const ProviderDetailsInfoProviders = () => {
               style={tw`w-full h-56 rounded-xl `}
               source={serviceDetails?.icon}
               contentFit="cover"
-              placeholder={ImgServiceImage}
+              placeholder={ImgPlaceholderService}
             />
 
             {/* price */}
@@ -474,7 +474,6 @@ const ProviderDetailsInfoProviders = () => {
             </View>
 
             {/* Included Services: */}
-
             <Text style={tw`font-LufgaMedium text-base text-black pt-4`}>
               Included Services:
             </Text>
@@ -499,9 +498,6 @@ const ProviderDetailsInfoProviders = () => {
               buttonTextStyle={tw`font-LufgaMedium text-base`}
               onPress={() => {
                 handleStateUpdate();
-                // router.push(
-                //   "/user_role_sections/placingProviderOrderService/providerOrderDateTimePlacing",
-                // );
               }}
               buttonContainerStyle={tw`mt-6`}
             />

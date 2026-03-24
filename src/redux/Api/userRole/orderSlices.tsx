@@ -58,7 +58,7 @@ export const orderSlices = api.injectEndpoints({
         url: `/bookings/${id}`,
         method: "GET",
       }),
-      providesTags: ["Booking"],
+      providesTags: ["Booking", "Payment", "Notification"],
     }),
     getDeliveryRequestDetails: builder.query({
       query: (id) => ({

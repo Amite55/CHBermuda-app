@@ -7,13 +7,13 @@ import { SvgXml } from "react-native-svg";
 import tw from "../lib/tailwind";
 
 interface Props {
-  image: any;
-  title: string;
+  image?: any;
+  title?: string;
   subTitle?: string;
-  ratings: number;
-  reviews: number;
+  ratings?: number;
+  reviews?: number;
   onPress?: () => void;
-  totalOrder: number;
+  totalOrder?: number;
   containerStyle?: any;
   disabled?: boolean;
 }

@@ -73,7 +73,7 @@ const Staffs = () => {
       <View>
         {/* Top bar */}
         <View style={tw`relative`}>
-          <BackTitleButton title="Staffs pro" onPress={() => router.back()} />
+          <BackTitleButton title="Staffs " onPress={() => router.back()} />
           <TouchableOpacity
             onPress={() =>
               router.push("/serviceProvider/providerStaffs/addNewStaffs")

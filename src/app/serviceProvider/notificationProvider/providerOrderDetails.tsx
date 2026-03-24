@@ -5,13 +5,15 @@ import {
   IconServiceName,
   IconSuccessIcon,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgServiceImage } from "@/assets/image";
+import { ImgProfileImg } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
 import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useGetBookingDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
   BottomSheetBackdrop,
@@ -20,7 +22,7 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { SvgXml } from "react-native-svg";
@@ -28,16 +30,14 @@ import { SvgXml } from "react-native-svg";
 const ProviderOrder = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { status } = useLocalSearchParams();
+  const { status, booking_id } = useLocalSearchParams();
+  // ============= hooks =============
   const role = useRoleHooks();
   const providerType = useGetProviderTypes();
 
-  const handleEditModalOpen = useCallback(async () => {
-    editBottomSheetModalRef.current?.present();
-  }, []);
-  const handleEditModalClose = useCallback(() => {
-    editBottomSheetModalRef.current?.dismiss();
-  }, []);
+  // ================ api end point ================
+  const { data: bookingDetails, isLoading: isBookingDetailsLoading } =
+    useGetBookingDetailsQuery(booking_id as string);
 
   return (
     <>
@@ -47,7 +47,10 @@ const ProviderOrder = () => {
         style={tw`flex-1 bg-bgBaseColor `}
         contentContainerStyle={tw`pb-5 px-5`}
       >
-        <BackTitleButton title="Order Details" onPress={() => router.back()} />
+        <BackTitleButton
+          title="Order Details --"
+          onPress={() => router.back()}
+        />
 
         <View style={tw`flex-row items-center gap-3 pt-3`}>
           <SvgXml xml={IconServiceName} />
@@ -56,10 +59,12 @@ const ProviderOrder = () => {
           </Text>
         </View>
         <MenuCard
-          titleText="Light cleaning"
-          subTitleText="Today, at 06:00 PM"
-          image={ImgServiceImage}
-          containerStyle={tw` bg-white`}
+          titleText={bookingDetails?.data?.package?.title}
+          subTitleText={helpers.formatDateTime(
+            bookingDetails?.data?.created_at,
+          )}
+          image={bookingDetails?.data?.package?.icon}
+          containerStyle={tw`bg-white`}
         />
         <View style={tw`flex-row items-center gap-3 pt-3`}>
           <SvgXml xml={IconProfileInactive} />
@@ -68,9 +73,9 @@ const ProviderOrder = () => {
           </Text>
         </View>
         <MenuCard
-          titleText="Mr. Lopez"
-          subTitleText="Location goes here."
-          image={ImgProfileImg}
+          titleText={bookingDetails?.data?.billing?.name}
+          subTitleText={bookingDetails?.data?.billing?.location}
+          image={bookingDetails?.data?.user?.avatar}
           containerStyle={tw` bg-white`}
         />
         {/* --------------------------- Schedule details --------------------------- */}
@@ -81,7 +86,9 @@ const ProviderOrder = () => {
               Scheduled for
             </Text>
             <Text style={tw`font-LufgaRegular text-sm text-black`}>
-              15 Sep, 2025 at 10:00 AM - 12:00 PM
+              {bookingDetails?.data?.schedule_date} at{" "}
+              {bookingDetails?.data?.schedule_time_from || ""} -{" "}
+              {bookingDetails?.data?.schedule_time_to || "N/A"}
             </Text>
           </View>
         </View>
@@ -119,7 +126,7 @@ const ProviderOrder = () => {
                 if (role === "PROVIDER") {
                   if (providerType === "ADMIN_PROVIDER") {
                     router.push(
-                      "/serviceProvider/notificationProvider/serviceAssign"
+                      "/serviceProvider/notificationProvider/serviceAssign",
                     );
                   } else {
                     setIsModalVisible(true);
@@ -148,7 +155,7 @@ const ProviderOrder = () => {
               <TouchableOpacity
                 onPress={() => {
                   router.push(
-                    "/serviceProvider/notificationProvider/serviceAssign"
+                    "/serviceProvider/notificationProvider/serviceAssign",
                   );
                 }}
                 style={tw`p-1.5 border border-subText rounded-xl`}
@@ -167,7 +174,7 @@ const ProviderOrder = () => {
             <PrimaryButton
               onPress={() => {
                 router.push(
-                  "/serviceProvider/notificationProvider/deliveryRequestSent"
+                  "/serviceProvider/notificationProvider/deliveryRequestSent",
                 );
               }}
               buttonText="Send delivery request"
@@ -185,7 +192,7 @@ const ProviderOrder = () => {
             </View>
             <ProviderCard
               onPress={() => {
-                handleEditModalOpen();
+                editBottomSheetModalRef.current?.present();
               }}
               image={ImgProfileImg}
               title="Mr. Lopez"
@@ -207,7 +214,7 @@ const ProviderOrder = () => {
             <PrimaryButton
               onPress={() => {
                 router.push(
-                  "/serviceProvider/notificationProvider/deliveryRequestSent"
+                  "/serviceProvider/notificationProvider/deliveryRequestSent",
                 );
               }}
               buttonText="Deliver again"
@@ -282,7 +289,9 @@ const ProviderOrder = () => {
               <Text style={tw`font-LufgaMedium text-sm text-white`}>
                 Review
               </Text>
-              <TouchableOpacity onPress={() => handleEditModalClose()}>
+              <TouchableOpacity
+                onPress={() => editBottomSheetModalRef.current?.dismiss()}
+              >
                 <SvgXml xml={IconCrossWhite} />
               </TouchableOpacity>
             </View>
@@ -290,7 +299,7 @@ const ProviderOrder = () => {
             <View style={tw`px-5 mt-4 flex-1`}>
               <ProviderCard
                 onPress={() => {
-                  handleEditModalOpen();
+                  editBottomSheetModalRef.current?.present();
                 }}
                 image={ImgProfileImg}
                 title="Mr. Lopez"

@@ -245,6 +245,15 @@ const Explore = () => {
       refreshControl={
         <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
       }
+      ListEmptyComponent={() => {
+        return (
+          <View>
+            <Text style={tw`text-gray-400 font-LufgaMedium text-center`}>
+              No Bundle
+            </Text>
+          </View>
+        );
+      }}
     />
   );
 };

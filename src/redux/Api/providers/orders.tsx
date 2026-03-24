@@ -9,13 +9,6 @@ export const userHomeSlices = api.injectEndpoints({
       }),
       providesTags: ["Booking", "Payment", "Notification"],
     }),
-    getBookingDetails: builder.query({
-      query: (id) => ({
-        url: `/bookings/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["Booking", "Payment", "Notification"],
-    }),
     declineBooking: builder.mutation({
       query: (id) => ({
         url: `/decline-booking/${id}`,
@@ -43,7 +36,7 @@ export const userHomeSlices = api.injectEndpoints({
 
 export const {
   useGetProviderOrdersQuery,
-  useGetBookingDetailsQuery,
+  useLazyGetProviderOrdersQuery,
   useDeclineBookingMutation,
   useAcceptBookingMutation,
   useSendDeliveryRequestMutation,

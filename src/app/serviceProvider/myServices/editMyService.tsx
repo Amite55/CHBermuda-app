@@ -9,7 +9,10 @@ import { useImagePicker } from "@/src/hooks/useImagePicker";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
-import { useGetPackageDetailsQuery } from "@/src/redux/Api/providers/accounts/myServices";
+import {
+  useGetPackageDetailsQuery,
+  useUpdatePackageMutation,
+} from "@/src/redux/Api/providers/accounts/myServices";
 import MyServiceSkeleton from "@/src/Skeletion/MyServiceSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { editPackageSchema } from "@/src/validationSchema/userValidationSchema";
@@ -44,6 +47,10 @@ const EditMyService = () => {
   // =============== api end point ===============
   const { data: packageDetails, isLoading: isPackageDetailsLoading } =
     useGetPackageDetailsQuery(id);
+  const [updatePackage, { isLoading: isUpdatePackageLoading }] =
+    useUpdatePackageMutation();
+  // =============== convert number to string with duration default value ===============
+  const numberDuration = String(packageDetails?.data?.duration);
 
   // =============== get image from camera ================
   const handleProfileImage = async () => {
@@ -54,11 +61,35 @@ const EditMyService = () => {
     }
   };
 
-  const handleUpdateService = (value: any) => {
+  const handleUpdateService = async (value: any) => {
     try {
-      console.log(value, "this is edit value-------->");
+      const formData = new FormData();
+      formData.append("title", value.title);
+      formData.append("description", value.description);
+      formData.append("price", value.price);
+      formData.append("duration", value.duration);
+      formData.append("_method", "PUT");
+      serviceIncludeArry.forEach((service, index) => {
+        formData.append(`included_services[${index}]`, service);
+      });
+      if (image) {
+        formData.append("icon", {
+          uri: image.uri,
+          name: image.name,
+          type: image.type,
+        } as any);
+      }
+      const res = await updatePackage({ id, data: formData }).unwrap();
+      if (res) {
+        toast.success("Your Service updated successfully!", 3000);
+        router.back();
+      }
     } catch (error: any) {
-      console.log(error, "Your service not updated.");
+      console.log(
+        error,
+        "Your service not updated ---------------------------->",
+      );
+      toast.showError(error.message || "Your service not updated.", 3000);
     }
   };
 
@@ -85,10 +116,9 @@ const EditMyService = () => {
             title: packageDetails?.data?.title || "",
             description: packageDetails?.data?.description || "",
             price: packageDetails?.data?.price || "",
-            duration: packageDetails?.data?.duration || "",
-            included_services: "",
+            duration: numberDuration || "",
           }}
-          onSubmit={(values) => console.log(values)}
+          onSubmit={(values) => handleUpdateService(values)}
           validationSchema={editPackageSchema}
         >
           {({
@@ -189,7 +219,6 @@ const EditMyService = () => {
                       setServicesText(text);
                       handleChange("included_services")(text);
                     }}
-                    onBlur={handleBlur("included_services")}
                     value={servicesText}
                     placeholder="Type here..."
                     placeholderTextColor="#535353"
@@ -247,7 +276,6 @@ const EditMyService = () => {
                     ))}
                   </View>
                 )}
-
                 {/*     ------------------ included Service end hare  ---------------- */}
 
                 {/* ------------------ price ---------------- */}
@@ -305,8 +333,10 @@ const EditMyService = () => {
               </View>
               {/* --------------------- bottom button ---------------- */}
               <PrimaryButton
-                onPress={handleSubmit}
+                onPress={() => handleSubmit()}
                 buttonText="Update"
+                disabled={isUpdatePackageLoading}
+                loading={isUpdatePackageLoading}
                 buttonTextStyle={tw`font-LufgaMedium text-base`}
                 leftIcon={IconPlus}
                 buttonContainerStyle={tw`mt-8`}

@@ -9,6 +9,7 @@ export const usePagination = (apiCall: Function, limit = 10) => {
   const pageRef = useRef(1);
   const hasMoreRef = useRef(true);
   const isFetchingRef = useRef(false);
+
   const fetchData = useCallback(async (page: number, reset = false) => {
     if (isFetchingRef.current) return;
     if (!hasMoreRef.current && !reset) return;

@@ -1,13 +1,36 @@
 import { ImgProfileImg } from "@/assets/image";
+import { usePagination } from "@/src/hooks/usePagination";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import tw from "@/src/lib/tailwind";
+import { useLazyGetOrderProvidedQuery } from "@/src/redux/Api/providers/accounts/balancAndOrder";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 const ServiceHistory = () => {
+  // ==================== api end ====================
+  const [getProvidedOrder, { isLoading: isOrderProvidedLoading }] =
+    useLazyGetOrderProvidedQuery();
+
+  // ================= FETCH FUNCTION HOOKS=================
+  const {
+    data: orderProvidedData,
+    isLoading,
+    isFetchingMore,
+    refreshing,
+    fetchData,
+    loadMore,
+    refresh,
+    response,
+  } = usePagination(getProvidedOrder);
+
+  //  ============ call pagination function ===========
+  useEffect(() => {
+    fetchData(1, true);
+  }, []);
+  console.log(orderProvidedData, "------------->");
   return (
     <FlatList
       data={[1, 2, 3, 4, 5]}

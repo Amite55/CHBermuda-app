@@ -264,11 +264,11 @@ const AddNewService = () => {
 
                 {serviceIncludeArry.length > 0 && (
                   <View
-                    style={tw`gap-4 my-4 border border-subText rounded-2xl p-3`}
+                    style={tw`flex-1 gap-4 my-4 border border-subText rounded-2xl p-3`}
                   >
                     {serviceIncludeArry.map((item, index) => (
-                      <View key={index} style={tw`flex-row justify-between`}>
-                        <View style={tw`flex-row items-center gap-1`}>
+                      <View key={index} style={tw` flex-row justify-between`}>
+                        <View style={tw` flex-1 flex-row items-center gap-1`}>
                           <View style={tw`w-1 h-1 bg-black rounded-full`} />
                           <Text
                             numberOfLines={2}

@@ -31,6 +31,5 @@ export const editPackageSchema = Yup.object().shape({
   title: Yup.string().required("Package title is required"),
   description: Yup.string().required("Package description is required"),
   price: Yup.string().required("Price is required"),
-  duration: Yup.string().required("duration is required"),
-  included_services: Yup.string().required("included services is required"),
+  duration: Yup.string().required("Duration is required"),
 });
