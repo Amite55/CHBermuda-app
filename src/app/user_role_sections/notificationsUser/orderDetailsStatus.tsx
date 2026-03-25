@@ -109,7 +109,10 @@ const OrderDetailsStatus = () => {
         style={tw`flex-1 bg-bgBaseColor `}
         contentContainerStyle={tw`pb-5 px-5`}
       >
-        <BackTitleButton title={status} onPress={() => router.back()} />
+        <BackTitleButton
+          title={status as string}
+          onPress={() => router.back()}
+        />
 
         {/* ============== Order Details Status ============== */}
         <View>

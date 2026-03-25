@@ -8,8 +8,10 @@ import {
 import { ServicesData } from "@/src/components/AllData";
 import CategoryItems from "@/src/components/CategoryItems";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useCheckLocation } from "@/src/hooks/useCheckLocation";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import tw from "@/src/lib/tailwind";
+import { useUpdateLatLongMutation } from "@/src/redux/Api/authSlices";
 import {
   useGetAllCategoryQuery,
   useGetServiceThirdPartyQuery,
@@ -19,7 +21,7 @@ import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FlatList,
   RefreshControl,
@@ -38,6 +40,7 @@ const User_home = () => {
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  const { location, loading, error, getLocation } = useCheckLocation();
   // ================= api end point ==================
   const {
     data: allCategory,
@@ -51,6 +54,23 @@ const User_home = () => {
     refetch,
   } = useGetServiceThirdPartyQuery({});
 
+  const [updateLatLong, { isLoading: isUpdateLatLongLoading }] =
+    useUpdateLatLongMutation();
+
+  // =============== get location ==================
+  const handleGetLocation = async () => {
+    const loc = await getLocation();
+    const data = {
+      lat: loc.latitude,
+      long: loc.longitude,
+    };
+    const res = await updateLatLong(data);
+    console.log(res, "update lat long");
+  };
+
+  useEffect(() => {
+    handleGetLocation();
+  }, []);
   // =============== onRefresh ==================
   const onRefresh = async () => {
     try {

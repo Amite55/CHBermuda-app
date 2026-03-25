@@ -2,17 +2,23 @@ import {
   IconCalendar,
   IconCrossWhite,
   IconProfileInactive,
+  IconRatingStar,
   IconServiceName,
   IconSuccessIcon,
 } from "@/assets/icons";
 import { ImgProfileImg } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
-import { useGetProviderTypes } from "@/src/hooks/useGetProviderTypes";
+import LogoutModal from "@/src/context/LogoutModal";
 import { useRoleHooks } from "@/src/hooks/useRoleHooks";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import { helpers } from "@/src/lib/helper/helpers";
+import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import {
+  useAcceptBookingMutation,
+  useDeclineBookingMutation,
+} from "@/src/redux/Api/providers/orders";
 import { useGetBookingDetailsQuery } from "@/src/redux/Api/userRole/orderSlices";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import {
@@ -31,13 +37,46 @@ const ProviderOrder = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { status, booking_id } = useLocalSearchParams();
+  const [isDeclineModalVisible, setIsDeclineModalVisible] = useState(false);
+  const toast = useToastHelpers();
   // ============= hooks =============
   const role = useRoleHooks();
-  const providerType = useGetProviderTypes();
-
   // ================ api end point ================
   const { data: bookingDetails, isLoading: isBookingDetailsLoading } =
     useGetBookingDetailsQuery(booking_id as string);
+  const [declineBooking, { isLoading: isDeclineLoading }] =
+    useDeclineBookingMutation();
+  const [acceptBooking, { isLoading: isAcceptLoading }] =
+    useAcceptBookingMutation();
+
+  // =============== accept order =================
+  const handleAcceptOrder = async (booking_id: string) => {
+    try {
+      const res = await acceptBooking(booking_id).unwrap();
+      if (res) {
+        router.push({
+          pathname: "/serviceProvider/notificationProvider/serviceAssign",
+          params: { booking_id: booking_id },
+        });
+        toast.success("Accepted successfully", 3000);
+      }
+    } catch (error: any) {
+      console.log(error, " Accept failed!");
+      toast.showError(error.message || "Accept failed!", 3000);
+    }
+  };
+
+  // ================== handle decline ==================
+  const handleDeclineOrder = async () => {
+    try {
+      await declineBooking(booking_id).unwrap();
+      router.back();
+    } catch (error: any) {
+      console.log(error, "Your Decline Request Not success!");
+    } finally {
+      setIsDeclineModalVisible(false);
+    }
+  };
 
   return (
     <>
@@ -48,7 +87,7 @@ const ProviderOrder = () => {
         contentContainerStyle={tw`pb-5 px-5`}
       >
         <BackTitleButton
-          title="Order Details --"
+          title={status as string}
           onPress={() => router.back()}
         />
 
@@ -114,33 +153,29 @@ const ProviderOrder = () => {
         </View>
 
         {/* Check status  */}
-        {status === "new_order" && (
-          <View style={tw`pt-3  items-center flex-row gap-2 justify-between `}>
+        {status === "new" && (
+          <View
+            style={tw`pt-3  items-center mt-3 flex-row gap-2 justify-between `}
+          >
             <PrimaryButton
               buttonText="Decline"
-              buttonContainerStyle={tw`bg-red-500 w-[48%]`}
+              buttonContainerStyle={tw`bg-red-500 h-10 w-[48%]`}
               buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
+              onPress={() => setIsDeclineModalVisible(true)}
             />
             <PrimaryButton
               onPress={() => {
                 if (role === "PROVIDER") {
-                  if (providerType === "ADMIN_PROVIDER") {
-                    router.push(
-                      "/serviceProvider/notificationProvider/serviceAssign",
-                    );
-                  } else {
-                    setIsModalVisible(true);
-                  }
+                  handleAcceptOrder(booking_id as string);
+                } else {
+                  setIsModalVisible(true);
                 }
               }}
-              buttonText={
-                role === "PROVIDER" &&
-                (providerType === "ADMIN_PROVIDER"
-                  ? "Accept & Assign"
-                  : "Assign")
-              }
-              buttonContainerStyle={tw`bg-green-500 w-[48%]`}
+              buttonText={role === "PROVIDER" ? "Accept & Assign " : "Accept"}
+              buttonContainerStyle={tw`bg-green-500 h-10 w-[48%]`}
               buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
+              disabled={isAcceptLoading}
+              loading={isAcceptLoading}
             />
           </View>
         )}
@@ -154,9 +189,11 @@ const ProviderOrder = () => {
               </Text>
               <TouchableOpacity
                 onPress={() => {
-                  router.push(
-                    "/serviceProvider/notificationProvider/serviceAssign",
-                  );
+                  router.push({
+                    pathname:
+                      "/serviceProvider/notificationProvider/serviceAssign",
+                    params: { booking_id: booking_id },
+                  });
                 }}
                 style={tw`p-1.5 border border-subText rounded-xl`}
               >
@@ -165,17 +202,36 @@ const ProviderOrder = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-            <MenuCard
-              titleText="Mr. Lopez"
-              subTitleText="Location goes here."
-              image={ImgProfileImg}
-              containerStyle={tw` bg-white`}
-            />
+            {bookingDetails?.data?.staff ? (
+              <MenuCard
+                titleText={bookingDetails?.data?.staff?.name}
+                subTitleText={bookingDetails?.data?.staff?.location}
+                image={bookingDetails?.data?.staff?.image}
+                containerStyle={tw`bg-white`}
+              />
+            ) : (
+              <PrimaryButton
+                onPress={() => {
+                  router.push({
+                    pathname:
+                      "/serviceProvider/notificationProvider/serviceAssign",
+                    params: { booking_id: booking_id },
+                  });
+                }}
+                buttonText={"Accept"}
+                buttonContainerStyle={tw`bg-green-500 h-10 w-[48%]`}
+                buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
+                disabled={isAcceptLoading}
+                loading={isAcceptLoading}
+              />
+            )}
             <PrimaryButton
               onPress={() => {
-                router.push(
-                  "/serviceProvider/notificationProvider/deliveryRequestSent",
-                );
+                router.push({
+                  pathname:
+                    "/serviceProvider/notificationProvider/deliveryRequestSent",
+                  params: { booking_id: booking_id },
+                });
               }}
               buttonText="Send delivery request"
               buttonContainerStyle={tw`bg-transparent border border-gray-300 mt-5`}
@@ -184,25 +240,31 @@ const ProviderOrder = () => {
           </View>
         )}
         {status === "approved" && (
-          <View>
-            <View style={tw`flex-row items-center gap-3 pt-3`}>
-              <Text style={tw`font-LufgaMedium text-black text-base`}>
-                Assigned stuff
+          <View
+            style={tw`bg-gray-100 rounded-2xl px-4 py-4 flex-row justify-between items-center mt-4`}
+          >
+            {/* Left Side */}
+            <View>
+              <Text style={tw`text-black text-base font-semibold mb-1`}>
+                Review
               </Text>
+
+              <View style={tw`flex-row items-center`}>
+                <SvgXml xml={IconRatingStar} />
+                <Text style={tw`ml-1 text-black text-base font-medium`}>
+                  4.0
+                </Text>
+              </View>
             </View>
-            <ProviderCard
-              onPress={() => {
-                editBottomSheetModalRef.current?.present();
-              }}
-              image={ImgProfileImg}
-              title="Mr. Lopez"
-              // subTitle="Cleaner"
-              ratings={4}
-              // reviews={4}
-              totalOrder={10}
-              containerStyle={tw`bg-white`}
-              disabled
-            />
+
+            {/* Right Button */}
+            <TouchableOpacity
+              style={tw`border border-gray-300 px-4 py-2 rounded-lg`}
+              onPress={() => editBottomSheetModalRef.current?.present()}
+              activeOpacity={0.7}
+            >
+              <Text style={tw`text-blue-600 font-medium`}>See review</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -213,9 +275,11 @@ const ProviderOrder = () => {
             </Text>
             <PrimaryButton
               onPress={() => {
-                router.push(
-                  "/serviceProvider/notificationProvider/deliveryRequestSent",
-                );
+                router.push({
+                  pathname:
+                    "/serviceProvider/notificationProvider/deliveryRequestSent",
+                  params: { booking_id: booking_id },
+                });
               }}
               buttonText="Deliver again"
               buttonContainerStyle={tw`bg-transparent border border-gray-300`}
@@ -225,8 +289,7 @@ const ProviderOrder = () => {
         )}
       </ScrollView>
 
-      {/*  ---------------------------  Modal --------------------------- */}
-
+      {/*  ---------------------------  accept Modal --------------------------- */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -264,6 +327,19 @@ const ProviderOrder = () => {
           </View>
         </View>
       </Modal>
+
+      {/* ======================== decline modal ======================== */}
+      <LogoutModal
+        modalVisible={isDeclineModalVisible}
+        setModalVisible={setIsDeclineModalVisible}
+        buttonTitle="Decline"
+        modalTitle="Order Decline"
+        loading={isDeclineLoading}
+        disabled={isDeclineLoading}
+        onPress={() => {
+          handleDeclineOrder();
+        }}
+      />
 
       {/* -0---------------------------- order address edit modal --------------------------- */}
       <BottomSheetModalProvider>

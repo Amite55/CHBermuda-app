@@ -5,24 +5,25 @@ import {
   IconProviderRecentOrders,
   IconProviderStaffs,
 } from "@/assets/icons";
-import {
-  ImgPlaceholderProfile,
-  ImgProviderBG,
-  ImgServiceImage,
-} from "@/assets/image";
+import { ImgPlaceholderProfile, ImgProviderBG } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useCheckLocation } from "@/src/hooks/useCheckLocation";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { usePagination } from "@/src/hooks/usePagination";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useUpdateLatLongMutation } from "@/src/redux/Api/authSlices";
 import { useLazyGetMyStaffsQuery } from "@/src/redux/Api/providers/accounts/staffs";
 import { useGetHomePageQuery } from "@/src/redux/Api/providers/home";
+import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import { Image, ImageBackground } from "expo-image";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   FlatList,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -34,12 +35,33 @@ const ProviderHome = () => {
   // ============= hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
     useProfile();
+  const { location, loading, error, getLocation } = useCheckLocation();
   // ============== api end point ================
-  const { data: providerHomeData, isLoading: isProviderHomeLoading } =
-    useGetHomePageQuery(undefined, {
-      refetchOnMountOrArgChange: true,
-    });
+  const {
+    data: providerHomeData,
+    isLoading: isProviderHomeLoading,
+    refetch,
+  } = useGetHomePageQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [getMyStaffs] = useLazyGetMyStaffsQuery();
+  const [updateLatLong, { isLoading: isUpdateLatLongLoading }] =
+    useUpdateLatLongMutation();
+
+  // =============== get location ==================
+  const handleGetLocation = async () => {
+    const loc = await getLocation();
+    const data = {
+      lat: loc.latitude,
+      long: loc.longitude,
+    };
+    const res = await updateLatLong(data);
+    console.log(res, "update lat long");
+  };
+
+  useEffect(() => {
+    handleGetLocation();
+  }, []);
   // ================= FETCH FUNCTION =================
   const {
     data: staffsData,
@@ -54,12 +76,27 @@ const ProviderHome = () => {
   useEffect(() => {
     fetchData(1, true);
   }, []);
+
+  const onRefresh = useCallback(async () => {
+    try {
+      await Promise.all([profileRefetch(), fetchData(1, true), refetch()]);
+    } catch (error) {
+      console.log(error, "filed to refresh from provider home screen!");
+    }
+  }, []);
+
+  // ===================== loading state ===================
+  if (isProfileLoading || isProviderHomeLoading || isLoading)
+    return <UserHomeSkeleton />;
   return (
     <ScrollView
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       style={tw`flex-1 bg-bgBaseColor`}
       contentContainerStyle={tw`pb-5 `}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <StatusBar style="dark" backgroundColor="#183E9F" />
       <View style={tw`relative`}>
@@ -179,24 +216,32 @@ const ProviderHome = () => {
         <Text style={tw`font-medium text-base text-black`}>Recent orders</Text>
       </View>
       <View style={tw`mt-4 gap-4 px-5`}>
-        {[1, 2, 3, 4, 5].map((item, index) => {
-          return (
-            <OrderCard
-              key={index.toString()}
-              onPress={() => {
-                router.push({
-                  pathname:
-                    "/serviceProvider/notificationProvider/providerOrderDetails",
-                  params: { status: "new_order" },
-                });
-              }}
-              image={ImgServiceImage}
-              title="Order Title"
-              subTitle="Order Sub Title"
-              dateAndTime="Date and Time"
-            />
-          );
-        })}
+        {providerHomeData?.data?.recent_order?.length > 0 ? (
+          providerHomeData?.data?.recent_order.map((item: any) => {
+            return (
+              <OrderCard
+                key={item?.id}
+                onPress={() => {
+                  router.push({
+                    pathname:
+                      "/serviceProvider/notificationProvider/providerOrderDetails",
+                    params: { status: item?.status, booking_id: item?.id },
+                  });
+                }}
+                image={item?.package?.icon}
+                title={item?.package?.title}
+                subTitle={item?.user?.name}
+                dateAndTime={helpers.timeDataAgo(item?.created_at)}
+              />
+            );
+          })
+        ) : (
+          <Text
+            style={tw`font-LufgaRegular text-base text-center text-subText`}
+          >
+            No recent order
+          </Text>
+        )}
       </View>
     </ScrollView>
   );

@@ -2,14 +2,13 @@ import {
   IconEmail,
   IconEyeHide,
   IconEyeShow,
-  IconGoogle,
   IconPassword,
   IconTriangleArrow,
 } from "@/assets/icons";
 import { ImgSplashLogo } from "@/assets/image";
 import TitleSubtile from "@/src/components/TitleSubtile";
 import { useAuth } from "@/src/context/AuthContext";
-import { useRoleHooks } from "@/src/hooks/useRoleHooks";
+import { useGetProviderTypes, useRoleHooks } from "@/src/hooks/useRoleHooks";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import { useLoginMutation } from "@/src/redux/Api/authSlices";
@@ -40,6 +39,7 @@ const SingIn = () => {
   const [savedPassword, setSavedPassword] = React.useState("");
   const toast = useToastHelpers();
   const role = useRoleHooks();
+  const providerType = useGetProviderTypes();
   const { saveUser } = useAuth();
 
   // =============== api end point =================
@@ -77,6 +77,7 @@ const SingIn = () => {
         const payload = {
           ...values,
           role: role,
+          ...(role === "PROVIDER" && { provider_type: providerType }),
         };
         const res = await singInInfo(payload).unwrap();
         await saveUser({
@@ -104,11 +105,14 @@ const SingIn = () => {
         }
         if (res) {
           await AsyncStorage.setItem("token", res?.data?.access_token);
-          if (res?.data?.user?.role === "USER") {
+          const role = res?.data?.user?.role;
+          const providerType = res?.data?.user?.provider_type;
+
+          if (role === "USER") {
             router.replace("/user_role_sections/user_tabs/user_home");
-          } else if (res?.data?.user?.role === "PROVIDER") {
+          } else if (role === "PROVIDER" && providerType === "THIRDPARTY") {
             router.replace("/serviceProvider/serviceProviderTabs/providerHome");
-          } else if (res?.data?.user?.role === "ADMIN") {
+          } else if (role === "PROVIDER" && providerType === "ADMIN") {
             router.replace("/admin_provider/adminTabs/adminHome");
           }
         }
@@ -277,7 +281,7 @@ const SingIn = () => {
                     onPress={handleSubmit}
                   />
 
-                  <View style={tw`flex-row items-center justify-center gap-4`}>
+                  {/* <View style={tw`flex-row items-center justify-center gap-4`}>
                     <View style={tw`border-t border-borderColor `} />
                     <Text
                       style={tw`text-regularText text-base font-LufgaRegular`}
@@ -285,37 +289,39 @@ const SingIn = () => {
                       or continue with
                     </Text>
                     <View style={tw`border  border-borderColor `} />
-                  </View>
+                  </View> */}
 
-                  <View style={tw`justify-center items-center pt-5`}>
+                  {/* <View style={tw`justify-center items-center pt-5`}>
                     <TouchableOpacity
                       style={tw`bg-white rounded-full w-14 h-14 items-center justify-center`}
                     >
                       <SvgXml xml={IconGoogle} />
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
 
-                  <View
-                    style={tw`flex-row items-center justify-center gap-2 pt-8`}
-                  >
-                    <Text
-                      style={tw`text-regularText text-base font-LufgaRegular`}
-                    >
-                      Don’t have an account ?
-                    </Text>
-                    <TouchableOpacity
-                      activeOpacity={0.6}
-                      onPress={() => router.push("/auth/singUp")}
-                      style={tw`flex-row items-center gap-1 `}
+                  {role === "USER" && (
+                    <View
+                      style={tw`flex-row items-center justify-center gap-2 pt-8`}
                     >
                       <Text
-                        style={tw`text-primaryBtn text-base font-LufgaRegular`}
+                        style={tw`text-regularText text-base font-LufgaRegular`}
                       >
-                        Sign up
+                        Don’t have an account ?
                       </Text>
-                      <SvgXml xml={IconTriangleArrow} />
-                    </TouchableOpacity>
-                  </View>
+                      <TouchableOpacity
+                        activeOpacity={0.6}
+                        onPress={() => router.push("/auth/singUp")}
+                        style={tw`flex-row items-center gap-1 `}
+                      >
+                        <Text
+                          style={tw`text-primaryBtn text-base font-LufgaRegular`}
+                        >
+                          Sign up
+                        </Text>
+                        <SvgXml xml={IconTriangleArrow} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               )}
             </Formik>

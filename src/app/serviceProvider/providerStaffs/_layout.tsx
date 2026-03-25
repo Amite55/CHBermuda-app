@@ -7,6 +7,7 @@ const _layout = () => {
       <Stack.Screen name="staffs" />
       <Stack.Screen name="addNewStaffs" />
       <Stack.Screen name="editStaffProfile" />
+      <Stack.Screen name="providedServiceFromStaff" />
     </Stack>
   );
 };

@@ -43,11 +43,13 @@ const EnterOTP = () => {
         toast.success(res?.message || "OTP send successfully", 3000);
         await AsyncStorage.setItem("token", res?.data?.access_token);
         // ============= navigate to dynamic role ===================
-        if (res?.data?.user?.role === "USER") {
+        const role = res?.data?.user?.role;
+        const providerType = res?.data?.user?.provider_type;
+        if (role === "USER") {
           router.replace("/user_role_sections/user_tabs/user_home");
-        } else if (res?.data?.user?.role === "PROVIDER") {
+        } else if (role === "PROVIDER" && providerType === "THIRDPARTY") {
           router.replace("/serviceProvider/serviceProviderTabs/providerHome");
-        } else if (res?.data?.user?.role === "ADMIN") {
+        } else if (role === "PROVIDER" && providerType === "ADMIN") {
           router.replace("/admin_provider/adminTabs/adminHome");
         }
       }

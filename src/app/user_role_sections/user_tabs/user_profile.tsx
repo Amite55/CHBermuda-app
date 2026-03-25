@@ -16,6 +16,7 @@ import {
 import { ImgG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useAuth } from "@/src/context/AuthContext";
 import DeleteAccountModal from "@/src/context/DeleteAccountModal";
 import LogoutModal from "@/src/context/LogoutModal";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
@@ -36,6 +37,7 @@ const User_Profile = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [logoutModal, setLogoutModal] = useState(false);
   const toast = useToastHelpers();
+  const { clearUser } = useAuth();
 
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
@@ -70,8 +72,7 @@ const User_Profile = () => {
     try {
       const res = await singOut({}).unwrap();
       if (res) {
-        await AsyncStorage.removeItem("token");
-        await AsyncStorage.removeItem("role");
+        await clearUser();
         router.replace("/chooseRole");
       }
     } catch (error: any) {

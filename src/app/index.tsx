@@ -19,10 +19,11 @@ export default function Index() {
           router.replace("/user_role_sections/user_tabs/user_home");
           break;
         case "PROVIDER":
-          router.replace("/serviceProvider/serviceProviderTabs/providerHome");
-          break;
-        case "ADMIN":
-          router.replace("/admin_provider/adminTabs/adminHome");
+          if (userInfo?.provider_type === "ADMIN") {
+            router.replace("/admin_provider/adminTabs/adminHome");
+          } else {
+            router.replace("/serviceProvider/serviceProviderTabs/providerHome");
+          }
           break;
         default:
           router.replace("/chooseRole");

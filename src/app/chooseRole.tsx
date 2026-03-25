@@ -17,18 +17,29 @@ import React, { useCallback, useRef } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import tw from "../lib/tailwind";
+
 const ChooseRole = () => {
   const BottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const handleSetRole = async (role: string) => {
-    await AsyncStorage.setItem("role", JSON.stringify(role));
+  // ================ role set ================
+  const handleSetRole = async (role: "USER" | "PROVIDER") => {
+    await AsyncStorage.setItem("role", role);
+    router.push(`/auth/singIn`);
+  };
+
+  // ================ provider type set ================
+  const handleSetProviderType = async (type: "ADMIN" | "THIRDPARTY") => {
+    await AsyncStorage.setItem("role", "PROVIDER");
+    await AsyncStorage.setItem("providerType", type);
+    handleProviderTypeModalClose();
     router.push(`/auth/singIn`);
   };
 
   // ================ Bottom Sheet ================
-  const handleProviderTypeModalOpen = useCallback(async () => {
+  const handleProviderTypeModalOpen = useCallback(() => {
     BottomSheetModalRef.current?.present();
   }, []);
+
   const handleProviderTypeModalClose = useCallback(() => {
     BottomSheetModalRef.current?.dismiss();
   }, []);
@@ -41,10 +52,7 @@ const ChooseRole = () => {
         style={tw`flex-1 bg-bgBaseColor`}
       >
         <Image style={tw`w-full h-80`} source={ImgChooseRoleBG} />
-        <View
-          style={tw`px-5 gap-6 py-4
-        `}
-        >
+        <View style={tw`px-5 gap-6 py-4`}>
           <Text
             style={tw`font-LufgaMedium text-2xl text-center text-regularText`}
           >
@@ -61,14 +69,10 @@ const ChooseRole = () => {
 
         <ImageBackground style={tw`w-full h-96`} source={ImgChooseRoleBottomBG}>
           <View style={tw`px-5 gap-4 justify-center flex-1`}>
+            {/* ====== USER ====== */}
             <TouchableOpacity
               activeOpacity={0.8}
-              delayPressIn={0}
-              delayPressOut={0}
-              delayLongPress={1000}
-              onPress={() => {
-                handleSetRole("USER");
-              }}
+              onPress={() => handleSetRole("USER")}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
               <View style={tw`flex-row items-center gap-3`}>
@@ -77,18 +81,13 @@ const ChooseRole = () => {
                   User
                 </Text>
               </View>
-
               <SvgXml xml={IconRightTopConnerArrow} />
             </TouchableOpacity>
+
+            {/* ====== PROVIDER — bottom sheet খোলে ====== */}
             <TouchableOpacity
               activeOpacity={0.8}
-              delayPressIn={0}
-              delayPressOut={0}
-              delayLongPress={1000}
-              onPress={() => {
-                // handleSetRole("PROVIDER");
-                handleProviderTypeModalOpen();
-              }}
+              onPress={handleProviderTypeModalOpen}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
               <View style={tw`flex-row items-center gap-3`}>
@@ -102,12 +101,13 @@ const ChooseRole = () => {
           </View>
         </ImageBackground>
       </ScrollView>
-      {/* ================== bottom sheet for provider type ================= */}
+
+      {/* ====== Provider Type Bottom Sheet ====== */}
       <BottomSheetModal
         ref={BottomSheetModalRef}
         enableDynamicSizing={false}
         snapPoints={["40%"]}
-        containerStyle={tw` bg-gray-500 bg-opacity-20`}
+        containerStyle={tw`bg-gray-500 bg-opacity-20`}
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
@@ -117,17 +117,12 @@ const ChooseRole = () => {
           />
         )}
       >
-        <BottomSheetView style={tw`  px-4`}>
-          <View style={tw`gap-4 `}>
+        <BottomSheetView style={tw`px-4`}>
+          <View style={tw`gap-4`}>
+            {/* ADMIN */}
             <TouchableOpacity
               activeOpacity={0.8}
-              delayPressIn={0}
-              delayPressOut={0}
-              delayLongPress={1000}
-              onPress={async () => {
-                handleSetRole("ADMIN");
-                handleProviderTypeModalClose();
-              }}
+              onPress={() => handleSetProviderType("ADMIN")}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
               <View style={tw`flex-row items-center gap-3`}>
@@ -136,19 +131,13 @@ const ChooseRole = () => {
                   Admin Provider
                 </Text>
               </View>
-
               <SvgXml xml={IconRightTopConnerArrow} />
             </TouchableOpacity>
 
+            {/* THIRDPARTY */}
             <TouchableOpacity
               activeOpacity={0.8}
-              delayPressIn={0}
-              delayPressOut={0}
-              delayLongPress={1000}
-              onPress={async () => {
-                handleSetRole("PROVIDER");
-                handleProviderTypeModalClose();
-              }}
+              onPress={() => handleSetProviderType("THIRDPARTY")}
               style={tw`flex-row items-center justify-between bg-slate-200 p-4 rounded-3xl border border-white bg-opacity-50`}
             >
               <View style={tw`flex-row items-center gap-3`}>
@@ -157,7 +146,6 @@ const ChooseRole = () => {
                   Service Provider
                 </Text>
               </View>
-
               <SvgXml xml={IconRightTopConnerArrow} />
             </TouchableOpacity>
           </View>

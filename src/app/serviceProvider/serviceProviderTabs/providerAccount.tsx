@@ -16,6 +16,7 @@ import {
 import { ImgProviderBG } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
+import { useAuth } from "@/src/context/AuthContext";
 import DeleteAccountModal from "@/src/context/DeleteAccountModal";
 import LogoutModal from "@/src/context/LogoutModal";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
@@ -35,6 +36,7 @@ const ProviderAccount = () => {
   const [logoutModal, setLogoutModal] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const toast = useToastHelpers();
+  const { clearUser } = useAuth();
 
   // ============ hooks ==================
   const { profileData, isProfileLoading, profileRefetch, isProfileFetching } =
@@ -49,8 +51,8 @@ const ProviderAccount = () => {
     try {
       const res = await singOut({}).unwrap();
       if (res) {
-        await AsyncStorage.removeItem("token");
-        await AsyncStorage.removeItem("role");
+        await clearUser();
+        await AsyncStorage.removeItem("providerType");
         router.replace("/chooseRole");
       }
     } catch (error: any) {

@@ -1,4 +1,5 @@
 // context/AuthContext.tsx
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -23,6 +24,23 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const verifyTokenWithBackend = async (token: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_BASE_API_URL}/profile`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.status === 200;
+  } catch {
+    return false;
+  }
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,10 +53,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const stored = await SecureStore.getItemAsync("user_info");
       if (stored) {
-        setUserInfo(JSON.parse(stored));
+        const parsed: UserInfo = JSON.parse(stored);
+
+        const isValid = await verifyTokenWithBackend(parsed.token);
+
+        if (isValid) {
+          setUserInfo(parsed);
+        } else {
+          await SecureStore.deleteItemAsync("user_info");
+          setUserInfo(null);
+        }
       }
     } catch (e) {
       console.log("SecureStore read error:", e);
+      await SecureStore.deleteItemAsync("user_info");
+      setUserInfo(null);
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Logout এ call করো
   const clearUser = async () => {
     await SecureStore.deleteItemAsync("user_info");
+    await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("role");
     setUserInfo(null);
   };
 

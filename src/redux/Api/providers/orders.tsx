@@ -28,8 +28,17 @@ export const userHomeSlices = api.injectEndpoints({
         url: `/send-delivery-request`,
         method: "POST",
         body: data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
-      invalidatesTags: ["Booking", "Notification"],
+      invalidatesTags: [
+        "Booking",
+        "Notification",
+        "Account",
+        "Provider",
+        "Service",
+      ],
     }),
   }),
 });

@@ -18,11 +18,16 @@ export const userHomeSlices = api.injectEndpoints({
       invalidatesTags: ["Staff", "Account", "Provider"],
     }),
     updateStaff: builder.mutation({
-      query: (data) => ({
-        url: `/staffs/${data?.id}`,
-        method: "PUT",
-        body: data,
-      }),
+      query: ({ id, data }) => {
+        return {
+          url: `/staffs/${id}`,
+          method: "POST",
+          body: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+      },
       invalidatesTags: ["Staff", "Account", "Provider"],
     }),
     deleteStaff: builder.mutation({
@@ -30,7 +35,13 @@ export const userHomeSlices = api.injectEndpoints({
         url: `/staffs/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Staff", "Account", "Provider"],
+      invalidatesTags: [
+        "Staff",
+        "Account",
+        "Provider",
+        "Notification",
+        "Provider",
+      ],
     }),
     assignStaff: builder.mutation({
       query: (data) => ({
@@ -47,6 +58,13 @@ export const userHomeSlices = api.injectEndpoints({
       }),
       providesTags: ["Service", "Provider"],
     }),
+    getStaffsDetails: builder.query({
+      query: (id) => ({
+        url: `/staffs-details/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Staff", "Account", "Provider"],
+    }),
   }),
 });
 
@@ -58,4 +76,5 @@ export const {
   useDeleteStaffMutation,
   useAssignStaffMutation,
   useGetStaffServiceProvidedQuery,
+  useGetStaffsDetailsQuery,
 } = userHomeSlices;
