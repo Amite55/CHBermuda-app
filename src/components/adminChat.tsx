@@ -29,7 +29,7 @@ const AdminChat = () => {
           greetingStyle={tw`text-white `}
           userNameStyle={tw`text-white `}
           notificationOnPress={() => {
-            router.push("/admin_provider/adminNotification/notificationsAdmin");
+            router.push("/user_role_sections/notificationsUser/notifications");
           }}
           profileOnPress={() => {}}
         />

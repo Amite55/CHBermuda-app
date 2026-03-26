@@ -9,7 +9,7 @@ const AdminProvider = () => {
       }}
     >
       <Stack.Screen name="adminTabs" />
-      <Stack.Screen name="adminNotification" />
+      <Stack.Screen name="orderProvided" />
     </Stack>
   );
 };

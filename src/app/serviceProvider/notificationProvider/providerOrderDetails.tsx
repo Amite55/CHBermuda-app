@@ -6,12 +6,14 @@ import {
   IconServiceName,
   IconSuccessIcon,
 } from "@/assets/icons";
-import { ImgProfileImg } from "@/assets/image";
+import { ImgPlaceholderProfile, ImgProfileImg } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
 import LogoutModal from "@/src/context/LogoutModal";
-import { useRoleHooks } from "@/src/hooks/useRoleHooks";
+import { useCheckLocation } from "@/src/hooks/useCheckLocation";
+import { useGetProviderTypes, useRoleHooks } from "@/src/hooks/useRoleHooks";
 import BackTitleButton from "@/src/lib/BackTitleButton";
+import OrderDetailsStatusSkeleton from "@/src/lib/CustomSkeleton/OrderDetailsStatusSkeleton";
 import { helpers } from "@/src/lib/helper/helpers";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
@@ -27,9 +29,17 @@ import {
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useRef, useState } from "react";
-import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { SvgXml } from "react-native-svg";
 // import { AppleMaps, GoogleMaps } from 'expo-maps';
@@ -37,10 +47,30 @@ const ProviderOrder = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { status, booking_id } = useLocalSearchParams();
+  console.log(booking_id, "thisis a;lskdjfsf");
   const [isDeclineModalVisible, setIsDeclineModalVisible] = useState(false);
-  const toast = useToastHelpers();
+  const mapRef = useRef<MapView>(null);
+  const [myCoords, setMyCoords] = useState<{
+    lat: number;
+    long: number;
+  } | null>(null);
+  const [trackedCoords, setTrackedCoords] = useState<{
+    lat: number;
+    long: number;
+  } | null>(null);
+
   // ============= hooks =============
+  const toast = useToastHelpers();
   const role = useRoleHooks();
+  const providerType = useGetProviderTypes();
+  const { location, loading, error, getLocation } = useCheckLocation();
+
+  // =============== get location ==================
+  const handleGetLocation = async () => {
+    const loc = await getLocation();
+    setMyCoords({ lat: loc.latitude, long: loc.longitude });
+  };
+
   // ================ api end point ================
   const { data: bookingDetails, isLoading: isBookingDetailsLoading } =
     useGetBookingDetailsQuery(booking_id as string);
@@ -49,16 +79,36 @@ const ProviderOrder = () => {
   const [acceptBooking, { isLoading: isAcceptLoading }] =
     useAcceptBookingMutation();
 
+  useEffect(() => {
+    handleGetLocation();
+  }, []);
+
+  useEffect(() => {
+    if (
+      bookingDetails?.data?.user?.latitude &&
+      bookingDetails?.data?.user?.longitude
+    ) {
+      setTrackedCoords({
+        lat: parseFloat(bookingDetails.data.user.latitude),
+        long: parseFloat(bookingDetails.data.user.longitude),
+      });
+    }
+  }, [bookingDetails]);
+
   // =============== accept order =================
   const handleAcceptOrder = async (booking_id: string) => {
     try {
       const res = await acceptBooking(booking_id).unwrap();
       if (res) {
-        router.push({
-          pathname: "/serviceProvider/notificationProvider/serviceAssign",
-          params: { booking_id: booking_id },
-        });
-        toast.success("Accepted successfully", 3000);
+        if (role === "PROVIDER" && providerType === "THIRDPARTY") {
+          router.push({
+            pathname: "/serviceProvider/notificationProvider/serviceAssign",
+            params: { booking_id: booking_id },
+          });
+          toast.success("Accepted successfully", 3000);
+        } else {
+          setIsModalVisible(true);
+        }
       }
     } catch (error: any) {
       console.log(error, " Accept failed!");
@@ -77,6 +127,10 @@ const ProviderOrder = () => {
       setIsDeclineModalVisible(false);
     }
   };
+
+  if (isBookingDetailsLoading || loading) {
+    return <OrderDetailsStatusSkeleton />;
+  }
 
   return (
     <>
@@ -135,25 +189,53 @@ const ProviderOrder = () => {
 
         <View style={tw`my-4`}>
           <MapView
+            ref={mapRef}
             provider={PROVIDER_GOOGLE}
             style={tw`h-60 w-full`}
             initialRegion={{
-              latitude: 23.8103, // Dhaka center
+              latitude: 23.8103,
               longitude: 90.4125,
               latitudeDelta: 5,
               longitudeDelta: 5,
             }}
           >
-            <Marker
-              coordinate={{ latitude: 23.8103, longitude: 90.4125 }}
-              title={"Dhaka"}
-              description={"Capital of Bangladesh"}
-            />
+            {/* তোমার location — নীল */}
+            {myCoords && (
+              <Marker
+                coordinate={{
+                  latitude: myCoords.lat,
+                  longitude: myCoords.long,
+                }}
+                title="আমি"
+                description="Your current location"
+                pinColor="blue"
+              />
+            )}
+
+            {/* Tracked user — লাল */}
+            {trackedCoords?.lat && trackedCoords?.long && (
+              <Marker
+                coordinate={{
+                  latitude: trackedCoords.lat,
+                  longitude: trackedCoords.long,
+                }}
+                title="Tracked User"
+                pinColor="red"
+              />
+            )}
           </MapView>
+
+          {loading && (
+            <View
+              style={tw`absolute inset-0 items-center justify-center bg-black/20`}
+            >
+              <ActivityIndicator size="large" color="#fff" />
+            </View>
+          )}
         </View>
 
         {/* Check status  */}
-        {status === "new" && (
+        {(status === "new" || status === "new_booking") && (
           <View
             style={tw`pt-3  items-center mt-3 flex-row gap-2 justify-between `}
           >
@@ -165,13 +247,13 @@ const ProviderOrder = () => {
             />
             <PrimaryButton
               onPress={() => {
-                if (role === "PROVIDER") {
-                  handleAcceptOrder(booking_id as string);
-                } else {
-                  setIsModalVisible(true);
-                }
+                handleAcceptOrder(booking_id as string);
               }}
-              buttonText={role === "PROVIDER" ? "Accept & Assign " : "Accept"}
+              buttonText={
+                role === "PROVIDER" && providerType === "THIRDPARTY"
+                  ? "Accept & Assign "
+                  : "Accept"
+              }
               buttonContainerStyle={tw`bg-green-500 h-10 w-[48%]`}
               buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
               disabled={isAcceptLoading}
@@ -181,48 +263,35 @@ const ProviderOrder = () => {
         )}
         {status === "pending" && (
           <View>
-            <View
-              style={tw`flex-row justify-between items-center gap-3 pt-3 pb-3`}
-            >
-              <Text style={tw`font-LufgaMedium text-black text-base`}>
-                Assigned stuff
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  router.push({
-                    pathname:
-                      "/serviceProvider/notificationProvider/serviceAssign",
-                    params: { booking_id: booking_id },
-                  });
-                }}
-                style={tw`p-1.5 border border-subText rounded-xl`}
+            {providerType === "THIRDPARTY" && (
+              <View
+                style={tw`flex-row justify-between items-center gap-3 pt-3 pb-3`}
               >
-                <Text style={tw`font-LufgaMedium text-black text-sm `}>
-                  Change stuff
+                <Text style={tw`font-LufgaMedium text-black text-base`}>
+                  Assigned stuff
                 </Text>
-              </TouchableOpacity>
-            </View>
-            {bookingDetails?.data?.staff ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname:
+                        "/serviceProvider/notificationProvider/serviceAssign",
+                      params: { booking_id: booking_id },
+                    });
+                  }}
+                  style={tw`p-1.5 border border-subText rounded-xl`}
+                >
+                  <Text style={tw`font-LufgaMedium text-black text-sm `}>
+                    Change stuff
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {bookingDetails?.data?.staff && (
               <MenuCard
                 titleText={bookingDetails?.data?.staff?.name}
                 subTitleText={bookingDetails?.data?.staff?.location}
                 image={bookingDetails?.data?.staff?.image}
                 containerStyle={tw`bg-white`}
-              />
-            ) : (
-              <PrimaryButton
-                onPress={() => {
-                  router.push({
-                    pathname:
-                      "/serviceProvider/notificationProvider/serviceAssign",
-                    params: { booking_id: booking_id },
-                  });
-                }}
-                buttonText={"Accept"}
-                buttonContainerStyle={tw`bg-green-500 h-10 w-[48%]`}
-                buttonTextStyle={tw`text-white text-base font-LufgaMedium`}
-                disabled={isAcceptLoading}
-                loading={isAcceptLoading}
               />
             )}
             <PrimaryButton
@@ -239,24 +308,34 @@ const ProviderOrder = () => {
             />
           </View>
         )}
-        {status === "approved" && (
+
+        {(status === "accepted_delivery_request" || status === "completed") && (
           <View
             style={tw`bg-gray-100 rounded-2xl px-4 py-4 flex-row justify-between items-center mt-4`}
           >
-            {/* Left Side */}
-            <View>
-              <Text style={tw`text-black text-base font-semibold mb-1`}>
-                Review
-              </Text>
-
-              <View style={tw`flex-row items-center`}>
-                <SvgXml xml={IconRatingStar} />
-                <Text style={tw`ml-1 text-black text-base font-medium`}>
-                  4.0
+            <View style={tw`flex-row gap-2 justify-center items-center`}>
+              {bookingDetails?.data?.staff && (
+                <Image
+                  source={bookingDetails?.data?.staff?.image}
+                  style={tw`w-16 h-16 rounded-full`}
+                  contentFit="cover"
+                  placeholder={ImgPlaceholderProfile}
+                />
+              )}
+              {/* Left Side */}
+              <View>
+                <Text style={tw`text-black text-base font-semibold mb-1`}>
+                  Review
                 </Text>
+
+                <View style={tw`flex-row items-center`}>
+                  <SvgXml xml={IconRatingStar} />
+                  <Text style={tw`ml-1 text-black text-base font-medium`}>
+                    {bookingDetails?.data?.rating?.rating || 0}
+                  </Text>
+                </View>
               </View>
             </View>
-
             {/* Right Button */}
             <TouchableOpacity
               style={tw`border border-gray-300 px-4 py-2 rounded-lg`}
@@ -268,7 +347,7 @@ const ProviderOrder = () => {
           </View>
         )}
 
-        {status === "canceled" && (
+        {status === "decline_delivery_request" && (
           <View style={tw`gap-3`}>
             <Text style={tw`text-red-500 text-center font-LufgaMedium `}>
               Delivery request canceled
@@ -319,7 +398,7 @@ const ProviderOrder = () => {
                 buttonTextStyle={tw`text-lg font-LufgaMedium`}
                 onPress={() => {
                   setIsModalVisible(false);
-                  // router.push("/user_role_sections/user_tabs/user_home");
+                  router.push("/user_role_sections/user_tabs/user_home");
                 }}
                 buttonContainerStyle={tw`w-full`}
               />
@@ -373,29 +452,28 @@ const ProviderOrder = () => {
             </View>
 
             <View style={tw`px-5 mt-4 flex-1`}>
-              <ProviderCard
-                onPress={() => {
-                  editBottomSheetModalRef.current?.present();
-                }}
-                image={ImgProfileImg}
-                title="Mr. Lopez"
-                // subTitle="Cleaner"
-                ratings={4}
-                // reviews={4}
-                totalOrder={10}
-                containerStyle={tw`bg-white`}
-                disabled
-              />
+              {bookingDetails?.data?.staff && (
+                <ProviderCard
+                  onPress={() => {
+                    editBottomSheetModalRef.current?.present();
+                  }}
+                  image={ImgProfileImg}
+                  title={bookingDetails?.data?.staff?.name}
+                  subTitle={bookingDetails?.data?.staff?.email}
+                  ratings={bookingDetails?.data?.rating?.rating || 0}
+                  // reviews={4}
+                  totalOrder={
+                    bookingDetails?.data?.rating?.order_completed || 0
+                  }
+                  containerStyle={tw`bg-white`}
+                  disabled
+                />
+              )}
               <Text style={tw`font-LufgaMedium text-base text-black`}>
                 Review
               </Text>
               <Text style={tw`font-LufgaRegular text-sm text-black mt-2`}>
-                Lorem ipsum dolor sit amet consectetur. Morbi volutpat urna
-                justo odio enim mattis non velit vulputate. Porttitor a auctor
-                sit eu. Laoreet nunc et nec dolor. Pharetra aliquet eu neque
-                justo eget eget. Pharetra facilisis semper tempus fermentum.
-                Maecenas urna sodales dapibus consectetur mi convallis. Lectus
-                sit nam vel nunc congue nunc amet eros purus.
+                {bookingDetails?.data?.rating?.review}
               </Text>
             </View>
 

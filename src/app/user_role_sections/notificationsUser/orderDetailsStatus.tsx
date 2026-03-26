@@ -1,5 +1,4 @@
 import {
-  IconCartWhite,
   IconCrossRed,
   IconCrossWhite,
   IconPendingStatus,
@@ -7,7 +6,6 @@ import {
   IconSuccess,
   IconTellPhone,
 } from "@/assets/icons";
-import { ImgProfileImg, ImgService } from "@/assets/image";
 import BookingDetailsBilingInfo from "@/src/components/BookingDetailsBilingInfo";
 import MenuCard from "@/src/components/MenuCard";
 import ProviderCard from "@/src/components/ProviderCard";
@@ -16,11 +14,15 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import OrderDetailsStatusSkeleton from "@/src/lib/CustomSkeleton/OrderDetailsStatusSkeleton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
+import { useAddRatingsMutation } from "@/src/redux/Api/ratingsSlices";
 import { useGetThirdPartyProviderDetailsQuery } from "@/src/redux/Api/userHomeSlices";
 import {
+  useAcceptDeliveryRequestMutation,
   useCancelBookingMutation,
+  useDeclineDeliveryRequestMutation,
   useGetAdminProviderDetailsQuery,
   useGetBookingDetailsQuery,
+  useGetDeliveryRequestDetailsQuery,
 } from "@/src/redux/Api/userRole/orderSlices";
 import { callPadLinkingFunction } from "@/src/utils/callPadLinkingFunction";
 import PrimaryButton from "@/src/utils/PrimaryButton";
@@ -29,6 +31,7 @@ import {
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -38,7 +41,6 @@ import {
   FlatList,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -47,14 +49,21 @@ import { SvgXml } from "react-native-svg";
 
 const OrderDetailsStatus = () => {
   const [rating, setRating] = useState(0);
-  const { status, id } = useLocalSearchParams();
+  const { status, id, request_id } = useLocalSearchParams();
   const ratingBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+  const [review, setReview] = useState("");
   const toast = useToastHelpers();
+
+  const isDeliveryRequest = status === "new_delivery_request";
 
   // ================== api end point ==================
   const { data: orderDetails, isLoading: isOrderDetailsLoading } =
     useGetBookingDetailsQuery(id);
+  const { data: deliveryRequestDetails, isLoading: isDeliveryRequestLoading } =
+    useGetDeliveryRequestDetailsQuery(request_id, {
+      skip: !isDeliveryRequest,
+    });
   const {
     data: thirdPartyProviderDetails,
     isLoading: isThirdPartyProviderDetailsLoading,
@@ -65,6 +74,14 @@ const OrderDetailsStatus = () => {
   } = useGetAdminProviderDetailsQuery(orderDetails?.data?.provider?.id);
   const [cancelOrder, { isLoading: isCancelOrderLoading }] =
     useCancelBookingMutation();
+  const [
+    declineDeliveryRequest,
+    { isLoading: isDeclineDeliveryRequestLoading },
+  ] = useDeclineDeliveryRequestMutation();
+  const [acceptDeliveryRequest, { isLoading: isAcceptDeliveryRequestLoading }] =
+    useAcceptDeliveryRequestMutation();
+  const [addRating, { isLoading: isAddRatingLoading }] =
+    useAddRatingsMutation();
 
   // ================== get provider data ================
   let providerData;
@@ -76,6 +93,47 @@ const OrderDetailsStatus = () => {
       providerData = adminProviderDetails?.data?.provider;
       break;
   }
+
+  // ================= decline delivery request function ================
+  const handleDeclineDeliveryRequest = async () => {
+    try {
+      await declineDeliveryRequest(request_id).unwrap();
+      toast.success("Delivery request declined successfully", 3000);
+      router.replace("/user_role_sections/user_tabs/user_home");
+    } catch (error: any) {
+      console.log(error, "Your Decline Request Not success!");
+      toast.showError("Your Decline Request Not success!", 3000);
+    }
+  };
+
+  // =============== accept delivery request function ================
+  const handleAcceptDeliveryRequest = async () => {
+    try {
+      await acceptDeliveryRequest(request_id).unwrap();
+      ratingBottomSheetModalRef.current?.present();
+    } catch (error: any) {
+      console.log(error, "Your Request Not success!");
+      toast.showError("Your Request Not success! please try again", 3000);
+    }
+  };
+
+  //  ============review and rating function ===========
+  const handleReviewAndRating = async () => {
+    try {
+      const data = {
+        rating: rating,
+        review: review,
+        booking_id: id,
+        provider_id: orderDetails?.data?.provider?.id,
+      };
+      await addRating(data).unwrap();
+      toast.success("Your review and rating successfully", 3000);
+      ratingBottomSheetModalRef.current?.dismiss();
+      router.push("/user_role_sections/user_tabs/user_home");
+    } catch (error: any) {
+      console.log(error, "Not summit your request !");
+    }
+  };
   // =========== cancel order function ===========
   const handleCancelOrder = () => {
     try {
@@ -96,7 +154,8 @@ const OrderDetailsStatus = () => {
   if (
     isAdminProviderDetailsLoading ||
     isOrderDetailsLoading ||
-    isThirdPartyProviderDetailsLoading
+    isThirdPartyProviderDetailsLoading ||
+    (isDeliveryRequest && isDeliveryRequestLoading)
   ) {
     return <OrderDetailsStatusSkeleton />;
   }
@@ -176,9 +235,58 @@ const OrderDetailsStatus = () => {
               {orderDetails?.data?.schedule_time_to}
             </Text>
           </View>
+          {/* ================== delivery request ================ */}
+          {isDeliveryRequest && (
+            <View>
+              <Text style={tw`font-LufgaSemiBold text-base text-black pt-4`}>
+                Photo
+              </Text>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={deliveryRequestDetails?.data?.files}
+                contentContainerStyle={tw`py-3 gap-4 pr-2`}
+                renderItem={({ item }) => {
+                  return (
+                    <Image source={item} style={tw`w-28 h-28 rounded-xl`} />
+                  );
+                }}
+              />
+              <Text style={tw`font-LufgaSemiBold text-base text-black py-2`}>
+                Message
+              </Text>
+              <View style={tw`py-4 bg-white rounded-xl min-h-36`}>
+                <Text style={tw`font-LufgaRegular text-sm text-black px-3`}>
+                  {deliveryRequestDetails?.data?.message}
+                </Text>
+              </View>
+              {/* =- status way botton =     */}
+              <View style={tw`flex-row justify-center gap-2 mt-8`}>
+                <PrimaryButton
+                  buttonText="Decline"
+                  buttonTextStyle={tw`text-sm`}
+                  disabled={isDeclineDeliveryRequestLoading}
+                  loading={isDeclineDeliveryRequestLoading}
+                  buttonContainerStyle={tw`h-10 bg-red-700 flex-1`}
+                  onPress={() => {
+                    handleDeclineDeliveryRequest();
+                  }}
+                />
+                <PrimaryButton
+                  buttonText="Accept"
+                  buttonTextStyle={tw`text-sm`}
+                  buttonContainerStyle={tw`h-10 bg-green-700 flex-1`}
+                  onPress={() => {
+                    handleAcceptDeliveryRequest();
+                  }}
+                  disabled={isAcceptDeliveryRequestLoading}
+                  loading={isAcceptDeliveryRequestLoading}
+                />
+              </View>
+            </View>
+          )}
 
           {/* ========================== status ways details ================ */}
-
           {status === "new_booking" && (
             <View>
               <View style={tw`justify-between items-center py-6`}>
@@ -209,7 +317,7 @@ const OrderDetailsStatus = () => {
                 <MenuCard
                   titleText={orderDetails?.data?.staff?.name}
                   subTitleText={orderDetails?.data?.staff?.phone}
-                  image={ImgProfileImg}
+                  image={orderDetails?.data?.staff?.image}
                   containerStyle={tw` bg-white`}
                   endIcon={status === "booking_approved" && IconTellPhone}
                   endIconOnPress={() => {
@@ -220,65 +328,15 @@ const OrderDetailsStatus = () => {
             )}
 
           {/* ================= cancel status details ================ */}
-          {status === "canceled" && (
-            <PrimaryButton
-              buttonText="Place order"
-              buttonTextStyle={tw`text-sm`}
-              buttonContainerStyle={tw`h-10 mt-4 mb-2`}
-              leftIcon={IconCartWhite}
-              onPress={() => {}}
-            />
-          )}
-
-          {/* =================== if status is delivered ================ */}
-
-          {status === "delivered" && (
-            <View>
-              <FlatList
-                data={[1, 2, 3, 4, 5]}
-                keyExtractor={(item, index) => index.toString()}
-                showsHorizontalScrollIndicator={false}
-                showsVerticalScrollIndicator={false}
-                horizontal
-                contentContainerStyle={tw`gap-3 py-4 `}
-                renderItem={() => (
-                  <Image source={ImgService} style={tw`w-28 h-28 rounded-xl`} />
-                )}
-              />
-
-              <Text style={tw`font-LufgaSemiBold text-base text-black`}>
-                Message
+          {status === "booking_canceled" && (
+            <TouchableOpacity
+              disabled
+              style={tw`flex-row justify-center items-center gap-2 py-3`}
+            >
+              <Text style={tw`font-LufgaRegular text-lg text-red-600`}>
+                Your Booking Cancel!
               </Text>
-
-              <View style={tw` bg-white p-3 rounded-2xl`}>
-                <Text style={tw`font-LufgaRegular text-sm text-black`}>
-                  Lorem ipsum dolor sit amet consectetur. Morbi volutpat urna
-                  justo odio enim mattis non velit vulputate. Porttitor a auctor
-                  sit eu. Laoreet nunc et nec dolor. Pharetra aliquet eu neque
-                  justo eget eget. Pharetra facilisis semper tempus fermentum.
-                  Maecenas urna sodales dapibus consectetur mi convallis. Lectus
-                  sit nam vel nunc congue nunc amet eros purus.
-                </Text>
-              </View>
-
-              {/* =- status way botton =     */}
-              <View style={tw`flex-row justify-center gap-2 mt-4`}>
-                <PrimaryButton
-                  buttonText="Decline"
-                  buttonTextStyle={tw`text-sm`}
-                  buttonContainerStyle={tw`h-10 bg-red-700 flex-1`}
-                  onPress={() => {}}
-                />
-                <PrimaryButton
-                  buttonText="Accept"
-                  buttonTextStyle={tw`text-sm`}
-                  buttonContainerStyle={tw`h-10 bg-green-700 flex-1`}
-                  onPress={() => {
-                    ratingBottomSheetModalRef.current?.present();
-                  }}
-                />
-              </View>
-            </View>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>
@@ -322,29 +380,24 @@ const OrderDetailsStatus = () => {
                 <Text style={tw`font-LufgaMedium text-black text-lg `}>
                   Delivery request accepted
                 </Text>
-                <Text style={tw`font-LufgaSemiBold text-black text-xl`}>
-                  $ 49.00
-                </Text>
 
                 {/* ------------- rating section ------------- */}
                 <Text style={tw`font-LufgaRegular text-black text-base mt-4`}>
                   Share your experience with John Doe
                 </Text>
-                {rating && (
+                {!!rating && (
                   <Text
                     style={tw`font-LufgaSemiBold text-black text-lg border border-black rounded-full px-4 py-1`}
                   >
-                    {rating === 0.5 || rating === 1
+                    {rating === 1
                       ? "Poor"
-                      : rating === 1.5 || rating === 2
+                      : rating === 2
                         ? "Good"
-                        : rating === 2.5 || rating === 3
+                        : rating === 3
                           ? "Better"
-                          : rating === 3.5 || rating === 4
+                          : rating === 4
                             ? "Best"
-                            : rating === 4.5 || rating === 5
-                              ? "Excellent"
-                              : null}
+                            : "Excellent"}
                   </Text>
                 )}
                 {/* ---------------------- input user rating ---------------- */}
@@ -352,33 +405,31 @@ const OrderDetailsStatus = () => {
                   starSize={30}
                   color="#F9A21E"
                   rating={rating}
-                  onChange={setRating}
+                  onChange={(val) => setRating(Math.round(val))}
                 />
 
                 {/* ------------------ user feedback description ---------------- */}
-
-                <TextInput
+                <BottomSheetTextInput
                   multiline
                   placeholder="Write a review"
                   placeholderTextColor={"#535353"}
                   textAlignVertical="top"
                   style={tw`font-LufgaRegular text-black text-base mt-4 bg-bgBaseColor w-full rounded-2xl p-3 h-28`}
                   numberOfLines={8}
+                  onChangeText={(text) => setReview(text)}
                 />
               </View>
 
               {/* = ----------------- button content ---------------- */}
               <PrimaryButton
                 onPress={() => {
-                  ratingBottomSheetModalRef.current?.dismiss();
-                  router.push({
-                    pathname:
-                      "/user_role_sections/notificationsUser/orderDetailsStatus",
-                  });
+                  handleReviewAndRating();
                 }}
                 buttonText="Done"
                 buttonTextStyle={tw`text-sm`}
                 rightIcon={IconRightCornerArrowWhite}
+                loading={isAddRatingLoading}
+                disabled={isAddRatingLoading}
               />
             </View>
           </BottomSheetScrollView>

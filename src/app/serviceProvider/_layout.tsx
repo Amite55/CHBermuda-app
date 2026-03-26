@@ -12,6 +12,7 @@ const ServiceProviderLayout = () => {
       <Stack.Screen name="providerStaffs" />
       <Stack.Screen name="serviceHistory" />
       <Stack.Screen name="messagingProviderService" />
+      <Stack.Screen name="myWallet" />
     </Stack>
   );
 };

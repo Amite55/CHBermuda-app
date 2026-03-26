@@ -29,7 +29,7 @@ const ProviderChat = () => {
           greetingStyle={tw`text-white `}
           userNameStyle={tw`text-white `}
           notificationOnPress={() => {
-            router.push("/serviceProvider/notificationProvider/notifications");
+            router.push("/user_role_sections/notificationsUser/notifications");
           }}
           profileOnPress={() => {}}
         />

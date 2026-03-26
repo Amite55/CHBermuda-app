@@ -29,9 +29,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.madhob.bermuda",
-      "permissions": [
-        "CALL_PHONE"
-      ]
+      "permissions": ["CALL_PHONE"]
     },
     "web": {
       "output": "static",
@@ -64,6 +62,12 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
         }
       ],
       [

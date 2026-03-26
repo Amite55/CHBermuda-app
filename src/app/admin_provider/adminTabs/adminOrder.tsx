@@ -3,6 +3,7 @@ import { ImgNoOrder, ImgProviderBG } from "@/assets/image";
 import OrderCard from "@/src/components/OrderCard";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
+import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
 import { useLazyGetProviderOrdersQuery } from "@/src/redux/Api/providers/orders";
 import { Image, ImageBackground } from "expo-image";
@@ -88,7 +89,7 @@ const ProviderOrder = () => {
           userImage={profileData?.data?.avatar}
           notificationIcon={IconNotificationWhite}
           notificationOnPress={() =>
-            router.push("/serviceProvider/notificationProvider/notifications")
+            router.push("/user_role_sections/notificationsUser/notifications")
           }
           profileOnPress={() => router.push("/auth/editProfile")}
           greetingStyle={tw`text-white`}
@@ -170,7 +171,7 @@ const ProviderOrder = () => {
               image={item.package?.icon}
               title={item.package?.title}
               subTitle={item.user?.name}
-              dateAndTime={`${item.schedule_date} | ${item.schedule_time_from}`}
+              dateAndTime={helpers.timeDataAgo(item.created_at)}
             />
           </View>
         );

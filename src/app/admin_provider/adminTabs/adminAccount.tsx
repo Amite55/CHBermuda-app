@@ -100,7 +100,7 @@ const AdminAccount = () => {
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/admin_provider/adminNotification/notificationsAdmin",
+                "/user_role_sections/notificationsUser/notifications",
               );
             }}
             profileOnPress={() => {
@@ -129,10 +129,10 @@ const AdminAccount = () => {
           />
           <MenuCard
             onPress={() => {
-              // router.push("/auth/changePassward");
+              router.push("/admin_provider/orderProvided");
             }}
             titleText="Order provided"
-            subTitleText="20"
+            subTitleText={profileData?.data?.service_provided}
             subTitleStyle={tw`font-LufgaSemiBold text-xl text-black`}
             icon={IconOrderProvided}
             endIcon={IconRightTopConnerArrow}

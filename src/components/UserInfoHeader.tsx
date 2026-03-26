@@ -1,4 +1,4 @@
-import { IconNotification } from "@/assets/icons";
+import { IconBadge, IconNotification } from "@/assets/icons";
 import { ImgPlaceholderProfile } from "@/assets/image";
 import { Image } from "expo-image";
 import React from "react";
@@ -20,6 +20,7 @@ interface IUserProps {
   isCartCount?: number;
   notificationContentStyle?: any;
   notificationIcon?: any;
+  isBadge?: boolean;
 }
 
 const UserInfoHeader = ({
@@ -35,6 +36,7 @@ const UserInfoHeader = ({
   isCartCount = 0,
   notificationContentStyle = "",
   notificationIcon = "",
+  isBadge = false,
 }: IUserProps) => {
   return (
     <View
@@ -56,6 +58,11 @@ const UserInfoHeader = ({
             source={userImage}
             style={tw`w-12 h-12 rounded-full`}
           />
+          {isBadge && (
+            <View>
+              <SvgXml xml={IconBadge} />
+            </View>
+          )}
         </TouchableOpacity>
         <View style={tw`flex-1`}>
           <Text

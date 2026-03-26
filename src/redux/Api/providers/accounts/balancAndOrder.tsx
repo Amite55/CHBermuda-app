@@ -23,4 +23,5 @@ export const {
   useGetOrderProvidedQuery,
   useLazyGetOrderProvidedQuery,
   useGetRecentTransactionsQuery,
+  useLazyGetRecentTransactionsQuery,
 } = userHomeSlices;

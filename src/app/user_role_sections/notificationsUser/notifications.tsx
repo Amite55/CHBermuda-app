@@ -1,5 +1,6 @@
 import { IconUserNotification } from "@/assets/icons";
 import NotificationCard from "@/src/components/NotificationCard";
+import { useProfile } from "@/src/hooks/useGetUserProfile";
 import BackTitleButton from "@/src/lib/BackTitleButton";
 import NotificationSkeleton from "@/src/lib/CustomSkeleton/NotificationSkeletion";
 import { helpers } from "@/src/lib/helper/helpers";
@@ -17,6 +18,9 @@ const Notifications = () => {
   const [hasMore, setHasMore] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
   const [notificationData, setIsNotificationData] = React.useState([]);
+
+  // ============== hooks end point ================
+  const { profileData, isProfileLoading } = useProfile();
 
   // ============== api end point ================
   const [
@@ -88,21 +92,35 @@ const Notifications = () => {
 
   // =================== render notification card/items ===============
   const RenderNotificationItems = (item: INotification) => {
-    console.log(
-      item?.data?.data?.type,
-      "this is notification types ===========>",
-    );
     return (
       <NotificationCard
         onPress={() => {
-          router.push({
-            pathname:
-              "/user_role_sections/notificationsUser/orderDetailsStatus",
-            params: {
-              status: item?.data?.data?.type,
-              id: item?.data?.data?.booking_id,
-            },
-          });
+          if (profileData?.data?.role === "USER") {
+            router.push({
+              pathname:
+                "/user_role_sections/notificationsUser/orderDetailsStatus",
+              params: {
+                status: item?.data?.data?.type,
+                id: item?.data?.data?.booking_id,
+                ...(item?.data?.data?.request_id &&
+                  item?.data?.data?.type === "new_delivery_request" && {
+                    request_id: item?.data?.data?.request_id,
+                  }),
+              },
+            });
+          } else if (
+            profileData?.data?.role === "PROVIDER"
+            // profileData?.data?.provider_type === "THIRDPARTY"
+          ) {
+            router.push({
+              pathname:
+                "/serviceProvider/notificationProvider/providerOrderDetails",
+              params: {
+                status: item?.data?.data?.type,
+                booking_id: item?.data?.data?.booking_id,
+              },
+            });
+          }
         }}
         title={item?.data?.title}
         description={item?.data?.body}

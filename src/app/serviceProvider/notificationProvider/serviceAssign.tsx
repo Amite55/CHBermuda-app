@@ -100,7 +100,7 @@ const ServiceAssign = () => {
       renderItem={({ item }) => {
         return (
           <View
-            style={tw`flex-1 flex-row items-center justify-between p-3 bg-white rounded-xl`}
+            style={tw`flex-1 flex-row items-center justify-between max-h-20 p-3 bg-white rounded-xl`}
           >
             <View style={tw`flex-row items-center gap-3`}>
               <Image

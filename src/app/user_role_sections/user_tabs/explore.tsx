@@ -208,7 +208,13 @@ const Explore = () => {
             <PrimaryButton
               buttonTextStyle={tw`text-base font-LufgaMedium`}
               buttonContainerStyle={tw`mt-4 h-10`}
-              buttonText="Subscribe Now"
+              buttonText="Get Started"
+              onPress={() => {
+                router.push({
+                  pathname: "/user_role_sections/bundleDetails",
+                  params: { id: item?.id },
+                });
+              }}
             />
           </View>
         </View>

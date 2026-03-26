@@ -30,10 +30,13 @@ const AdminHome = () => {
     useProfile();
 
   // ============== api end point ================
-  const { data: providerHomeData, isLoading: isProviderHomeLoading } =
-    useGetHomePageQuery(undefined, {
-      refetchOnMountOrArgChange: true,
-    });
+  const {
+    data: providerHomeData,
+    isLoading: isProviderHomeLoading,
+    refetch,
+  } = useGetHomePageQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [updateLatLong, { isLoading: isUpdateLatLongLoading }] =
     useUpdateLatLongMutation();
 
@@ -44,8 +47,7 @@ const AdminHome = () => {
       lat: loc.latitude,
       long: loc.longitude,
     };
-    const res = await updateLatLong(data);
-    console.log(res, "update lat long");
+    await updateLatLong(data);
   };
 
   useEffect(() => {
@@ -55,7 +57,7 @@ const AdminHome = () => {
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      await Promise.all([profileRefetch(), isProfileFetching]);
+      await Promise.all([profileRefetch(), isProfileFetching, refetch()]);
     } catch (error: any) {
       console.log(error, "Your Refresh not success------------>");
     } finally {
@@ -64,7 +66,8 @@ const AdminHome = () => {
   }, []);
 
   // ===================== loading state ===================
-  if (isProfileLoading || isProviderHomeLoading) return <UserHomeSkeleton />;
+  if (isProfileLoading || isProviderHomeLoading || isUpdateLatLongLoading)
+    return <UserHomeSkeleton />;
 
   return (
     <ScrollView
@@ -90,7 +93,7 @@ const AdminHome = () => {
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/admin_provider/adminNotification/notificationsAdmin",
+                "/user_role_sections/notificationsUser/notifications",
               );
             }}
             profileOnPress={() => {}}

@@ -55,8 +55,7 @@ const ProviderHome = () => {
       lat: loc.latitude,
       long: loc.longitude,
     };
-    const res = await updateLatLong(data);
-    console.log(res, "update lat long");
+    await updateLatLong(data);
   };
 
   useEffect(() => {
@@ -112,7 +111,7 @@ const ProviderHome = () => {
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/serviceProvider/notificationProvider/notifications",
+                "/user_role_sections/notificationsUser/notifications",
               );
             }}
             profileOnPress={() => {}}

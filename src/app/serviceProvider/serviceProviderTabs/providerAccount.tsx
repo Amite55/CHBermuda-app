@@ -26,6 +26,8 @@ import {
   useDeleteProfileMutation,
   useLogoutMutation,
 } from "@/src/redux/Api/authSlices";
+import { useGetAccountBalanceQuery } from "@/src/redux/Api/stripeSlices";
+import StaffsSkeleton from "@/src/Skeletion/StaffsSkeleton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ImageBackground } from "expo-image";
 import { router } from "expo-router";
@@ -45,7 +47,10 @@ const ProviderAccount = () => {
   const [singOut, { isLoading: isLogoutLoading }] = useLogoutMutation();
   const [deleteProfile, { isLoading: isDeleteProfileLoading }] =
     useDeleteProfileMutation();
-
+  const { data: getAccountBalance, isLoading: isGetAccountBalanceLoading } =
+    useGetAccountBalanceQuery(profileData?.data?.stripe_account_id, {
+      skip: !profileData?.data?.stripe_account_id,
+    });
   // =============== account logout function ===============
   const handleLogoutUser = async () => {
     try {
@@ -83,6 +88,11 @@ const ProviderAccount = () => {
       toast.showError(error.message || "Your account not deleted", 3000);
     }
   };
+
+  // =========== loading ===================
+  if (isProfileLoading || isGetAccountBalanceLoading) {
+    return <StaffsSkeleton />;
+  }
   return (
     <View style={tw`flex-1`}>
       <ScrollView
@@ -103,7 +113,7 @@ const ProviderAccount = () => {
             userNameStyle={tw`text-white `}
             notificationOnPress={() => {
               router.push(
-                "/serviceProvider/notificationProvider/notifications",
+                "/user_role_sections/notificationsUser/notifications",
               );
             }}
             profileOnPress={() => {
@@ -132,10 +142,10 @@ const ProviderAccount = () => {
           />
           <MenuCard
             onPress={() => {
-              // router.push("/auth/changePassward");
+              router.push("/serviceProvider/myWallet");
             }}
             titleText="Available balance"
-            subTitleText="$1200"
+            subTitleText={`$${getAccountBalance?.data?.available?.[0]?.amount}`}
             subTitleStyle={tw`font-LufgaSemiBold text-xl text-black`}
             icon={IconProviderBalance}
             endIcon={IconRightTopConnerArrow}

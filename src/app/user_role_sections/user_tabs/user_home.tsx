@@ -64,8 +64,7 @@ const User_home = () => {
       lat: loc.latitude,
       long: loc.longitude,
     };
-    const res = await updateLatLong(data);
-    console.log(res, "update lat long");
+    await updateLatLong(data);
   };
 
   useEffect(() => {
@@ -89,7 +88,7 @@ const User_home = () => {
   const isInitialLoading =
     isProfileLoading || isCategoryLoading || isThirdPartyServicesLoading;
 
-  if (isInitialLoading) {
+  if (isInitialLoading || isUpdateLatLongLoading) {
     return <UserHomeSkeleton />;
   }
 

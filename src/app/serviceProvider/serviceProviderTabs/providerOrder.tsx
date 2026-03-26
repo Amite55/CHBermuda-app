@@ -88,7 +88,7 @@ const ProviderOrder = () => {
           userImage={profileData?.data?.avatar}
           notificationIcon={IconNotificationWhite}
           notificationOnPress={() =>
-            router.push("/serviceProvider/notificationProvider/notifications")
+            router.push("/user_role_sections/notificationsUser/notifications")
           }
           profileOnPress={() => router.push("/auth/editProfile")}
           greetingStyle={tw`text-white`}
