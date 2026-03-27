@@ -47,7 +47,6 @@ const ProviderOrder = () => {
   const editBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { status, booking_id } = useLocalSearchParams();
-  console.log(booking_id, "thisis a;lskdjfsf");
   const [isDeclineModalVisible, setIsDeclineModalVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
   const [myCoords, setMyCoords] = useState<{
@@ -199,20 +198,20 @@ const ProviderOrder = () => {
               longitudeDelta: 5,
             }}
           >
-            {/* তোমার location — নীল */}
+            {/* Your location — blue */}
             {myCoords && (
               <Marker
                 coordinate={{
                   latitude: myCoords.lat,
                   longitude: myCoords.long,
                 }}
-                title="আমি"
+                title="Your Location"
                 description="Your current location"
                 pinColor="blue"
               />
             )}
 
-            {/* Tracked user — লাল */}
+            {/* Tracked user — red */}
             {trackedCoords?.lat && trackedCoords?.long && (
               <Marker
                 coordinate={{

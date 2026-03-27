@@ -27,7 +27,7 @@ const Notifications = () => {
               router.push({
                 pathname:
                   "/serviceProvider/notificationProvider/providerOrderDetails",
-                params: { status: item.item.status },
+                params: { status: item?.item?.status },
               });
             }}
             title={item.item.title}

@@ -8,23 +8,24 @@ import {
   useAssignStaffMutation,
   useLazyGetMyStaffsQuery,
 } from "@/src/redux/Api/providers/accounts/staffs";
+import ServiceHistorySkeleton from "@/src/Skeletion/ServiceHistorySkeleton";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-const ServiceAssign = () => {
-  const { booking_id } = useLocalSearchParams();
+const AssingCard = ({ item, booking_id }: any) => {
   const toast = useToastHelpers();
 
-  // ============= api end point =================
-  const [getMyStaffs, { isLoading: isStaffsLoading }] =
-    useLazyGetMyStaffsQuery();
   const [assignStaff, { isLoading: isAssignLoading }] =
     useAssignStaffMutation();
-
-  // ================ handle assign staff ===============
   const handleAssignStaff = async (staff_id: string) => {
     try {
       const res = await assignStaff({
@@ -43,6 +44,59 @@ const ServiceAssign = () => {
     }
   };
 
+  return (
+    <View
+      style={tw`flex-1 flex-row flex-shrink-0 my-1 items-center justify-between max-h-20 p-3 bg-white rounded-xl`}
+    >
+      <View style={tw`flex-row items-center gap-3`}>
+        <Image
+          style={tw`w-12 h-12 rounded-full`}
+          source={item?.image}
+          contentFit="cover"
+          placeholder={ImgPlaceholderProfile}
+        />
+        <View>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={tw`flex-1 font-LufgaMedium text-base text-black`}
+          >
+            {item?.name}
+          </Text>
+          <Text style={tw`font-LufgaRegular text-sm text-subText`}>
+            {helpers.timeDataAgo(item?.created_at)}
+          </Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={tw`p-1.5 border border-subText rounded-xl`}
+        activeOpacity={0.7}
+        disabled={isAssignLoading}
+        onPress={() => {
+          handleAssignStaff(item?.id);
+        }}
+      >
+        {isAssignLoading ? (
+          <ActivityIndicator size="small" />
+        ) : (
+          <Text style={tw`font-LufgaMedium text-primaryBtn text-sm `}>
+            Assign
+          </Text>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const ServiceAssign = () => {
+  const { booking_id } = useLocalSearchParams();
+
+  // ============= api end point =================
+  const [getMyStaffs, { isLoading: isStaffsLoading, isFetching }] =
+    useLazyGetMyStaffsQuery();
+
+  // ================ handle assign staff ===============
+
   // ================= FETCH FUNCTION =================
   const {
     data: staffsData,
@@ -54,6 +108,8 @@ const ServiceAssign = () => {
     refresh,
     response,
   } = usePagination(getMyStaffs);
+
+  // console.log(staffsData);
 
   //  ============ call pagination function ===========
   useEffect(() => {
@@ -82,70 +138,44 @@ const ServiceAssign = () => {
     [isFetchingMore],
   );
 
+  // // =========== loading state  ===============
+  if (isStaffsLoading) {
+    return <ServiceHistorySkeleton />;
+  }
+
   return (
     <FlatList
-      data={staffsData}
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-      keyExtractor={(item, index) => index.toString()}
-      contentContainerStyle={tw`bg-bgBaseColor px-5 gap-3 pb-3 flex-grow `}
       ListHeaderComponent={() => {
         return (
-          <BackTitleButton
-            title="Assign provider"
-            onPress={() => router.back()}
-          />
-        );
-      }}
-      renderItem={({ item }) => {
-        return (
-          <View
-            style={tw`flex-1 flex-row items-center justify-between max-h-20 p-3 bg-white rounded-xl`}
-          >
-            <View style={tw`flex-row items-center gap-3`}>
-              <Image
-                style={tw`w-12 h-12 rounded-full`}
-                source={item?.image}
-                contentFit="cover"
-                placeholder={ImgPlaceholderProfile}
-              />
-              <View>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={tw`flex-1 font-LufgaMedium text-base text-black`}
-                >
-                  {item?.name}
-                </Text>
-                <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-                  {helpers.timeDataAgo(item?.created_at)}
-                </Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={tw`p-1.5 border border-subText rounded-xl`}
-              activeOpacity={0.7}
-              onPress={() => {
-                handleAssignStaff(item?.id);
-              }}
-            >
-              {isAssignLoading ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                <Text style={tw`font-LufgaMedium text-primaryBtn text-sm `}>
-                  Assign
-                </Text>
-              )}
-            </TouchableOpacity>
+          <View style={tw`bg-bgBaseColor  py-3`}>
+            <BackTitleButton
+              title="Assign provider"
+              onPress={() => router.back()}
+            />
           </View>
         );
       }}
+      data={staffsData}
+      refreshControl={
+        <RefreshControl
+          style={tw`z-50`}
+          refreshing={false}
+          onRefresh={() => {
+            console.log("Refreshing");
+          }}
+        />
+      }
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
+      keyExtractor={(item, index) => item?.id?.toString()}
+      contentContainerStyle={tw`pb-6 flex-grow `}
+      style={tw` bg-bgBaseColor px-5`}
+      renderItem={({ item }) => {
+        return <AssingCard item={item} booking_id={booking_id} />;
+      }}
       // ─── pagination ───────────────────────────────────────────────────
       onEndReached={loadMore}
-      onEndReachedThreshold={0.1}
-      // ─── pull to refresh ──────────────────────────────────────────────
-      refreshing={refreshing}
-      onRefresh={refresh}
+      onEndReachedThreshold={0.2}
       // ─── footer / empty ───────────────────────────────────────────────
       ListFooterComponent={
         isFetchingMore ? <ActivityIndicator size="small" /> : ListFooter

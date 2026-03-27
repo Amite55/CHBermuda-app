@@ -84,7 +84,7 @@ const OrderProvided = () => {
       ListHeaderComponent={ListHeader}
       renderItem={OrderProvidedItems}
       onEndReached={loadMore}
-      onEndReachedThreshold={0.1}
+      onEndReachedThreshold={0.5}
       refreshing={refreshing}
       onRefresh={onRefreshHandler}
       ListFooterComponent={ListFooter}

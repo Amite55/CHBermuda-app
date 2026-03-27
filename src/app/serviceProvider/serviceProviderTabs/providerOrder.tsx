@@ -164,7 +164,7 @@ const ProviderOrder = () => {
                 router.push({
                   pathname:
                     "/serviceProvider/notificationProvider/providerOrderDetails",
-                  params: { status: item?.status, booking_id: item.id },
+                  params: { status: item?.status, booking_id: item?.id },
                 })
               }
               image={item.package?.icon}

@@ -76,5 +76,6 @@ export const {
   useDeleteStaffMutation,
   useAssignStaffMutation,
   useGetStaffServiceProvidedQuery,
+  useLazyGetStaffServiceProvidedQuery,
   useGetStaffsDetailsQuery,
 } = userHomeSlices;

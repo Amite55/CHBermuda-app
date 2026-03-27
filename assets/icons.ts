@@ -1017,10 +1017,29 @@ export const IconWithdraw = `<svg width="24" height="24" viewBox="0 0 24 24" fil
 <path d="M12 12C12.5909 12 13.1761 12.1164 13.7221 12.3425C14.268 12.5687 14.7641 12.9002 15.182 13.318C15.5998 13.7359 15.9313 14.232 16.1575 14.7779C16.3836 15.3239 16.5 15.9091 16.5 16.5C16.5 17.0909 16.3836 17.6761 16.1575 18.2221C15.9313 18.768 15.5998 19.2641 15.182 19.682C14.7641 20.0998 14.268 20.4313 13.7221 20.6575C13.1761 20.8836 12.5909 21 12 21H19.5V19.5H21V13.5H19.5V12H12ZM7.5 16.5C7.5 15.3065 7.97411 14.1619 8.81802 13.318C9.66193 12.4741 10.8065 12 12 12H4.5V13.5H3V19.5H4.5V21H12C10.8065 21 9.66193 20.5259 8.81802 19.682C7.97411 18.8381 7.5 17.6935 7.5 16.5Z" fill="white"/>
 </svg>
 `;
-export const IconBadge = `<svg width="27" height="20" viewBox="0 0 27 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.5364 1.99029C8.67832 5.30626 4.25842 10.0105 0 9.07888L2.67398 19.1848H13.2537L15.2351 12.9693L13.2537 0L11.5364 1.99029Z" fill="#FEFA9A"/>
-<path d="M26.5183 9.03854C22.2486 9.98971 17.8083 5.2864 14.9399 1.95832L13.2539 6.10352e-05V19.1848H23.8336L26.5183 9.03854Z" fill="#FADF00"/>
+export const IconBadge = `<svg width="38" height="36" viewBox="0 0 38 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_114_14291)">
+<path d="M16.8484 10.8055C13.9903 14.1215 9.57043 18.8257 5.31201 17.8941L7.98599 28H18.5657L20.5471 21.7846L18.5657 8.81525L16.8484 10.8055Z" fill="#FEFA9A"/>
+<path d="M31.8303 17.8538C27.5606 18.805 23.1203 14.1016 20.2519 10.7736L18.5659 8.81531V28.0001H29.1457L31.8303 17.8538Z" fill="#FADF00"/>
+<path d="M13.852 9.42778H15.7064L15.3192 10.3896C14.5911 12.1981 13.1217 13.6146 11.2877 14.2759C9.45368 14.9372 7.41838 14.7844 5.7037 13.8567L4 12.935L5.31218 17.8941C9.5706 18.8257 13.9905 18.0109 16.8486 14.6949L18.5659 12.7047L20.5473 8.47889L18.5659 0L13.852 9.42778Z" fill="#FADF00"/>
+<path d="M31.4281 13.8567C29.7134 14.7844 27.6781 14.9372 25.8441 14.2759C24.0102 13.6146 22.5407 12.1981 21.8126 10.3896L21.4254 9.42778H23.2798L18.5659 0V12.7047L20.2519 14.663C23.1203 17.991 27.5606 18.8049 31.8303 17.8537L33.1318 12.935L31.4281 13.8567Z" fill="#FDC40A"/>
+<path d="M18.5657 18.8636L15.73 21.6994L18.5657 24.5352L19.9915 21.6994L18.5657 18.8636Z" fill="#FC4555"/>
+<path d="M18.5659 18.8636V24.5352L21.4017 21.6994L18.5659 18.8636Z" fill="#DB2155"/>
+</g>
+<defs>
+<filter id="filter0_d_114_14291" x="0" y="0" width="37.1318" height="36.0001" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_114_14291"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_114_14291" result="shape"/>
+</filter>
+</defs>
 </svg>
+
 
 `;
 export const IconWallet = `<svg width="81" height="80" viewBox="0 0 81 80" fill="none" xmlns="http://www.w3.org/2000/svg">

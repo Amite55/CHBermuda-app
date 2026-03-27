@@ -200,7 +200,7 @@ const Staffs = () => {
       )}
       // ─── pagination ───────────────────────────────────────────────────
       onEndReached={loadMore}
-      onEndReachedThreshold={0.1}
+      onEndReachedThreshold={0.5}
       // ─── pull to refresh ──────────────────────────────────────────────
       refreshing={refreshing}
       onRefresh={refresh}

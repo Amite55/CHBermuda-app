@@ -5,7 +5,6 @@ import {
   ImgExploreBanner,
   ImgG,
 } from "@/assets/image";
-import { ServicesData } from "@/src/components/AllData";
 import CategoryItems from "@/src/components/CategoryItems";
 import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useCheckLocation } from "@/src/hooks/useCheckLocation";
@@ -16,6 +15,7 @@ import {
   useGetAllCategoryQuery,
   useGetServiceThirdPartyQuery,
 } from "@/src/redux/Api/userHomeSlices";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { updateBooking } from "@/src/redux/appStore/bookingSlices";
 import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
@@ -42,20 +42,18 @@ const User_home = () => {
     useProfile();
   const { location, loading, error, getLocation } = useCheckLocation();
   // ================= api end point ==================
-  const {
-    data: allCategory,
-    isLoading: isCategoryLoading,
-    isFetching: isCategoryFetching,
-  } = useGetAllCategoryQuery({});
+  const { data: allCategory, isLoading: isCategoryLoading } =
+    useGetAllCategoryQuery({});
   const {
     data: thirdPartyServices,
     isLoading: isThirdPartyServicesLoading,
     isFetching: isThirdPartyServicesFetching,
     refetch,
   } = useGetServiceThirdPartyQuery({});
-
   const [updateLatLong, { isLoading: isUpdateLatLongLoading }] =
     useUpdateLatLongMutation();
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
 
   // =============== get location ==================
   const handleGetLocation = async () => {
@@ -86,7 +84,10 @@ const User_home = () => {
 
   // =============== loading skeleton =================
   const isInitialLoading =
-    isProfileLoading || isCategoryLoading || isThirdPartyServicesLoading;
+    isProfileLoading ||
+    isCategoryLoading ||
+    isThirdPartyServicesLoading ||
+    isActivePlansLoading;
 
   if (isInitialLoading || isUpdateLatLongLoading) {
     return <UserHomeSkeleton />;
@@ -114,6 +115,7 @@ const User_home = () => {
           profileOnPress={() => {
             router.push("/user_role_sections/user_tabs/user_profile");
           }}
+          isBadge={activePlans?.data?.length > 0 ? true : false}
         />
       </ImageBackground>
       {/* ------------------------ promo banner section just for demo  ---------------- */}
@@ -125,23 +127,31 @@ const User_home = () => {
         <View style={tw`relative`}>
           <View style={tw`gap-1 my-4 ml-4 `}>
             <Text style={tw`font-LufgaMedium text-base text-black`}>
-              Purchase plan
+              {activePlans?.data?.length > 0
+                ? "Purchased plan"
+                : "Purchase plan"}
             </Text>
             <Text
               numberOfLines={2}
               style={tw`font-LufgaRegular text-sm text-black`}
             >
-              Get a plan and enjoy unlimited {"\n"} caring services.
+              {activePlans?.data?.length > 0
+                ? `You have a plan. \n Enjoy unlimited `
+                : `Get a plan and enjoy unlimited \n "caring services."`}
             </Text>
             <TouchableOpacity
               onPress={() => {
                 router.push("/user_role_sections/user_tabs/explore");
               }}
               activeOpacity={0.7}
-              style={tw`w-32 h-8 mt-2 z-30 bg-primaryBtn rounded-lg justify-center items-center`}
+              style={[
+                tw`w-36 h-8 mt-2 z-30 bg-primaryBtn rounded-lg justify-center items-center`,
+              ]}
             >
               <Text style={tw`font-LufgaRegular text-sm text-white`}>
-                Buy now
+                {activePlans?.data?.length > 0
+                  ? "  Buy another plan"
+                  : "  Buy now"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -286,52 +296,47 @@ const User_home = () => {
         </View>
 
         {/* ========================================== Services section      ---------------- */}
-        <View>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={tw`gap-5 mt-2 pl-4`}
-            data={ServicesData}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={(items) => {
-              return (
-                <ImageBackground
-                  style={tw`w-80 rounded-2xl `}
-                  source={ImgExploreBanner}
-                  contentPosition={"center"}
-                  imageStyle={tw`w-full h-full rounded-xl`}
-                  contentFit="fill"
+        <View style={tw`items-center pb-10`}>
+          <ImageBackground
+            style={tw`w-10/12 h-96 rounded-2xl `}
+            source={ImgExploreBanner}
+            contentPosition={"center"}
+            imageStyle={tw`w-full h-full rounded-xl`}
+            contentFit="cover"
+          >
+            <View style={tw`flex-grow justify-between p-4`}>
+              <View />
+              <View>
+                <Text
+                  style={tw`font-LufgaRegular text-base text-white text-center py-5`}
                 >
-                  <View style={tw`flex-grow justify-between p-4`}>
-                    <View />
-                    <View>
-                      <Text
-                        style={tw`font-LufgaRegular text-base text-white text-center py-5`}
-                      >
-                        We offer four types of care services. Choose a plan that
-                        suits you best and enjoy the freedom of care.
-                      </Text>
+                  We offer four types of care services. Choose a plan that suits
+                  you best and enjoy the freedom of care.
+                </Text>
 
-                      <TouchableOpacity
-                        onPress={() => {
-                          router.push(
-                            "/user_role_sections/categoryPlaning/adminProviderService",
-                          );
-                        }}
-                        activeOpacity={0.8}
-                        style={tw`flex-row justify-between  items-center p-3 border border-white rounded-full  bg-white bg-opacity-40 `}
-                      >
-                        <Text style={tw`font-LufgaMedium text-lg text-white`}>
-                          Explore all services
-                        </Text>
-                        <SvgXml xml={IconRightCornerArrowWhite} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </ImageBackground>
-              );
-            }}
-          />
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname:
+                        "/user_role_sections/categoryPlaning/adminProviderService",
+                      params: {
+                        title: "Care givers",
+                        category: "admin_service",
+                        id: 1,
+                      },
+                    });
+                  }}
+                  activeOpacity={0.8}
+                  style={tw`flex-row justify-between  items-center p-3 border border-white rounded-full  bg-white bg-opacity-20 `}
+                >
+                  <Text style={tw`font-LufgaMedium text-lg text-white`}>
+                    Explore all services
+                  </Text>
+                  <SvgXml xml={IconRightCornerArrowWhite} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ImageBackground>
         </View>
       </View>
     </ScrollView>

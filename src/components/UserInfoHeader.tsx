@@ -59,7 +59,9 @@ const UserInfoHeader = ({
             style={tw`w-12 h-12 rounded-full`}
           />
           {isBadge && (
-            <View>
+            <View
+              style={tw`absolute -top-3 -right-3 items-center justify-center`}
+            >
               <SvgXml xml={IconBadge} />
             </View>
           )}
