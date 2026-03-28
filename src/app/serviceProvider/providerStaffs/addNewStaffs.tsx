@@ -28,7 +28,6 @@ import { SvgXml } from "react-native-svg";
 
 const AddNewStaffs = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  // const [image, setImage] = useState<any>(null);
 
   // =============== hooks ===================
   const { image, previewUri, loading, error, pickImage } = useImagePicker();
@@ -54,14 +53,12 @@ const AddNewStaffs = () => {
       name: image.name,
       type: image.type,
     } as any);
-    console.log(formData, "this is form data ");
+    formData.append("name", info.name);
+    formData.append("email", info.email);
+    formData.append("phone", info.phone);
+    formData.append("location", info.location);
     try {
-      const payload = {
-        ...info,
-        formData,
-      };
-      const res = await addNewStaffs(payload).unwrap();
-      console.log(res, "image uploaded success------->");
+      const res = await addNewStaffs(formData).unwrap();
       if (res) {
         router.back();
         toast.success(

@@ -15,6 +15,7 @@ import tw from "@/src/lib/tailwind";
 import { useRegisterMutation } from "@/src/redux/Api/authSlices";
 import { ISignUp } from "@/src/redux/CommonTypes/CommonType";
 import PrimaryButton from "@/src/utils/PrimaryButton";
+import { SignUpSchema } from "@/src/validationSchema/userValidationSchema";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Formik } from "formik";
@@ -31,7 +32,6 @@ import {
   View,
 } from "react-native";
 import { SvgXml } from "react-native-svg";
-import * as Yup from "yup";
 
 const SingUp = () => {
   const toast = useToastHelpers();
@@ -41,22 +41,6 @@ const SingUp = () => {
   const role = useRoleHooks();
   // =============== api end point =================
   const [registerInfo, { isLoading: isSingUpLoading }] = useRegisterMutation();
-
-  // ==================== Validation Schema ====================
-  const SignUpSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Please enter a valid email address")
-      .required("Email is required"),
-    name: Yup.string()
-      .min(3, "Full name must be at least 3 characters")
-      .required("Full name is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-    password_confirmation: Yup.string()
-      .oneOf([Yup.ref("password")], "Passwords must match")
-      .required("Confirm password is required"),
-  });
 
   const handleCheckBox = async () => {
     setIsChecked(!isChecked);
@@ -72,7 +56,6 @@ const SingUp = () => {
       const payload = {
         ...values,
         role: role,
-        // ...(role === "PROVIDER" && { provider_type: providerType }),
       };
       const res = await registerInfo(payload).unwrap();
       if (res) {

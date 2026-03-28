@@ -17,6 +17,7 @@ interface Props {
   titleTextStyle?: any;
   subTitleStyle?: any;
   endIcon?: any;
+  placeholderImage?: any;
 }
 
 const MenuCard = ({
@@ -31,6 +32,7 @@ const MenuCard = ({
   subTitleStyle = "",
   endIcon = "",
   endIconOnPress,
+  placeholderImage = ImgPlaceholderService,
 }: Props) => {
   return (
     <TouchableOpacity
@@ -61,7 +63,7 @@ const MenuCard = ({
             source={image}
             style={[tw`w-16 h-16 shrink-0 rounded-full`, imageStyle]}
             contentFit="cover"
-            placeholder={ImgPlaceholderService}
+            placeholder={placeholderImage}
           />
         )}
 

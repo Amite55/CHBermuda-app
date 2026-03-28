@@ -7,6 +7,7 @@ import {
   useGetAllCategoryQuery,
   useLazyGetAddonBundlesQuery,
 } from "@/src/redux/Api/userHomeSlices";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import UserHomeSkeleton from "@/src/Skeletion/UserHomeSkeleton";
 import PrimaryButton from "@/src/utils/PrimaryButton";
 import { Image, ImageBackground } from "expo-image";
@@ -32,6 +33,8 @@ const Explore = () => {
   } = useGetAllCategoryQuery({});
   const [addonBundles, { isLoading: isAddonBundlesLoading, isFetching }] =
     useLazyGetAddonBundlesQuery({});
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
 
   const getAddonBundles = useCallback(
     async (pageNum = 1, isRefresh = false) => {
@@ -41,7 +44,6 @@ const Explore = () => {
           per_page: 10,
           _timestamp: Date.now(),
         }).unwrap();
-
         const newData = response?.data?.data || [];
         const lastPage = response?.data?.last_page || 1;
         if (isRefresh) {
@@ -82,6 +84,7 @@ const Explore = () => {
             profileOnPress={() =>
               router.push("/user_role_sections/user_tabs/user_profile")
             }
+            isBadge={activePlans?.data?.length > 0 ? true : false}
           />
           <Text
             style={tw`font-LufgaMedium text-2xl text-center text-regularText`}
@@ -222,11 +225,19 @@ const Explore = () => {
     );
   };
 
+  // ============= load more =================
+  const handleLoadMore = useCallback(async () => {
+    if (!isFetching && hasMore) {
+      await getAddonBundles(page);
+    }
+  }, [getAddonBundles, isFetching, hasMore, page]);
+
   // ================= REFRESH FUNCTION ==================
   const onRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
-      await Promise.all([isCategoryFetching, isFetching, profileRefetch()]);
+      await Promise.all([isCategoryFetching, profileRefetch()]);
+      await getAddonBundles(page);
     } catch (error: any) {
       console.log(error, "this is wrong refresh ------------");
     } finally {
@@ -235,7 +246,12 @@ const Explore = () => {
   }, []);
 
   // ========= loading state ==================
-  if (isCategoryLoading || isAddonBundlesLoading || isProfileLoading) {
+  if (
+    isCategoryLoading ||
+    isAddonBundlesLoading ||
+    isProfileLoading ||
+    isActivePlansLoading
+  ) {
     return <UserHomeSkeleton />;
   }
 
@@ -260,6 +276,8 @@ const Explore = () => {
           </View>
         );
       }}
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.5}
     />
   );
 };

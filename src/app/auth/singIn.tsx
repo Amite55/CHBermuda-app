@@ -163,6 +163,18 @@ const SingIn = () => {
     loadData();
   }, []);
 
+  let sininLabal;
+
+  if (role === "USER") {
+    sininLabal = "Please use your credentials to sign in as a user";
+  } else if (role === "PROVIDER" && providerType === "THIRDPARTY") {
+    sininLabal =
+      "Please use your credentials to sign in as a provider. If you don’t have the sign in credentials then please contact with the admin.";
+  } else if (role === "PROVIDER" && providerType === "ADMIN") {
+    sininLabal =
+      "Please use your credentials to sign in as a admin. If you don’t have the sign in credentials then please contact with the admin.";
+  }
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -179,7 +191,7 @@ const SingIn = () => {
 
             <TitleSubtile
               title="Welcome Back"
-              subtile="Please use your credentials to sign in as a user"
+              subtile={sininLabal || "Please use your credentials to sign in."}
             />
             <Formik
               initialValues={{ email: savedEmail, password: savedPassword }}
@@ -263,14 +275,16 @@ const SingIn = () => {
                         Remember me
                       </Text>
                     </View>
-                    <Text style={tw` text-[12px] font-LufgaRegular`}>
-                      <Link
-                        href={"/auth/forgotPassword"}
-                        style={tw`text-primaryBtn underline`}
-                      >
-                        Forget password?
-                      </Link>
-                    </Text>
+                    {role === "USER" && (
+                      <Text style={tw` text-[12px] font-LufgaRegular`}>
+                        <Link
+                          href={"/auth/forgotPassword"}
+                          style={tw`text-primaryBtn underline`}
+                        >
+                          Forget password?
+                        </Link>
+                      </Text>
+                    )}
                   </View>
                   {/* ------------------- sign in button    ---------------- */}
                   <PrimaryButton

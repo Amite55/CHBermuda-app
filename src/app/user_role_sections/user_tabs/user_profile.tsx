@@ -108,6 +108,7 @@ const User_Profile = () => {
             profileOnPress={() => {
               router.push("/user_role_sections/user_tabs/user_profile");
             }}
+            isBadge={activePlans?.data?.length > 0 ? true : false}
           />
           <Text
             style={tw`font-LufgaMedium text-2xl text-center text-regularText`}

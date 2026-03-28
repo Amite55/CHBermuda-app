@@ -55,6 +55,17 @@ const OrderDetailsStatus = () => {
   const [review, setReview] = useState("");
   const toast = useToastHelpers();
 
+  //  ============ booking status label ===========
+  const statusLabelMap = {
+    booking_approved: "Booking Approved",
+    booking_cancelled: "Booking Cancelled",
+    new_booking: "New Booking",
+    new_delivery_request: "New Delivery Request",
+    decline_delivery_request: "Decline Delivery Request",
+    accepted_delivery_request: "Accepted Delivery Request",
+  };
+  const label =
+    statusLabelMap[status as keyof typeof statusLabelMap] || "Order Details";
   const isDeliveryRequest = status === "new_delivery_request";
 
   // ================== api end point ==================
@@ -168,10 +179,7 @@ const OrderDetailsStatus = () => {
         style={tw`flex-1 bg-bgBaseColor `}
         contentContainerStyle={tw`pb-5 px-5`}
       >
-        <BackTitleButton
-          title={status as string}
-          onPress={() => router.back()}
-        />
+        <BackTitleButton title={label} onPress={() => router.back()} />
 
         {/* ============== Order Details Status ============== */}
         <View>

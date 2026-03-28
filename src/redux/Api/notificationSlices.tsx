@@ -7,21 +7,45 @@ export const notificationSlices = api.injectEndpoints({
         url: `/notifications?per_page=${per_page}&page=${page}`,
         method: "GET",
       }),
-      providesTags: ["Notification"],
+      providesTags: [
+        "Notification",
+        "Booking",
+        "Payment",
+        "Plan",
+        "Service",
+        "Staff",
+        "Provider",
+      ],
     }),
     singleMarkAsRead: builder.mutation({
       query: (id) => ({
         url: `/mark-notification/${id}`,
         method: "POST",
       }),
-      invalidatesTags: ["Notification"],
+      invalidatesTags: [
+        "Notification",
+        "Booking",
+        "Payment",
+        "Plan",
+        "Service",
+        "Staff",
+        "Provider",
+      ],
     }),
     allMarkAsRead: builder.mutation({
       query: () => ({
         url: `/mark-all-notification`,
         method: "POST",
       }),
-      invalidatesTags: ["Notification"],
+      invalidatesTags: [
+        "Notification",
+        "Booking",
+        "Payment",
+        "Plan",
+        "Service",
+        "Staff",
+        "Provider",
+      ],
     }),
   }),
 });

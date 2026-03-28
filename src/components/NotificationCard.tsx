@@ -18,6 +18,7 @@ interface Props {
   icon: string;
   onPress?: () => void;
   type?: string;
+  containerStyle?: any;
 }
 // Color Map type   ===============
 interface ColorMap {
@@ -50,6 +51,7 @@ const NotificationCard = ({
   icon,
   onPress,
   type,
+  containerStyle,
 }: Props) => {
   const textColor = textColorMap[type] || "#000000";
   const Icon = iconMap[type] || IconUserNotification;
@@ -57,7 +59,10 @@ const NotificationCard = ({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      style={tw`bg-slate-300 rounded-2xl p-3 flex-row items-center gap-3 `}
+      style={[
+        tw`bg-slate-300 rounded-2xl p-3 flex-row items-center gap-3 `,
+        containerStyle,
+      ]}
     >
       <View
         style={tw`w-12 h-12 rounded-lg bg-gray-200 items-center justify-center`}

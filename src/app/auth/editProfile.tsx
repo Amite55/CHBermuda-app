@@ -70,7 +70,6 @@ const EditProfile = () => {
           name: filename,
           type: mime,
         } as any);
-        console.log(formData, "this is form data ");
         const res = await editProfilePicture(formData).unwrap();
         if (res) {
           toast.success(
@@ -189,7 +188,7 @@ const EditProfile = () => {
                     Full Name
                   </Text>
                   <View
-                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-slate-100`}
+                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-white`}
                   >
                     <TextInput
                       onChangeText={handleChange("name")}
@@ -207,7 +206,7 @@ const EditProfile = () => {
                     Phone
                   </Text>
                   <View
-                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-slate-100`}
+                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-white`}
                   >
                     <TextInput
                       onChangeText={handleChange("phone")}
@@ -245,7 +244,7 @@ const EditProfile = () => {
                     Location
                   </Text>
                   <View
-                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-slate-100`}
+                    style={tw`w-full h-12 px-4 rounded-full border border-borderColor mt-1 bg-white`}
                   >
                     <TextInput
                       onChangeText={handleChange("address")}

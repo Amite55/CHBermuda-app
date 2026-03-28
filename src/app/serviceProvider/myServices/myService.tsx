@@ -82,7 +82,7 @@ const MyService = () => {
       !isLoading ? (
         <View style={tw`items-center py-10`}>
           <Text style={tw`font-LufgaRegular text-sm text-subText`}>
-            No staffs found
+            No services found
           </Text>
         </View>
       ) : null,
@@ -112,8 +112,8 @@ const MyService = () => {
               activeOpacity={0.7}
               style={tw` bg-primaryBtn  items-center justify-center rounded-lg py-1.5 px-3`}
             >
-              <Text style={tw`font-LufgaMedium text-base text-white`}>
-                Create Account
+              <Text style={tw`font-LufgaMedium text-sm text-white`}>
+                Create Connect Account
               </Text>
             </TouchableOpacity>
           ) : (

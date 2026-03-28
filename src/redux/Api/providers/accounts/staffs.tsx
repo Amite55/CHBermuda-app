@@ -14,8 +14,19 @@ export const userHomeSlices = api.injectEndpoints({
         url: "/staffs",
         method: "POST",
         body: data,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
-      invalidatesTags: ["Staff", "Account", "Provider"],
+      invalidatesTags: [
+        "Staff",
+        "Account",
+        "Provider",
+        "Notification",
+        "Package",
+        "Plan",
+        "Service",
+      ],
     }),
     updateStaff: builder.mutation({
       query: ({ id, data }) => {

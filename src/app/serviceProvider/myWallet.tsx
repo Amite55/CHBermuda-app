@@ -182,6 +182,10 @@ const MyWallet = () => {
     fetchData(1, true);
   }, []);
 
+  const availableBalance = getAccountBalance?.data?.available?.[0]?.amount
+    ? Number(getAccountBalance?.data?.available?.[0]?.amount)
+    : 0.0;
+
   // ─── Header ───────────────────────────────────────────────────────────────
   const ListHeader = useCallback(
     () => (
@@ -202,8 +206,13 @@ const MyWallet = () => {
           {isLoadingBalance ? (
             <ActivityIndicator size="small" color="#1D4ED8" />
           ) : (
-            <Text style={tw`text-textColor font-LufgaBold text-3xl`}>
-              ${getAccountBalance?.data?.available?.[0]?.amount || "0.00"}
+            <Text
+              style={[
+                tw`text-black font-LufgaBold text-3xl`,
+                availableBalance ? tw`text-black` : tw`text-red-500`,
+              ]}
+            >
+              ${availableBalance || "0.00"}
             </Text>
           )}
         </View>
@@ -323,7 +332,7 @@ const MyWallet = () => {
                   placeholder="Enter amount to withdraw"
                   placeholderTextColor={"#535353"}
                   textAlignVertical="top"
-                  style={tw`font-LufgaRegular text-black text-base mt-4 bg-bgBaseColor w-full rounded-2xl p-3 h-12`}
+                  style={tw`font-LufgaRegular border border-white text-black text-base mt-4 bg-bgBaseColor w-full rounded-2xl p-3 h-12`}
                   onChangeText={(text) => setAmount(text)}
                   value={ammount}
                   keyboardType="numeric"

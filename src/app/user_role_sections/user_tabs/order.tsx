@@ -4,6 +4,7 @@ import UserInfoHeader from "@/src/components/UserInfoHeader";
 import { useProfile } from "@/src/hooks/useGetUserProfile";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
+import { useGetActivePlansQuery } from "@/src/redux/Api/userRole/accountSlices";
 import { useLazyGetUserOrderQuery } from "@/src/redux/Api/userRole/orderSlices";
 import { LIMIT } from "@/src/utils/PaginationLimit";
 import { Image, ImageBackground } from "expo-image";
@@ -37,6 +38,8 @@ const Order = () => {
   const { profileData } = useProfile();
   // hooks and api end points --------------------------
   const [getUserOrder] = useLazyGetUserOrderQuery();
+  const { data: activePlans, isLoading: isActivePlansLoading } =
+    useGetActivePlansQuery({});
 
   // ─────────────────────────────────────────────────────────────────────────
   const fetchOrders = useCallback(
@@ -145,6 +148,7 @@ const Order = () => {
           profileOnPress={() =>
             router.push("/user_role_sections/user_tabs/user_profile")
           }
+          isBadge={activePlans?.data?.length > 0 ? true : false}
         />
         <Text
           style={tw`font-LufgaMedium text-2xl text-center text-regularText`}

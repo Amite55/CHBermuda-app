@@ -51,6 +51,7 @@ const ProviderAccount = () => {
     useGetAccountBalanceQuery(profileData?.data?.stripe_account_id, {
       skip: !profileData?.data?.stripe_account_id,
     });
+
   // =============== account logout function ===============
   const handleLogoutUser = async () => {
     try {
@@ -145,7 +146,10 @@ const ProviderAccount = () => {
               router.push("/serviceProvider/myWallet");
             }}
             titleText="Available balance"
-            subTitleText={`$${getAccountBalance?.data?.available?.[0]?.amount}`}
+            subTitleText={
+              `$${getAccountBalance?.data?.available?.[0]?.amount ? getAccountBalance?.data?.available?.[0]?.amount : 0}` ||
+              " 0"
+            }
             subTitleStyle={tw`font-LufgaSemiBold text-xl text-black`}
             icon={IconProviderBalance}
             endIcon={IconRightTopConnerArrow}

@@ -17,6 +17,12 @@ export const addStaffsSchema = Yup.object().shape({
   phone: Yup.string().required("Phone number is required"),
   location: Yup.string().required("Location is required"),
 });
+// =========================== email schema ===========================
+export const emailSchema = Yup.object().shape({
+  email: Yup.string()
+    .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address")
+    .required("Email is required"),
+});
 
 // ==================== add package Validation Schema ====================
 export const addPackageSchema = Yup.object().shape({
@@ -32,4 +38,30 @@ export const editPackageSchema = Yup.object().shape({
   description: Yup.string().required("Package description is required"),
   price: Yup.string().required("Price is required"),
   duration: Yup.string().required("Duration is required"),
+});
+
+// ==================== Validation Schema ====================
+export const ResetSchema = Yup.object().shape({
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+  password_confirmation: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
+});
+
+// ==================== Validation Schema ====================
+export const SignUpSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
+  name: Yup.string()
+    .min(3, "Full name must be at least 3 characters")
+    .required("Full name is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+  password_confirmation: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
 });

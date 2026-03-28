@@ -5,7 +5,10 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import NotificationSkeleton from "@/src/lib/CustomSkeleton/NotificationSkeletion";
 import { helpers } from "@/src/lib/helper/helpers";
 import tw from "@/src/lib/tailwind";
-import { useLazyGetNotificationsQuery } from "@/src/redux/Api/notificationSlices";
+import {
+  useLazyGetNotificationsQuery,
+  useSingleMarkAsReadMutation,
+} from "@/src/redux/Api/notificationSlices";
 import { INotification } from "@/src/redux/CommonTypes/CommonType";
 import { router } from "expo-router";
 import React, { useCallback, useEffect } from "react";
@@ -30,6 +33,45 @@ const Notifications = () => {
       isFetching: isNotificationDataFetching,
     },
   ] = useLazyGetNotificationsQuery({});
+  const [
+    singleMarkNotification,
+    { isLoading: isSingleMarkNotificationLoading },
+  ] = useSingleMarkAsReadMutation();
+
+  // ================ handle mark as read and navigate to details page ================
+  const handleMarkAsReadClick = async (notification: any) => {
+    try {
+      if (!notification?.read_at) {
+        await singleMarkNotification(notification?.id).unwrap();
+      }
+    } catch (error: any) {
+      console.log("Ignore mark error:", error?.data?.message);
+    }
+    if (profileData?.data?.role === "USER") {
+      router.push({
+        pathname: "/user_role_sections/notificationsUser/orderDetailsStatus",
+        params: {
+          status: notification?.data?.data?.type,
+          id: notification?.data?.data?.booking_id,
+          ...(notification?.data?.data?.request_id &&
+            notification?.data?.data?.type === "new_delivery_request" && {
+              request_id: notification?.data?.data?.request_id,
+            }),
+        },
+      });
+    } else if (
+      profileData?.data?.role === "PROVIDER"
+      // profileData?.data?.provider_type === "THIRDPARTY"
+    ) {
+      router.push({
+        pathname: "/serviceProvider/notificationProvider/providerOrderDetails",
+        params: {
+          status: notification?.data?.data?.type,
+          booking_id: notification?.data?.data?.booking_id,
+        },
+      });
+    }
+  };
 
   // ========================= get data with paginate ========================
   const loadData = useCallback(
@@ -65,28 +107,26 @@ const Notifications = () => {
   // ========= initial render =========
   useEffect(() => {
     loadData(1);
-  }, [getNotifications]);
+  }, []);
 
   // ============= load more =================
   const handleLoadMore = useCallback(async () => {
-    if (isNotificationDataFetching && hasMore) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      await loadData(nextPage);
+    if (!isNotificationDataFetching && hasMore) {
+      await loadData(page);
     }
   }, [loadData, isNotificationDataFetching, hasMore, page]);
 
   const onRefresh = async () => {
     try {
       setRefreshing(true);
-      await Promise.all([isNotificationDataFetching]);
+      setPage(1);
+      await loadData(1, true);
     } finally {
       setRefreshing(false);
     }
   };
-
   // ================ notification skeleton loading =================
-  if (isNotificationDataLoading) {
+  if (isNotificationDataLoading || isProfileLoading) {
     return <NotificationSkeleton />;
   }
 
@@ -95,38 +135,14 @@ const Notifications = () => {
     return (
       <NotificationCard
         onPress={() => {
-          if (profileData?.data?.role === "USER") {
-            router.push({
-              pathname:
-                "/user_role_sections/notificationsUser/orderDetailsStatus",
-              params: {
-                status: item?.data?.data?.type,
-                id: item?.data?.data?.booking_id,
-                ...(item?.data?.data?.request_id &&
-                  item?.data?.data?.type === "new_delivery_request" && {
-                    request_id: item?.data?.data?.request_id,
-                  }),
-              },
-            });
-          } else if (
-            profileData?.data?.role === "PROVIDER"
-            // profileData?.data?.provider_type === "THIRDPARTY"
-          ) {
-            router.push({
-              pathname:
-                "/serviceProvider/notificationProvider/providerOrderDetails",
-              params: {
-                status: item?.data?.data?.type,
-                booking_id: item?.data?.data?.booking_id,
-              },
-            });
-          }
+          handleMarkAsReadClick(item);
         }}
         title={item?.data?.title}
         description={item?.data?.body}
         time={helpers.timeDataAgo(item?.created_at)}
         icon={IconUserNotification}
         type={item?.data?.data?.type}
+        containerStyle={[tw``, item?.read_at ? tw`bg-white` : tw`bg-gray-300`]}
       />
     );
   };
@@ -138,9 +154,9 @@ const Notifications = () => {
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={tw`bg-bgBaseColor px-5 gap-3 pb-3 flex-grow `}
         refreshing={refreshing}
-        onEndReached={handleLoadMore}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
+        onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

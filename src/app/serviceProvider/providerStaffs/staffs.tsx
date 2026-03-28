@@ -3,7 +3,7 @@ import {
   IconPlus,
   IconRightTopConnerArrow,
 } from "@/assets/icons";
-import { ImgEmployees } from "@/assets/image";
+import { ImgEmployees, ImgPlaceholderProfile } from "@/assets/image";
 import MenuCard from "@/src/components/MenuCard";
 import { usePagination } from "@/src/hooks/usePagination";
 import BackTitleButton from "@/src/lib/BackTitleButton";
@@ -194,6 +194,7 @@ const Staffs = () => {
               imageStyle={tw`w-16 h-16 rounded-full`}
               endIcon={IconRightTopConnerArrow}
               containerStyle={tw`py-2`}
+              placeholderImage={ImgPlaceholderProfile}
             />
           </View>
         </Swipeable>

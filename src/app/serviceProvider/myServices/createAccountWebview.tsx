@@ -2,7 +2,6 @@ import BackTitleButton from "@/src/lib/BackTitleButton";
 import { useToastHelpers } from "@/src/lib/helper/useToastHelper";
 import tw from "@/src/lib/tailwind";
 import {
-  useCreateAccountMutation,
   useCreateOnboardingLinkMutation,
   useOnboardingVerificationMutation,
 } from "@/src/redux/Api/stripeSlices";
@@ -18,8 +17,6 @@ const CreateAccountWebview = () => {
   // =============== hooks =================
   const toast = useToastHelpers();
   // ================ api end point =================
-  const [createConnectAccount, { isLoading: isCreatingConnectAccountLoading }] =
-    useCreateAccountMutation();
   const [createOnboardingLink, { isLoading: isCreatingOnboardingLinkLoading }] =
     useCreateOnboardingLinkMutation();
   const [
@@ -29,22 +26,11 @@ const CreateAccountWebview = () => {
 
   // ====================== handle create connect account ======================
   const handleCreateConnectAccount = async () => {
-    const onBoardingData = {
-      return_url: "https://bermuda.app/stripe-success",
-      refresh_url: "https://bermuda.app/stripe-refresh",
-    };
     try {
-      const createResponse = await createConnectAccount({
-        country: "US",
-      }).unwrap();
-      //   ============= append onboarding data =============
-      if (createResponse) {
-        const onboardingResponse =
-          await createOnboardingLink(onBoardingData).unwrap();
-        const url = onboardingResponse?.data?.onboarding_url;
-        if (url) {
-          setOnboardingUrl(url);
-        }
+      const onboardingResponse = await createOnboardingLink({}).unwrap();
+      const url = onboardingResponse?.data?.onboarding_url;
+      if (url) {
+        setOnboardingUrl(url);
       }
     } catch (error: any) {
       console.log(error, "Create Connect Account not success ->>");
@@ -61,7 +47,7 @@ const CreateAccountWebview = () => {
   }, []);
 
   //   ============== loading state ================
-  if (isCreatingConnectAccountLoading || isCreatingOnboardingLinkLoading) {
+  if (isCreatingOnboardingLinkLoading) {
     return <WebViewSkeleton />;
   }
   return (
@@ -80,20 +66,31 @@ const CreateAccountWebview = () => {
           <ActivityIndicator size="large" color="#000" style={tw`mt-10`} />
         )}
         onNavigationStateChange={async (navState) => {
-          if (navState.url.includes("stripe-success")) {
-            try {
-              await onboardingVerification({}).unwrap();
-              toast.success("Your account created successfully", 3000);
-              router.replace(
-                "/serviceProvider/serviceProviderTabs/providerHome",
-              );
-            } catch (e) {
-              console.log(e, "verification failed");
-              toast.showError("Verification failed", 3000);
+          const url = navState.url;
+          if (url.includes("/stripe/onboarding/callback")) {
+            const urlParams = new URL(url);
+            const status = urlParams.searchParams.get("status");
+
+            console.log("Status:", status);
+            if (status === "success") {
+              try {
+                toast.success("Your account created successfully", 3000);
+                router.replace(
+                  "/serviceProvider/serviceProviderTabs/providerHome",
+                );
+              } catch (e) {
+                console.log(e, "verification failed");
+                toast.showError("Verification failed", 3000);
+              }
             }
-          }
-          if (navState.url.includes("stripe-refresh")) {
-            handleCreateConnectAccount();
+            // ============ when status is error =========== to navigate back =========
+            if (status === "error") {
+              toast.showError(
+                "Stripe onboarding failed. Please try again.",
+                3000,
+              );
+              router.back();
+            }
           }
         }}
         onError={(e) => {
