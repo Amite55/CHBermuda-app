@@ -52,8 +52,11 @@ const User_home = () => {
   } = useGetServiceThirdPartyQuery({});
   const [updateLatLong, { isLoading: isUpdateLatLongLoading }] =
     useUpdateLatLongMutation();
-  const { data: activePlans, isLoading: isActivePlansLoading } =
-    useGetActivePlansQuery({});
+  const {
+    data: activePlans,
+    isLoading: isActivePlansLoading,
+    refetch: isActivePlansRefetch,
+  } = useGetActivePlansQuery({});
 
   // =============== get location ==================
   const handleGetLocation = async () => {
@@ -76,6 +79,7 @@ const User_home = () => {
         profileRefetch(),
         refetch(),
         isThirdPartyServicesFetching,
+        isActivePlansRefetch(),
       ]);
     } finally {
       setRefreshing(false);

@@ -136,6 +136,8 @@ const ConfirmDetailsAdminOrders = () => {
   ) => {
     try {
       let response;
+      console.log(response, "there is response --------------->");
+      console.log(bookingData, "here is booking data ----------->");
       // ============= call api for respite care and third party ===========
       if (bookingType === "respite_care") {
         response = await bookingSuccessRespiteCare({

@@ -64,11 +64,10 @@ const ActivePlan = () => {
           params: {
             id: serviceItem?.package_id,
             title: serviceItem?.service?.name || "Service Details",
-            // category: item?.subscription_items?.[0]?.package?.service?.type,
             category: serviceItem?.package?.service?.type,
           },
         });
-      } else if (serviceItem?.package?.service?.type === "thirdparty_service") {
+      } else if (serviceItem?.service?.type === "thirdparty_service") {
         dispatch(
           updateBooking({
             booking_type: "thirdparty_service",
@@ -295,7 +294,7 @@ const ActivePlan = () => {
             const totalRemainingDays =
               Number(item?.subscription_days_remaining) / Number(totalDays);
             return (
-              <View key={item} style={tw``}>
+              <View key={item?.id} style={tw``}>
                 <View style={tw`w-full bg-white py-4 rounded-2xl`}>
                   <FlatList
                     data={item?.subscription_items}
@@ -379,47 +378,44 @@ const ActivePlan = () => {
                     </View>
                   </View>
                   {/* ====================== addons service item progress bar ================== */}
-                  <View style={tw`flex-row flex-grow justify-between gap-2`}>
-                    {item?.subscription_items?.length > 0 &&
-                      item?.subscription_items?.map((serviceItem: any) => {
-                        const progressCalculation =
-                          Number(serviceItem?.monthly_visits) /
-                          Number(serviceItem?.package?.monthly_visits);
-                        return (
-                          <TouchableOpacity
-                            onPress={() => {
-                              handleBundlePlanButton(serviceItem);
-                            }}
-                            activeOpacity={0.5}
-                            key={serviceItem?.id}
-                            style={tw`rounded-2xl flex-1 gap-3`}
+                  <View style={tw`flex-row flex-wrap gap-2`}>
+                    {item?.subscription_items?.map((serviceItem: any) => {
+                      const progressCalculation =
+                        Number(serviceItem?.monthly_visits) /
+                        Number(serviceItem?.package?.monthly_visits);
+                      return (
+                        <TouchableOpacity
+                          onPress={() => handleBundlePlanButton(serviceItem)}
+                          activeOpacity={0.5}
+                          key={serviceItem?.id}
+                          style={tw`rounded-2xl gap-3 w-[48%]`}
+                        >
+                          <View
+                            style={tw`bg-white rounded-2xl items-center gap-2 px-2 py-3`}
                           >
-                            <View
-                              style={tw`bg-white rounded-2xl items-center gap-2 px-2 py-3`}
+                            <Text
+                              style={tw`font-LufgaRegular text-sm text-subText`}
                             >
-                              <Text
-                                style={tw`font-LufgaRegular text-sm text-subText`}
-                              >
-                                {serviceItem?.service?.name}
-                              </Text>
-                              <Text
-                                style={tw`font-LufgaMedium text-sm text-black`}
-                              >
-                                Used: {serviceItem?.monthly_visits} of{" "}
-                                {serviceItem?.package?.monthly_visits}
-                              </Text>
-                              <Progress.Bar
-                                width={120}
-                                progress={progressCalculation}
-                                color="#183E9F"
-                                unfilledColor="#D9D9D9"
-                                borderWidth={0}
-                                animated={true}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
+                              {serviceItem?.service?.name}
+                            </Text>
+                            <Text
+                              style={tw`font-LufgaMedium text-sm text-black`}
+                            >
+                              Used: {serviceItem?.monthly_visits} of{" "}
+                              {serviceItem?.package?.monthly_visits}
+                            </Text>
+                            <Progress.Bar
+                              width={120}
+                              progress={progressCalculation}
+                              color="#183E9F"
+                              unfilledColor="#D9D9D9"
+                              borderWidth={0}
+                              animated={true}
+                            />
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 </View>
                 {/* ---------------------- plan progress bar end hare  ---------------------- */}
